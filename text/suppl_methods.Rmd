@@ -1,0 +1,115 @@
+---
+author: "N.S."
+date: "15 October 2019"
+output: html_document
+---
+
+# Supplementary methods
+## Species selection
+-> bigger than 7cm 
+-> Family for which we had cnp body content data
+-> omit extreme rare species (X%) 
+
+## 1. Parameter estimates
+
+### 1. Growth parameters
+
+#### Data compilation
+We used the parameter kmax see renato paper
+
+We extracted the data from @Morais2019 and filtered out only the species of our species list. As the Lenth-Frequency method consistently overestimates kmax, we omitted the kmax estimates coming from this method. In total this selection process resulted in xx observations of kmax for different species and temperatures. 
+
+Further, we used the otolith data provided by Morat et al. and fitted vbgc's to all species at each loction for which there were at least 3 individuals. We fitted the model using bayesian regression models as provided by fishflux. kmax was obtained using similar methods as described in @Morais2019. 
+In total we retrieved 57 kmax observations for xx species and xx locations of varying sst's. 
+
+After combining the two data sources, we obtained a database of 496 observations and 181 number of species. 
+kmax is mostly determined by body size and temperature. 
+Morais and bellwood account for phylogeny, but don't actually include it for predictions. Here we try to include phylogeny directly.
+
+#### Statistical analysis
+
+\noindent We applied a hierarchical model to predict the growth rate of fishes in function of body size, temperature and phylogeny:  
+
+\begin{equation}
+	\textrm{ln}kmax = (\beta_\textrm{0} + \gamma_\textrm{0phy}) +  \beta_\textrm{1} \textrm{ln}size +  \beta_\textrm{2} sst + \epsilon,
+	\label{kmax}
+\end{equation}
+
+where $\textrm{ln}kmax$ represents the natural log-transformed kmax value, $\beta_\textrm{0}$ is the fixed-effect intercept, \gamma_\textrm{0phy} is the vector of random-effect coefficients that account for the resisual intercept variation, based on the relatedness as described by the phylogeny, $\beta_\textrm{1}$ is the slope for the natural transformed maximum body size, $\beta_\textrm{2}$ is the slope for the average ambient sea surface temperature, $\epsilon$ is the residual variation.
+
+\noindent 
+
+Phylogenetic re
+Thephylogenetic heritability (equivalent to Pagel’\lambda (29,30)), was estimated asthe proportion of total variance, conditioned on the fixed effects, attributable to the random effect of phylogeny (i.e.s2[lng0phy]=(s2[lng0phy]+s2[lng0spp]+s2[lne]))
+
+
+We use the R package brms to fit a bayesian phylogenetic regression model We predict log(kmax) in function of log(sizemax), sst with varying intercept per species. The intercept per species is structured by the covariance matrix. 
+
+ Family: gaussian 
+  Links: mu = identity; sigma = identity 
+Formula: log(kmax) ~ log(sizemax) + sstmean + (1 | phylo) 
+   Data: oto (Number of observations: 496) 
+Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup samples = 4000
+
+Group-Level Effects: 
+~phylo (Number of levels: 181) 
+              Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+sd(Intercept)     0.83      0.09     0.67     1.01        843 1.00
+
+Population-Level Effects: 
+           Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+Intercept      0.66      0.58    -0.48     1.81       1498 1.00
+logsizemax    -0.76      0.10    -0.96    -0.57       1281 1.00
+sstmean        0.02      0.01    -0.00     0.05       4071 1.00
+
+Family Specific Parameters: 
+      Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+sigma     0.46      0.02     0.43     0.50       1991 1.00
+
+Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
+is a crude measure of effective sample size, and Rhat is the potential 
+scale reduction factor on split chains (at convergence, Rhat = 1).
+
+phylogenetic signal is 0.76 (0.65, 0.84). 
+bayes R2 is 0.73759 (0.702, 0.769).
+
+For extrapolation we use:
+phyestimate from package picante which uses brownian motion 
+with this we extrapolate the phylogenetic effect for each iteration. We only use one chain in order to keep computational time reasonable. 
+
+For each draw, we extrapolate the phylogenetic effect for 100 trees and then take the average effect of these 100 trees. 
+This is done for each draw. To take into account the temperature variation in which species can occur, we predict the kmax for each temperature (rounded 1 °C) where a species occurs in the global uvc database. This results in kmax predictions for 4712 cases and 1110 species. (extra table?) To predict kmax per draw we used the respective estimates of intercept and slopes. 
+Finally, we summarised all kmax predictions per sst per species by taking the mean and standard deviation across all draws. 
+
+### 2. Diet
+
+### 3. Body stoichiometry
+#### 3.1 Data collection
+
+#### 3.2 Data analysis
+
+only species with nrep >= 3
+
+Stoichiometry is well conserved within taxonomic entities. Through a database of 1633 individuals, 108 species, locations: Moorea, Palmyra, Carribean
+
+25 families
+ [1] "Acanthuridae"   "Balistidae"     "Bothidae"       "Chaetodontidae" "Cirrhitidae"    "Fistulariidae" 
+ [7] "Haemulidae"     "Holocentridae"  "Kyphosidae"     "Labridae"       "Lethrinidae"    "Lutjanidae"    
+[13] "Monacanthidae"  "Mugilidae"      "Mullidae"       "Ostraciidae"    "Pempheridae"    "Pomacanthidae" 
+[19] "Pomacentridae"  "Sciaenidae"     "Scorpaenidae"   "Serranidae"     "Siganidae"      "Tetraodontidae"
+[25] "Zanclidae"     
+
+multivariate model
+
+extrapolation
+
+phylopars from rphylopars
+for each iteration of 1 chain, for each tree of 100 trees
+
+
+
+
+
+
+
