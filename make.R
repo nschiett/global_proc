@@ -5,5 +5,9 @@ source("R/plan.R")      # creates the drake plan
 
 make(
   plan, # defined in R/plan.R
-  verbose = 2
+  verbose = 2, lock_envir = FALSE
 )
+
+
+#config <- drake_config(plan)
+#vis_drake_graph(config, targets_only = TRUE)

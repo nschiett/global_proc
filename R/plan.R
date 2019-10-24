@@ -6,19 +6,22 @@ plan <- drake_plan(
   cnp = get_cnp(),
   cnpdiet = get_cnpdiet(),
   metpar = get_metpar(kmax, sptl),
-  artr = get_artr(),
+  artr = get_artr(sptl),
   params = combine_params(sptl, kmax, lw, cnp, cnpdiet, metpar, artr),
-  output_params = write.csv(params, "params_sst_glob.csv", row.names = FALSE),
+  output_params = write.csv(params, "output/data/params_sst_glob.csv", row.names = FALSE),
   tfish_unique = get_tfish_unique(),
   cnpflux = run_fishflux(tfish_unique, params),
-  output_cnpflux = write.csv(cnpflux, "flux_results.csv", row.names = FALSE)
+  output_cnpflux = write.csv(cnpflux, "output/data/flux_results.csv", row.names = FALSE),
+  
+  tfish = read.csv("data/tfish_corr.csv"),
+  
+  summary_transect = summarise_pertransect(tfish, cnpflux, params),
+  output_fluxsum = write.csv(summary_transect, "output/data/flux_summary_transect.csv", row.names = FALSE),
+  
+  contributions = get_contributions(tfish, cnpflux, params, summary_transect),
+  
+  models_contributions_Fp = fit_contribution_Fp(contributions)
 )
 
-#make(plan)
-
-small_config <- drake_config(plan)
-vis_drake_graph(small_config, targets_only = TRUE)
-
-make(plan)
 
 #hello
