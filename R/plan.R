@@ -19,8 +19,16 @@ plan <- drake_plan(
   output_fluxsum = write.csv(summary_transect, "output/data/flux_summary_transect.csv", row.names = FALSE),
   
   contributions = get_contributions(tfish, cnpflux, params, summary_transect),
+  sp_loc = unique(select(ungroup(contributions), bioregion, species)),
   
-  models_contributions_Fp = fit_contribution_Fp(contributions)
+  models_contributions_Fp = fit_contribution_Fp(contributions, sp_loc),
+  models_contributions_Fn = fit_contribution_Fn(contributions, sp_loc),
+  models_contributions_Fc = fit_contribution_Fc(contributions, sp_loc),
+  models_contributions_Ic = fit_contribution_Ic(contributions, sp_loc),
+  models_contributions_Gc = fit_contribution_Gc(contributions, sp_loc),
+  models_contributions_Wp = fit_contribution_Wp(contributions, sp_loc),
+  models_contributions_Wn = fit_contribution_Wn(contributions, sp_loc),
+  models_contributions_Wc = fit_contribution_Wc(contributions, sp_loc)
 )
 
 

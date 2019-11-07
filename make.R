@@ -8,6 +8,7 @@ make(
   verbose = 2, lock_envir = FALSE
 )
 
+make(plan, targets = c("models_contributions_Wc", "models_contributions_Wn", "models_contributions_Wp"))
 
 #config <- drake_config(plan)
 #vis_drake_graph(config, targets_only = TRUE)

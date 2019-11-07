@@ -388,35 +388,166 @@ tfss <- left_join(tfs, select(summary_transect, transect_id, nspec, bioregion)) 
 return(tfss)
 }
 
+
 ##### fit contribution models #####
-fit_contribution_Fp <- function(contributions){
+fit_contribution_Fp <- function(contributions, sp_loc){
   
   ## compile model once 
-  subsp <- filter(contributions, species == "Variola_louti")
-  subsp$bioregion <- as.factor(as.character(subsp$bioregion))
-  fit <- brm("Fp_p ~ (0 + bioregion) + (0 + 1|locality)", chains = 1, family = "beta", data = subsp)
-  
-  spp <- unique(contributions$species)
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Fp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
   
   # run same model on all species
-  list <- parallel::mclapply(spp[1:2], function(x){
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
     print(x)
-    subsp <- filter(contributions, species == x)
-    subsp$bioregion <- as.factor(as.character(subsp$bioregion))
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.95))
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
     return(fit_new)
-  }, mc.cores = 7)
+  }, mc.cores = 6)
   
   return(list)
 }
 
-# l2 <- parallel::mclapply(list, function(x){
+fit_contribution_Fn <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Fn_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  
+  return(list)
+}
+
+fit_contribution_Fc <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Fc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  
+  return(list)
+}
+
+fit_contribution_Ic <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Ic_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  
+  return(list)
+}
+
+fit_contribution_Gc <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Gc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  subsp[1:10, "Gc_p"] <- 0
+  fitzi <- brm("Gc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "zero_inflated_beta", data = subsp)
+      
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    if(min(subsp$Gc_p) == 0){
+      fit_new <- update(fitzi, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    }else{
+      fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    }
+    return(fit_new)
+  }, mc.cores = 6)
+  
+  return(list)
+}
+
+fit_contribution_Wp <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Wp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  return(list)
+}
+
+fit_contribution_Wn <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Wn_p ~1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  return(list)
+}
+
+fit_contribution_Wc <- function(contributions, sp_loc){
+  
+  ## compile model once 
+  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
+  fit <- brm("Wc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  
+  # run same model on all species
+  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
+    print(x)
+    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
+    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99))
+    return(fit_new)
+  }, mc.cores = 6)
+  return(list)
+}
+# 
+# library(drake)
+# rm(models_contributions_Gc)
+# loadd(models_contributions_Gc)
+# 
+# l2 <- parallel::mclapply(models_contributions_Gc, function(x){
 #   np <- nuts_params(x)
 #   return(sum(subset(np, Parameter == "divergent__")$Value))
 # }, mc.cores = 50)
-
+# 
+# l3 <- parallel::mclapply(models_contributions_Gc, function(x){
+#   s <- summary(x)
+#   return(expit(s$fixed[,1]))
+# }, mc.cores = 50)
+# 
+# res <- sp_loc %>% mutate(con_Gc = unlist(l3))
 
 # 
+# # 
 # summary(fit_new)
 # 
 # me <- marginal_effects(fit_new)
@@ -424,4 +555,4 @@ fit_contribution_Fp <- function(contributions){
 # np <- nuts_params(fit_new)
 # sum(subset(np, Parameter == "divergent__")$Value)
 
-
+#expit <- function(x){exp(x)/(1+exp(x))}
