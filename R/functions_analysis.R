@@ -1,3 +1,280 @@
+standard <- function(x){
+  m <- mean(x, na.rm = TRUE)
+  sd <- sd(x, na.rm = TRUE)
+  st <- sapply(x, FUN = function(i){
+    st <- (i - m)/sd
+    return(st)
+  })
+  return(st)
+}
+
+normalize <- function(x){
+  100 * (x - min(x, na.rm = TRUE))/(max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
+
+##### calculate multifunctionality #####
+add_multi <- function(summary_transect, herb_pisc){
+  
+  flux <- summary_transect
+  hp <- herb_pisc$summary_herb_pisc
+  sst <- read.csv("data/avSst.csv")
+  flux <- left_join(flux, hp) %>% left_join(sst)
+  
+  # transform into centiles then divide by 100
+  scores <- select(flux, transect_id, Fn, Fp, Gc, I_herb, I_pisc)  %>% 
+    filter(I_herb>0, I_pisc>0) %>%
+    mutate_at(2:6, function(x){normalize(log(x))}) %>%
+    drop_na()
+  # correlation for weighing
+  m <-  cor(scores[2:6])
+  m <- 1-m
+  we <-  rowSums((m))
+  we <- we/sum(we)
+  
+
+  multi <- scores %>%
+    rowwise() %>% 
+    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
+           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
+    group_by() %>%
+    mutate(multi = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
+  
+  flux <- flux %>% left_join(select(multi, transect_id, multi))
+  
+  return(flux)
+  
+}
+
+flux <- left_join(flux, res)
+flux$good <- ( flux$biomass_tot< 50 & flux$multi < quantile(flux$multi, 0.05, na.rm = TRUE))
+
+flux <- flux %>%
+  mutate(cat = case_when(
+    biomass_tot < 50 & 
+      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
+    biomass_tot < 50 & 
+      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
+    biomass_tot > 150 & 
+      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
+    biomass_tot > 150 & 
+      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
+    TRUE~"other"
+  ))
+
+t <-flux %>%
+  group_by(sites, locality) %>% summarise_if(is.numeric, mean)
+
+t <- t %>%
+  mutate(cat = case_when(
+    biomass_tot < 50 & 
+      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
+    biomass_tot < 50 & 
+      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
+    biomass_tot > 150 & 
+      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
+    biomass_tot > 200 & 
+      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
+    TRUE~"other"
+  ))
+test <- table(flux$cat, flux$sites) %>% as.data.frame() %>%
+  group_by(Var2) %>%
+  mutate(tot = sum(Freq)) %>%
+  mutate(Freq/tot) %>%
+  filter(!(Var1 %in% c("bb", "bg") & Freq>1))
+
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = imm_m))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = imm_q1))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = imm_q3))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = size_m))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = log(sizemax_m)))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = log(sizemax_q1)))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = log(sizemax_q3)))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = size_q1)) +
+  scale_y_continuous(trans = "log")
+ggplot(flux) +
+  geom_violin(aes(x = cat, y = size_q1))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = size_q3))
+ggplot(flux) +
+  geom_violin(aes(x = cat, y = size_m))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = troph_m))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = troph_q3))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = troph_q1))
+
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = multi))
+
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = log(nspec)))
+ggplot(flux) +
+  geom_boxplot(aes(x = cat, y = mean))
+
+ggplot(flux, aes(x = nspec, y = multi)) +
+  geom_point() +
+  geom_smooth() 
+
+fitm <- brm(standard(multi) ~ standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+              standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+            data = flux[!is.na(flux$multi),], chain = 3, cores = 3)
+
+summary(fitm)
+
+t <-flux %>%
+  group_by(sites) %>% summarise_if(is.numeric, mean)
+
+##### models with biomass, sst, locality, and site effects #######
+
+run_procmodels <- function(summary_transect_complete){
+  
+  flux <- summary_transect_complete
+  
+  # run models
+  fit_Fn <- brm(standard(log(Fn)) ~ (log(biomass_tot)) + (mean), data = flux, cores = 4)
+  
+  fit_Fp <- brm(standard(log(Fp)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
+              data = flux, cores = 4)
+  
+  fit_Gc <- brm(standard(log(Gc)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
+                data = flux[flux$Gc > 0, ], cores = 4)
+  
+  fit_I_herb <- brm(standard(log(I_herb)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
+                    data = flux[flux$I_herb > 0,], cores = 4)  
+  
+  fit_I_pisc <- brm(standard(log(I_pisc)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
+                    data = flux[flux$I_pisc > 0,], cores = 4)
+  
+  fit_multi <- brm(standard(multi) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
+                    data = flux[flux$multi > 0,], cores = 4)
+  
+  return(list(fit_Fn = fit_Fn, fit_Fp = fit_Fp, fit_Gc = fit_Gc, 
+              fit_I_herb = fit_I_herb, fit_I_pisc = fit_I_pisc, fit_multi = fit_multi))
+}
+
+get_residuals <- function(summary_transect_complete, procmodels){
+  
+  flux <- summary_transect_complete
+  
+  res1 <- residuals(procmodels[[1]], re_formula = "standard(log(Fn)) ~ log(biomass_tot) + mean")
+  res2 <- residuals(procmodels[[2]], re_formula = "standard(log(Fp)) ~ log(biomass_tot) + mean")
+  res3 <- residuals(procmodels[[3]], re_formula = "standard(log(Gc)) ~ log(biomass_tot) + mean")
+  res4 <- residuals(procmodels[[4]], re_formula = "standard(log(I_herb)) ~ log(biomass_tot) + mean")
+  res5 <- residuals(procmodels[[5]], re_formula = "standard(log(I_pisc)) ~ log(biomass_tot) + mean")
+  res6 <- residuals(procmodels[[6]], re_formula = "standard(multi) ~ log(biomass_tot) + mean")
+  
+  res <- data.frame(
+    transect_id = flux$transect_id,
+    Fn_r = res1[,1],
+    Fp_r = res2[,1],
+    Gc_r = res3[,1]
+  )
+  
+  res_h <- data.frame(
+    transect_id = flux[flux$I_herb>0, ]$transect_id,
+    I_herb_r = res4[,1]
+  )
+  
+  res_p <- data.frame(
+    transect_id = flux[flux$I_pisc>0, ]$transect_id,
+    I_pisc_r = res5[,1]
+  )
+  
+  res_m <- data.frame(
+    transect_id = flux[!is.na(flux$multi), ]$transect_id,
+    multi_r = res6[,1]
+  )
+  
+  res <- res %>% left_join(res_h) %>% left_join(res_p) %>% left_join(res_m)
+  
+  #add multifunctionality
+  scores <- select(res, transect_id, Fn = Fn_r, Fp = Fp_r, Gc = Gc_r, I_herb = I_herb_r, I_pisc = I_pisc_r)  %>% 
+    drop_na() %>%
+    mutate_at(2:6, function(x){normalize(x)}) 
+  
+  multi <- scores %>%
+    rowwise() %>% 
+    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
+           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
+    group_by() %>%
+    mutate(multi2 = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
+  
+  res <- left_join(res, select(multi, transect_id, multi, multi2))
+  
+  return(res)
+}
+
+get_location_effect <- function(procmodels, summary_transect){
+  result <- lapply(procmodels, function(x){
+      x %>%
+      spread_draws(r_locality[locality, Intercept]) %>%
+      median_qi() %>%
+      select(locality, effect = r_locality)
+  }) %>% purrr::reduce(dplyr::left_join, by = "locality")
+  
+  colnames(result) <- c("locality", "r_loc_Fn", "r_loc_Fp", "r_loc_Gc", 
+                        "r_loc_I_herb", "r_loc_I_pisc", "r_loc_multi")
+  
+  # add coordinates
+  coord <- select(summary_transect, bioregion, locality, lat, lon) %>%
+    unique() %>%
+    group_by(bioregion, locality) %>%
+    summarize_all(mean)
+  
+  result <- coord %>% left_join(result) %>% ungroup()
+  
+  #add multifunctionality
+  scores <- select(result, locality, Fn = r_loc_Fn, Fp = r_loc_Fp, Gc = r_loc_Gc, I_herb = r_loc_I_herb, I_pisc = r_loc_I_pisc)  %>% 
+    drop_na() %>%
+    mutate_at(2:6, function(x){normalize(x)}) 
+  
+  multi <- scores %>%
+    rowwise() %>% 
+    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
+           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
+    group_by() %>%
+    mutate(multi = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
+  
+  result <- left_join(result, select(multi, locality, multi))
+  
+  return(result)
+    
+}
+
+
+# summary(fitN)
+# 
+# res_Fn <- 
+#   fitN %>%
+#   spread_draws(r_sites[sites, Intercept]) %>%
+#   median_qi() %>%
+#   select(sites, Fn_r = r_sites)
+# 
+# res_Fp <- 
+#   fitP %>%
+#   spread_draws(r_sites[sites, Intercept]) %>%
+#   median_qi() %>%
+#   select(sites, Fp_r = r_sites)
+# 
+# res <- left_join(res_Fn, res_Fp)
+# 
+# ggplot(res) +
+# geom_point(aes(x = Fn_r, y = Fp_r))
+# 
+# summary(cor(res$Fn_r, res$Fp_r))
+
+
+
+
 ####### contributions ######
 
 ####### vulnerability ######

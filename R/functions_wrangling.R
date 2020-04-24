@@ -733,8 +733,8 @@ colnames(summary) <- c(
 return(summary)
 }
 
-combine_contributions <- function(sp_loc, contributions_Fc, contributions_Fn, 
-                                  contributions_Fp, contributions_Ic, contributions_Gc, 
+combine_contributions <- function(sp_loc, contributions_Fn, 
+                                  contributions_Fp, contributions_Gc, 
                                   contributions_I_herb, contributions_I_pisc, herb_pisc){
   
   herb <-  herb_pisc$contributions_herb_pisc %>%
@@ -750,8 +750,8 @@ combine_contributions <- function(sp_loc, contributions_Fc, contributions_Fn,
     cbind(contributions_I_pisc)
   
   comb <- cbind(
-    sp_loc, contributions_Fc, contributions_Fn, contributions_Fp,
-    contributions_Ic, contributions_Gc
+    sp_loc, contributions_Fn, contributions_Fp,
+    contributions_Gc
   ) %>% left_join(sploc_h) %>% left_join(sploc_p) %>% replace(., is.na(.), 0)
   
   return(comb)
@@ -770,15 +770,15 @@ add_occurence <- function(contributions, contributions_sp_loc, herb_pisc){
     dplyr::select(-tot)
   result <- left_join(contributions_sp_loc, occ)
   
-  correct <- filter(result, (Fc_p_q3 - Fc_p_q1) > 0.99) %>% select(1:2) %>%
-    inner_join(select(ungroup(contributions), bioregion, species, Fc_p, Fn_p, Fp_p, Ic_p, Gc_p)) %>%
+  correct <-  select(result, 1:2) %>%
+    inner_join(select(ungroup(contributions), bioregion, species, Fn_p, Fp_p, Gc_p)) %>%
     left_join(herb_pisc$contributions_herb_pisc) %>%
     group_by(bioregion, species) %>%
     summarise(
-      Fc_p_m = median(Fc_p),
-      Fc_p_sd = sd(Fc_p),
-      Fc_p_q1 = quantile(Fc_p, 0.025),
-      Fc_p_q3 = quantile(Fc_p, 0.975),
+      # Fc_p_m = median(Fc_p),
+      # Fc_p_sd = sd(Fc_p),
+      # Fc_p_q1 = quantile(Fc_p, 0.025),
+      # Fc_p_q3 = quantile(Fc_p, 0.975),
       Fn_p_m = median(Fn_p),
       Fn_p_sd = sd(Fp_p),
       Fn_p_q1 = quantile(Fn_p, 0.025),
@@ -787,10 +787,10 @@ add_occurence <- function(contributions, contributions_sp_loc, herb_pisc){
       Fp_p_sd = sd(Fp_p),
       Fp_p_q1 = quantile(Fp_p, 0.025),
       Fp_p_q3 = quantile(Fp_p, 0.975),  
-      Ic_p_m = median(Ic_p),
-      Ic_p_sd = sd(Ic_p),
-      Ic_p_q1 = quantile(Ic_p, 0.025),
-      Ic_p_q3 = quantile(Ic_p, 0.975),
+      # Ic_p_m = median(Ic_p),
+      # Ic_p_sd = sd(Ic_p),
+      # Ic_p_q1 = quantile(Ic_p, 0.025),
+      # Ic_p_q3 = quantile(Ic_p, 0.975),
       Gc_p_m = median(Gc_p),
       Gc_p_sd = sd(Gc_p),
       Gc_p_q1 = quantile(Gc_p, 0.025),
@@ -803,8 +803,7 @@ add_occurence <- function(contributions, contributions_sp_loc, herb_pisc){
       I_pisc_p_sd = sd(I_pisc_p),
       I_pisc_p_q1 = quantile(I_pisc_p, 0.025),
       I_pisc_p_q3 = quantile(I_pisc_p, 0.975)
-    ) %>% left_join(select(result, species, bioregion, occurence, rel_occ)) %>%
-    bind_rows(filter(result, (Fc_p_q3 - Fc_p_q1) < 0.99))
+    ) %>% left_join(select(result, species, bioregion, occurence, rel_occ)) 
   
   
   return(correct)

@@ -14,5 +14,10 @@ library(fishualize)
 library(ggnewscale)
 library(tidytree)
 library(ggtree)
+library(forcats)
+library(ggrepel)
+library(tidyr)
+library(readr)
+
 
 Sys.setlocale("LC_MESSAGES", "en_US.utf8")

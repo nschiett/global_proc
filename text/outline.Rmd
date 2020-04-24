@@ -1,0 +1,142 @@
+---
+title: "Outline"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+title options: 
+
+# Functional mismatch and importance of species redefine global coral reef management targets
+
+# Functional mismatch and occasional keystones redefine global coral reef management targets
+
+# Functional mismatch and the lack of global keystone species redefine global coral reef management targets
+
+# Functioning beyond biomass redefines global coral reef management targets
+
+# A multi-process analysis of global coral reefs reveals a functional mismatch and the importance of local keystones
+
+Paragraphs: 
+      
+## 1) Intro (1 or 2 paragraphs)
+- Coral reefs are diverse, productive and threatened
+- fishes contribute to a high proportion of biomass, are important for functioning, crucial for humans 
+- fishes are threatened by intensive fishing and habitat destruction
+- Will the reefs of the future be able to sustain function? How do we maximize functioning? 
+
+Ecosystem functioning and services in times of extreme human impacts; maximizing function and multifunctionality is the hallmark of many conservation strategies and calls from scientist, mostly derived from an ecosystem economics approach (maximize function and services).  However, this pertains predominantly to grasslands, forests and other heavily managed, cultivated systems. Marine ecosystems differ dramatically from terrestrial by being much less manageable; coral reefs provide tremendous services and are one of the most vulnerable ecosystems worldwide. Fishes are the most important consumer taxon, have a close relationship with corals, and are a critical source of livelihoods.
+
+- First challenge is to properly define function  
+- We know that more biomass = more function, more sst = more function  
+- Beyond biomass and temperature, what defines functioning?  
+- Here we quantify 5 key processes: N excretion, P excretion, production, herbivory, piscivory   
+- 2 targets:     
+     1) functions beyond biomass    
+     how does community structure affect functioning? Can all functions be maximized? 
+     2) Species identity and vulnerability    
+     Are there a consistent set of species that are more important than others and how vulnerable are "important" species to fishing and climate change (habitat destruction)?  
+
+## 2) Summary
+- There is a mismatch between different functions   
+- Maximized multifunctionality can only be achieved where all functions are below the maximum    
+- Most communities have a high degree of dominance, and most species are occasional keystones      
+- There are no super hero species that are always important      
+- Species that are important for functioning are more vulnerable to fishing than to climate change, but there is some regional variation    
+
+Here, we show that, superficially equal fish communities on the world's coral reefs can vary up to 100-fold in their functionality, depending on various aspects of their community structure. However, due to inherent biological trade-offs, no single configuration can maximize all functions. Furthermore, we reveal unpredictable local functional dominance by a wide range of species,changing contributions of families to ecological processes, and varying vulnerabilities of processes to fishing and climate-related stressors.Our results suggest that current local and global conservation objectives for coral reefs and other marine ecosystems need to be reconsidered: management for functionality and targeted conservation of species or functional groups need to be adjusted for local conditions and needs, but holistic protection of a diverse pool of species will increase the likelihood of sustaining critical ecological processes.
+
+## 3) Mismatch between functions + ecological structure
+- All functions are definitely related to biomass    
+- But, for communities with similar biomass, functions can still vary 10- to 100-fold   
+- Beyond biomass, there is a mismatch between the different functions (fig1)   
+- Trophic, size, and age structure affect functions in different ways (fig1 + 2)   
+- Maximizing "multifunctionality" is defined by intermediate values of certain community variables. (fig2)
+
+## 4) Species dominance and vulnerability
+- Locally there is often a high degree of dominance, i.e. a couple of species perform most of the function. (A bit less for herbivory-> more complementary) (fig3, maps)   
+- On the family level, across geographical regions there is some variation in the contributions to functions (fig3, heatmaps)    
+- Globally, there is no species that is always important (beta regressions, distribution parameters, supplemental)
+- Important species are generally more vulnerable to fishing, double jeapardy seems rare
+- About 70% of all species can be locally important (defined as performing more than 1/total nb of species in a community)     
+- Species important to piscivory are most vulnerable to fishing (fig4)    
+- Most herbivores and piscivores are important somewhere
+- A bit more species are important to P excretion compared to N excretion and biomass production     
+- Important species are generally more vulnerable to fishing that to climate change (Important note: climate change only includes dependance on corals of adults)     
+
+## 5) Discussion human impact on functioning and community structure
+- We know that multiple human stressors are causing species to decline, and are affecting the size, age, and trophic structure of fish communities.   
+- More details about human impact on community structure, and how in turn that affects functioning.   
+- Indeed, we see that N excretion and production increase with human impact (suppl. figure) (see also Morais as example). 
+- Due to the observed mismatch, it is untenable to achieve maximized values for all functions. Relate to other ecosystems.
+- The effect of potential extinctions of species varies across locations. Provide an example? For most species, total extinction would have a big effect on functioning somewhere. 
+
+
+## 6) Consequences for conservation
+- 1) Important to consider multiple functions beyond biomass. Only looking at N excretion for example would give va biased view. Maximized function does not nescessarily represent a "healthy" ecosystem.
+We need to step away from economics approach and define conservation targets locally.  
+Examples:      
+      - Reefs that are most crucial for fishing -> Maximize biomass production   
+      - Reefs that are succeptible to algae growth -> Maximize herbivory   
+      - Reefs that are vulnerable to bleaching -> Maximize P excretion   
+- 2) Secondly, species important for the different functions are not the same ones across locations. Most species are occasionally important, but none are always important. Species conservation targets cannot be generalized globally. Species importance and conservation should be planned locally, taking into acount historical knowledge (i.e. some species that are rare/depleted may have played an important role in the past)  
+- 3) Third, important species seem to be most vulnerable to fishing. Local fisheries management may prioritize species that are extra vulnerable. Note that also long-term effects of habitat loss will affect a greater amunt of species than presented herein so there is no doubt that climate change should be targeted by global action. 
+- Thus, conservation needs to be planned locally and in general we essentially want to conserve all species     
+
+## 7) Future perspective ?????
+- Need to take variability in behavior within each function into account    
+- A fish peeing in a cave does not equal a fish peeing in the water column    
+- Herbivores target different types of algae    
+- Fishes producing biomass may vary in terms of the micronutrient/vitamin content    
+
+## 8) Conclusion ?? probably not
+- Analyzing the functioning of reefs really requires the quantification of processes    
+- There is no magical community structure that maximizes all functions    
+- Need to rethink multifunctionality case by case    
+- There are no superhero's for functioning, but most species are occasional superhero's    
+- Conservation should be planned locally with extra attention to fishes vulnerable to fishing    
+
+## Figures  
+### Figure 1 option 1: 
+
+           
+![](../output/plots/fig1_simple.png)
+
+## figure 1 option 2:     
+              
+![](../output/plots/fig1_simple_v2.png)
+
+Figure 1: a) Fold variation of each function per biomass class of 50g/m2 across fish communities. 
+b) Correlation matrix od the residuals of the five functions.   
+         
+
+![](../output/plots/figure2.png)
+          
+Figure 2: a: Slope values of the Bayesian linear regression for each function with community variables. All data was standardized to be able to compare across functions and variables. Functions were log-transformed before standardisation. b-d: Marginal effect plots, where each predicted value was normalised a posteriori. The solid black line represents the multifunctionality. 
+
+![](../output/plots/multimap.png)
+\  
+Figure 3: Left: Median degree of dominance of each function per location. A degree of dominance of 0 means each species contributes equally to a function, 1 means a single species performs a function. Size of dots represents the median value of the function itself. Right: Heat maps of median family-level contributions to each function per bioregion. CIP = Central Indo-Pacific, CP = Central Pacific, EA = Eastern Atlantic, EP = Eastern Pacific, WA = Western Atlantic, WI = Western Indian 
+
+![](../figures/figure4_allspecies.png)   
+
+Figure 4: Vulnerability and importance to each function of fish species included in this study. Transparant bars represent the relative number of species in each category of vulnerability. Filled bars show the proportion of species that are locally important (i.e. perform more than 1/N of the function, where N is the number of species observed in a certain transect). 
+
+## Supplementary figures  
+          
+![](../output/plots/residuals_multipanel.png)
+\  
+             
+![](../output/plots/gravity_markets.png)
+\  
+         
+![](../output/plots/beta_params.png)
+
+
+
+
+
+
+
