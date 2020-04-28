@@ -8,14 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Supplementary methods
-# 1. Underwater visual census database
-\noindent We used a published global database of field data collection of belt transects [@Barneche2019]. This database encompasses transect data across 585 sites in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, Western Atlantic (Figure). This database only includes sites with a hard reef bottom are at the outer reef slope and were carried out at a constant depth, parallel to the reef crest. We splected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize bias and finally, we discarded rare species, for which less than 20 individuals were ever recorded across all sites. The dataset then included 1110 species of 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
 
-# 2. Phylogeny
-
-# 3. Parameter estimates
-
-\newpage  
+To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N), and phosphorus (P), a number of parameters are required (Table 1). Here, we describe how these parameters were quantified for all 1110 species in our database. 
 
 \begin{table}[h!]
 \centering
@@ -49,9 +43,9 @@ $D_\textrm{k}$  & Elemental stoichiometry of diet & \% \\
 
 \newpage
 
-## 3.1. Growth parameters
+## 1. Growth parameters
 
-### 3.1.1 Data compilation
+### 1.1 Data compilation
 We first compiled maximum lengths for all species with FishBase and used these lengths for the $l_{\infty}$ (REF). For $\kappa$, we used a standardized coefficient that describes the potential growth trajectory of an individual if $l_{\infty}$ were to be equal to  equal to its maximum length [i.e. $k_{max}$, @Morais2019]. $t0$ was kept constant at 0 for all species. 
 
 We extracted the data for $k_{max}$ from @Morais2019 and filtered out only the species of our species list. As the Lenth-Frequency method consistently overestimates kmax, we omitted the $k_{max}$ estimates coming from this method. In total, this selection process resulted in 439 observations of kmax for different species and temperatures. 
@@ -60,7 +54,7 @@ Further, we used the otolith data provided by Morat et al., including measuremen
 
 After combining the two data sources, we obtained a database of 496 observations and 181 species. 
 
-### 3.1.2 Statistical analysis and extrapolation
+### 1.2 Statistical analysis and extrapolation
 
 \noindent Aside from phylogeny, $k_{max}$ is mostly determined by body size and temperature [@Morais2019]. 
 
@@ -76,42 +70,14 @@ We applied a Bayesian hierarchical model to predict the growth rate of fishes in
 \noindent The model fit confirmed a negative relationship of $\textrm{ln}kmax$ with $\textrm{ln}size$, and a positive relationship with sea surface temperature. The Bayesian R2 of the model was 0.73759 (95\%CI: 0.702-0.769). 
 \noindent The phylogenetic heritability (equivalent to Pagel’$\lambda$) was estimated as the proportion of total variance, conditioned on the effects, attributable to the  phylogeny(i.e. $\lambda = (\textrm{sd}(\gamma_\textrm{0phy})^2  / (\textrm{sd}(\gamma_\textrm{0phy})^2 + \epsilon^2)$). This calculation resulted in a phylogenetic signal of 0.74 (95\% CI: 0.70 - 0.77). 
 
-We use the R package brms to fit a bayesian phylogenetic regression model We predict log(kmax) in function of log(sizemax), sst with varying intercept per species. The intercept per species is structured by the covariance matrix. 
-
- Family: gaussian 
-  Links: mu = identity; sigma = identity 
-Formula: log(kmax) ~ log(sizemax) + sstmean + (1 | phylo) 
-   Data: oto (Number of observations: 496) 
-Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
-         total post-warmup samples = 4000
-
-Group-Level Effects: 
-~phylo (Number of levels: 181) 
-              Estimate Est.Error l-95\% CI u-95\% CI Eff.Sample Rhat
-sd(Intercept)     0.83      0.09     0.67     1.01        843 1.00
-
-Population-Level Effects: 
-           Estimate Est.Error l-95\% CI u-95\% CI Eff.Sample Rhat
-Intercept      0.66      0.58    -0.48     1.81       1498 1.00
-logsizemax    -0.76      0.10    -0.96    -0.57       1281 1.00
-sstmean        0.02      0.01    -0.00     0.05       4071 1.00
-
-Family Specific Parameters: 
-      Estimate Est.Error l-95\% CI u-95\% CI Eff.Sample Rhat
-sigma     0.46      0.02     0.43     0.50       1991 1.00
-
-Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
-is a crude measure of effective sample size, and Rhat is the potential 
-scale reduction factor on split chains (at convergence, Rhat = 1).
-
 \noindent We extrapolated $\kappa$ for all species across the full temperature range in which those species occur in the database, with temperature rounded to the °C, which results in 4712 unique temperature and species combinations.  
 There is currently no streamlined method to make predictions to new species from a phylogenetic regression model. We circumvent the issue by extracting draws of the phylogenetic effect, $\gamma_\textrm{0phy}$ for each species included in the model. We subsequently predicted these phylogenetic effects for missing species with the help of the function phyEstimate in the picante package for R [@Kembel2010]. This function uses phylogenetic ancestral state estimation to infer trait values for new species on a phylogenetic tree by rerooting the tree to the parent edge for the node to be predicted [@Kembel2012]. We repeated this for all 100 trees and 1000 draws. Per draw, we averaged the extrapolated values per species for the hundred trees. Then, by combining the predicted phylogenetic effects with the global intercept and slopes for body size and temperatures for each draw, we predicted $\kappa$ for each species. We only use one chain in order to keep computational time reasonable. Finally, we summarised all $\kappa$ predictions per sst per species by taking the mean and standard deviation across the 1000 draws. 
 
-## 3.2 Body stoichiometry    
-### 3.2.1 Data collection    
-\noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Moorea, Carribean and Palmyra. Their gut contents were removed, and the whole body was freeze-dried and ground to powder with a Precellys homogeniser. $Q_\textrm{k}$ (\%) were then measured in the lab using standard methods. Ground samples were analysed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500) for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis (Allen et al. 1974). Elemental content was calculated based on dry mass. 
+## 2 Body stoichiometry    
+### 2.1 Data collection    
+\noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Moorea, the Carribean, and Palmyra. Their gut contents were removed, and the whole body was freeze-dried and ground to powder with a Precellys homogeniser. $Q_\textrm{k}$ (\%) were then measured in the lab using standard methods. Ground samples were analysed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500) for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis (Allen et al. 1974). Elemental content was calculated based on dry mass. 
 
-### 3.2.2 Data analysis and extrapolation  
+### 2.2 Data analysis and extrapolation  
 
 \noindent We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
 
@@ -133,33 +99,30 @@ There is currently no streamlined method to make predictions to new species from
                 
 \noindent As before, we used 1000 fitted draws for each species, and 100 phylogenetic trees to extrapolate to all species with unknown body stoichiometry. Specifically, we used the phylopars function from the Rphylopars package [@Bruggeman2009]. This function uses ancectral state reconstruction and brownian motion, and takes the correlation between C, N and P into account.      
 
+## 3 Diet stoichiometry    
+### 3.1 Data collection 
+\noindent We collected 571 adult individuals of 51 species between 2018 and 2019 in Mo'orea and Tetiaroa, and Mangareva, three Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab for CNP% content analysis using similar methods as for the fish body stoichiometry. 
 
-## 3.3 Diet stoichiometry    
-### 3.3.1 Data collection 
-\noindent We collected 345 adult individuals of 37 species and 12 families between 2018 and 2019 in Mo'orea and Tetiaroa, two Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab (more info!!) for CNP% content analysis. 
+### 3.2 Data analysis and extrapolation  
+\noindent We used trophic guilds defined by Parravicini et al. (2020). We fitted a multivariate Bayesian regression model to summarize CNP\% content data per trophic guild with random effects at the species level. This model had a median Bayesian R2 of 0.62, 0.62, and 0.48 for C, N and P respectively.           
+Next, we extracted 1000 draws of the predicted the CNP\% per trophic guild. Parravicini et al. (2020) provides the probability of reef fish species to be assigned to each of the 8 defined trophic guilds. By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. We then took the average and standard deviation across all 1000 draws. 
 
-### 3.3.2 Data analysis and extrapolation  
-\noindent We extracted trophic group information from ref diet paper. We constructed a simple multivariate Bayesian regression model to summarize CNP\% content data per trophic group with a random effect at the species level. This model had a Bayesian R2 of 0.61 (0.56-0.65), 0.31 (0.23-0.38), and 0.48 (0.42-0.54).           
-bayes_R2(fit_cnpdiet)
-     Estimate  Est.Error      Q2.5     Q97.5
-R2c 0.6250538 0.02299497 0.5756378 0.6642792
-R2n 0.3043510 0.03973636 0.2271046 0.3771861
-R2p 0.4857449 0.03164611 0.4191740 0.5417580
+## 4 Metabolic parameters    
+### 4.1 Data collection    
+In the period between 2018 and 2019, we collected 1393 individuals of 61 species and 18 families with a minimum of 3 replicates per species. Individuals were collected using handnets and clove oil by scuba divers. After arrival in the lab, individuals were kept starved for a period of x hours/days. Then, they were held in respirometry chambers for 23 hours. 
 
-\noindent We then predicted the CNP\% per diet category.
+## 4.2 SMR and MMR 
 
-   cat    Dc_m  Dn_m  Dp_m Dc_sd Dn_sd Dp_sd
-  <chr> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-1 1      30.6  4.13 0.424  2.88 0.865 0.197
-2 2      35.1  7.96 1.50   2.71 0.857 0.193
-3 3      33.1  5.79 0.751  3.52 1.06  0.242
-4 4      38.1  7.45 0.879  5.14 1.60  0.360
-5 5      28.9  5.10 0.619  3.35 1.03  0.239 
+## 4.3 metabolic parameters
 
-## 3.4 Metabolic parameters    
-### 3.4.1 Data collection    
-
-
-
+fit_mr <- brm(log10(mr) ~ 1 + log10(mass) + (0 + log10(mass)|Family) + (0 + log10(mass)|Species) + 
+                (1|Family:mr_type) + (1|Species:mr_type) + (0 + log10(mass)|Family:mr_type) +
+                (0 + log10(mass)|Species:mr_type), data = test,
+              control = list(adapt_delta = 0.9),#, max_treedepth = 12),
+              prior = set_prior(class = "b", "log10mass", prior = "normal(0.8, 0.5)"), cores = 4,
+              warmup = 2000, iter = 4000)
+              
+Estimate    Est.Error      Q2.5   Q97.5
+R2 0.9728325 0.0004120478 0.9719845 0.97362
 
 
