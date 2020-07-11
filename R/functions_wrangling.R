@@ -325,19 +325,22 @@ return(tfs)
 
 get_contributions <- function(tfish, cnpflux, params, summary_transect){
   
-  tfish <- left_join(tfish, cnpflux) %>% left_join(select(params, Species, Dp_m)) %>% mutate(
-    Fc = Fc_median * abun,
-    Fn = Fn_median * abun,
-    Fp = Fp_median * abun,
-    Ic = Ic_median * abun,
-    In = In_median * abun,
-    Ip = Ip_median * abun,
-    Gc = Gc_median * abun,
-    Gn = Gn_median * abun,
-    Gp = Gp_median * abun,
-    Wc = Wc_median * abun,
-    Wn = Wn_median * abun,
-    Wp = Wp_median * abun)
+  tfish <- left_join(tfish, cnpflux) %>% 
+    left_join(select(params, Species, lwa_m, lwb_m, diet_cat)) %>% 
+    mutate(
+      Fc = Fc_median * abun,
+      Fn = Fn_median * abun,
+      Fp = Fp_median * abun,
+      Ic = Ic_median * abun,
+      In = In_median * abun,
+      Ip = Ip_median * abun,
+      Gc = Gc_median * abun,
+      Gn = Gn_median * abun,
+      Gp = Gp_median * abun,
+      Wc = Wc_median * abun,
+      Wn = Wn_median * abun,
+      Wp = Wp_median * abun,
+      biomass = abun * lwa_m * size_cm^lwb_m)
   
   tfs <- group_by(tfish, studyName, region, locality, sites, area, transect_id, lon, lat) %>% 
     dplyr::summarise(
@@ -352,9 +355,13 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
       Fc_s = sum(Fc),
       Wc_s = sum(Wc),
       Wn_s = sum(Wn),
-      Wp_s = sum(Wp)
+      Wp_s = sum(Wp),
+      biomass_s = sum(biomass),
+      biomass_h_s = sum(biomass[diet_cat == 2 & Family != "Mugilidae"]),
+      biomass_p_s = sum(biomass[diet_cat == 4])
     ) %>% right_join(tfish) %>% 
-    group_by(studyName, region, locality, sites, area, transect_id, lon, lat, species) %>%
+    group_by(studyName, region, locality, sites, area, transect_id, lon, lat, 
+             Family, species, diet_cat) %>%
     dplyr::summarise(
       Fn_p = sum(Fn)/unique(Fn_s),
       Fp_p = sum(Fp)/unique(Fp_s),
@@ -367,10 +374,22 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
       Fc_p = sum(Fc)/unique(Fc_s),
       Wc_p = sum(Wc)/unique(Wc_s),
       Wn_p = sum(Wn)/unique(Wn_s),
-      Wp_p = sum(Wp)/unique(Wp_s)
-    )
+      Wp_p = sum(Wp)/unique(Wp_s),
+      biomass_p = sum(biomass)/unique(biomass_s),
+      biomass_herb_p = sum(biomass)/unique(biomass_h_s),
+      biomass_pisc_p = sum(biomass)/unique(biomass_p_s)
+    ) %>%
+    # 
+    mutate(
+      biomass_herb_p = case_when(
+        diet_cat == 2 & Family != "Mugilidae" ~ biomass_herb_p,
+        TRUE ~ 0),
+      biomass_pisc_p = case_when(
+        diet_cat == 4 ~ biomass_pisc_p,
+        TRUE ~ 0))
   
-  tfss <- left_join(tfs, select(summary_transect, transect_id, nspec, bioregion)) %>% filter(!is.na(nspec))
+  tfss <- left_join(tfs, select(summary_transect, transect_id, nspec, bioregion)) %>% 
+    filter(!is.na(nspec))
   
   return(tfss)
 }
@@ -421,6 +440,18 @@ contr <- left_join(contr, select(summary_transect, transect_id, nspec, bioregion
 
 
 return(list(contributions_herb_pisc = contr, summary_herb_pisc = tfs))
+}
+
+##### final transect summary #####
+combine_summary <- function(summary_transect, herb_pisc){
+  
+  flux <- summary_transect
+  hp <- herb_pisc$summary_herb_pisc
+  sst <- read.csv("data/avSst.csv")
+  flux <- left_join(flux, hp) %>% left_join(sst)
+  
+  return(flux)
+  
 }
 
 

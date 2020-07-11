@@ -1,95 +1,102 @@
 ---
-title: "Methods"
 output:
-  html_document: default
+  word_document:
+    fig_caption: yes
+    reference_docx: ../text/word_template.docx
+bibliography: ../text/global_proc.bib
+csl: nature.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# 1. Underwater visual census database
-\noindent We used a published global database of field data collection of belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, Western Atlantic (Suppl. table). This database only includes sites with a hard reef bottom at the outer reef slope and were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize bias and finally, we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species of 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
+# Methods 
 
-# 2. Bioenergetic modeling
-\noindent We applied a series of bioenergetic models for each existing combination of species identity, body size, and sea surface temperature (n = 30668). The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [Schiettekatte2020]. As such, this model is well suited for the application of a wide variety of fish species. The model relies on a set of input parameters including elements of metabolism, growth, and diet and body stoichiometry. We quantified the input parameters for all species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). The bioenergetic model then allows for the prediction of elemental fluxes mediated by individuals, including ingestion rate, excretion rates of N and P, and growth rate. Here, we focused on 5 key processes: N excretion rate (g N / day), P excretion rate (g P/day), production (g C/day), herbivory (g/day), and piscivory (g/day). We summed the contribution of each individual to each process on the transect-level, to get community-level estimates, then dividing it by the surface area that was surveyed. Each process is thus expressed in dry mass per day per square meter. We note that N excretion, P excretion, and production include contributions of each individual, whereas herbivory and piscivory are only carried out by a subset of the community, with respect to their trophic guild (Parravicini et al. 2020).    
+## 1. Underwater visual census database
+\noindent We used a published global database of reef fish abundance and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, Western Atlantic. The database only includes sites with a hard reef bottom at the outer reef slope. Transects were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize the bias related to the indentification of small individuals, and finally we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species that belong to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
 
-# 3. Variation beyond biomass and temperature
-\noindent To quantify the fold variation that exists across transects with a similar total standing fish biomass, we grouped transects into 320 bins with an interval of 50g/m2. We then quantified the fold-variation by dividing the maximum by the minimum value for each process within each bin. 
+## 2. Bioenergetic modeling
+\noindent We applied a series of bioenergetic models for each existing combination of species identity, body size, and sea surface temperature (n = 30668). The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. As such, this model is well suited for the application of a wide variety of fish species. The model relies on a set of input parameters including elements of metabolism, growth, and diet and body stoichiometry. We quantified the input parameters for all species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). The bioenergetic model then allows for the prediction of elemental fluxes mediated by individuals, including ingestion rate, excretion rates of N and P, and growth rate. Here, we focused on 5 key processes: N excretion rate (g N / day), P excretion rate (g P/day), production of body mass through growth (g C/day), herbivory, i.e. ingestion rate of macrophytes (g/day), and piscivory, i.e. ingestion rate of fishes (g/day). We summed the contribution of each individual to each process on the transect-level, to get community-level estimates, then dividing it by the surface area that was surveyed. Each process is thus expressed in dry mass per day per square meter. We note that N excretion, P excretion, and production include contributions of all fishes, whereas herbivory and piscivory are only carried out by a subset of the community, with respect to their trophic guild (@Parravicini2020).    
 
-\noindent To assess the covariation that exists among processes without the positive effect of standing biomass and sea surface temperature, we performed a Bayesian mixed effect regression of each log-transformed function for transect-scale observations ($y_j$):
-\begin{equation}
-	y_\textrm{j} \sim N(\mu_j, \sigma_j)),
-	\label{modbiom1}
-\end{equation}     
+## 3. Relationship between functions and biomass
 
-\begin{equation}
-	\mu_\textrm{j} = \beta_0 + \beta_1 x_{log(biomass),j} + \beta_2 x_{sst,j}
-	\label{modbiom2}
-\end{equation}
-and then extracted the median residuals for each process per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. To assess the covariation, we then quantified the correlations that exist among the different proocesses. To visualize the residuals per locality on a world map, we first grouped all transects per site by taking the median value for each process across multiple transect. We then grouped the sites again into localities by taking the median.  
+To assess the effect of biomass and sea surface temperature sst), we performed a Bayesian mixed effect regression of each log-transformed function for transect-scale observations ($y_j$):
+<!-- \begin{equation} -->
+	$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
+<!-- 	\label{modbiom1} -->
+<!-- \end{equation}      -->
 
-# 4. Community structure 
-\noindent To investigate the effect of the community structure together with the effect of standing biomass and sea surface temperature, we quantified a set of variables that characterize the community. Specifically, we took the 2.5%, 50% and 97.5% quantiles of the total length, immaturity, and trophic level of all individuals per transect. The total length is based on the visual estimation by divers. The immaturity is quantified using the following formula: 
-\begin{equation}
-	\textrm{immaturity}_\textrm{i} = \kappa (\textrm{l}_{\infty} - \textrm{l}_\textrm{i}),
-	\label{imm}
-\end{equation}
+<!-- \begin{equation} -->
+$$\mu_{\textrm{j}} = \beta_0 +{\beta_1} {x_{log(biomass),j}} + {\beta_2} {x_{sst,j}}$$
+<!-- 	\label{modbiom2} -->
+<!-- \end{equation} -->
+
+\noindent We then assessed the covariation between functions, independent of biomass and sst. To do so, we first extracted the median residuals for each function per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. To assess the covariation, we then quantified the correlations that exist among the different functions. To visualize the residuals per locality on a world map, we first grouped all transects per site by taking the median value for each process across multiple transect. We then grouped the sites again into localities by taking the median.  
+
+\noindent Finally, we quantified baseline values for each function and assessed the occurrence of communities that reach baseline values for each function. Based on the biomass reference for a healthy reef of ~100g/m2 (@MacNeil2015), we predicted the baseline for each function for the full range of sst's. Then, for all communities, we quantified whether or not the community had higher values for all functions compared to their baselines. Using this logical variable, we fitted a Bernoulli model with a logit-link to predict the probability of having all five functions above their threshold in relation to biomass and sea surface temperature, similar to the model specified above. 
+
+## 4. Effect of community structure on ecosystem functions 
+\noindent To investigate the effect of the community structure accounting for the effect of standing biomass and sea surface temperature, we quantified a set of variables that characterize the community. These variables discribe the size, age, and trophic distribution of the community, as these may all affect functions [@Schiettekatte2020]. Specifically, we took the 2.5%, 50% and 97.5% quantiles of the total length, immaturity, and trophic level of all individuals per transect. The total length is based on the visual estimation by divers. The immaturity is quantified using the following formula: 
+<!-- \begin{equation} -->
+	$$\textrm{immaturity}_\textrm{i} = \kappa (\textrm{l}_{\infty} - \textrm{l}_\textrm{i}),$$
+<!-- 	\label{imm} -->
+<!-- \end{equation} -->
 where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018]. Additionally, we quantified the transect-level species richness. 
 For each log-transformed function we then fitted a Bayesian mixed-effect model with all 12 above-mentioned variables: 
 
-\begin{equation}
-	y_\textrm{j} \sim N(\mu_j, \sigma_j)),
-	\label{modcom1}
-\end{equation}     
+<!-- \begin{equation} -->
+$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
+<!-- 	\label{modcom1} -->
+<!-- \end{equation}      -->
+       
+<!-- \begin{equation} -->
+$\begin{array}{c} \mu_{j} = \beta_0 + \beta_1 x_{log(biomass),j} + \beta_2 x_{sst,j}  + \beta_3 x_{richness,j}  + \beta_4 x_{size_m,j}  + \beta_5 x_{size_{2.5\%},j} +  \beta_6 x_{size_{97.5\%},j} + \\ \beta_7 x_{troph_m,j}  + \beta_8 x_{troph_{2.5\%},j} +  \beta_9 x_{troph_{97.5\%},j} + \beta_{10} x_{imm_m,j}  + \beta_{11} x_{imm_{2.5\%},j} +  \beta_{12} x_{imm_{97.5\%},j} \end{array}$     
+<!-- 	\label{modcom2} -->
+<!-- \end{equation} -->
 
-\begin{equation}
- \mu_{j} = \beta_0 + \beta_1 x_{log(biomass),j} + \beta_2 x_{sst,j}  + \beta_3 x_{richness,j}  + \beta_4 x_{size_m,j}  + \beta_5 x_{size_{2.5\%},j} +  \beta_6 x_{size_{97.5\%},j} + \beta_7 x_{troph_m,j}  + \beta_8 x_{troph_{2.5\%},j} +  \beta_9 x_{troph_{97.5\%},j} + \beta_{10} x_{imm_m,j}  + \beta_{11} x_{imm_{2.5\%},j} +  \beta_{12} x_{imm_{97.5\%},j} 
-	\label{modcom2}
-\end{equation}
+To compare effects across functions and assess the relative importance of each variable, we standardized all variables prior to model fitting. We fitted all 5 models by using 4 cores, that each had 2000 iterations with a warm-up of 1000 iterations. We used weakly-informative priors [@Burkner2017].
 
-To compare effects across functions and assess the relative importance of each variable we standardized all variables prior to model fitting. We fitted all 5 models by using 4 cores, that each had 2000 iterations with a warm-up of 1000 iterations. We used weakly-informative priors [@Burkner2017].
-
-# 5. Contributions and dominance
+## 5. Species dominance and contributions to functions
 To investigate the role of each species for each function, we quantified the contribution of each species to each function for all transects as followed:
-\begin{equation}
-	\textrm{contribution}_{f,i,j} = \frac{\sum F_{f,i,j}}{\sum F_{f,j}},
-	\label{con}
-\end{equation}
+<!-- \begin{equation} -->
+$$	\textrm{contribution}_{f,i,j} = \frac{\sum F_{f,i,j}}{\sum F_{f,j}},$$
+<!-- 	\label{con} -->
+<!-- \end{equation} -->
 where i is a certain species, j is a transect, F is the value of function f. 
 
 Then, we quantified the degree of species dominance per function for each transect. 
-We did this by first ranking species according to their contribution, followed by quantifying the cumulative contributions. Then, we used the area under the species accumulation curve as a measure for the degree of dominance.
+We did this by first ranking species according to their contribution to function, followed by quantifying the cumulative contributions of species to functions. Then, we used the area under the species accumulation curve as a measure for the degree of dominance.
 Specifically, the degree of dominance (DD) was calculated as followed:
-\begin{equation}
-	\textrm{DD} = \frac{A - A_{min}}{A_{max} - A_{min}},
-	\label{dd}
-\end{equation}
+<!-- \begin{equation} -->
+$$	\textrm{DD} = \frac{A - A_{min}}{A_{max} - A_{min}},$$
+<!-- 	\label{dd} -->
+<!-- \end{equation} -->
 where $A$ is the area under the curve, $A_{min}$ is the theoretical area under the curve where each species has an equal contribution to a certain function, $A_max$ is the theoretical area under the curve where one species performs the entire function. They are quantified as:
-\begin{equation}
-	\textrm{A}_{min} = \frac{R^2 - 1}{2 R},
-	\label{Amin}
-\end{equation}
+<!-- \begin{equation} -->
+$$	\textrm{A}_{min} = \frac{R^2 - 1}{2 R},$$
+<!-- 	\label{Amin} -->
+<!-- \end{equation} -->
 
-\begin{equation}
-	\textrm{A}_{max} = R - 1,
-	\label{Amax}
-\end{equation}
+<!-- \begin{equation} -->
+$$	\textrm{A}_{max} = R - 1,$$
+<!-- 	\label{Amax} -->
+<!-- \end{equation} -->
 
-\begin{equation}
-	\textrm{A} = \sum_{i = 2}^R \frac{C_i + C_{i-1}}{2},
-	\label{A}
-\end{equation}
+<!-- \begin{equation} -->
+$$	\textrm{A} = \sum_{i = 2}^R \frac{C_i + C_{i-1}}{2},$$
+<!-- 	\label{A} -->
+<!-- \end{equation} -->
 
-where C_i is the contribution of a certain species and R is the species richness. The degree of dominance thus ranges between 0 and 1, where 0 means that each species contributes equally and 1 means that one species performs the entire function, which is only possible in practice if there is only one species performing a particular function. 
+where $C_i$ is the contribution of a certain species and R is the species richness. The degree of dominance thus ranges between 0 and 1, where 0 means that each species contributes equally and 1 means that one species performs the entire function. 
 
-Finally, to know how often species are contributing a lot for a certain function, we quantified the frequency of dominance, i.e. the number of times a species is dominant divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function. 
+Finally, to know how often species are contributing more than average for a certain function, we quantified the frequency of dominance, i.e. the number of times a species is dominant divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function. 
 
-# 6. Species vulnerability 
-For each species, we quantified two measures of vulnerability: vulnerability to climate change and vulnerability to fishing pressure. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change is related to diet specialization, habitat specialization, recruitment specialization for live coral and body size [@Graham2011]. @Graham2011 developed a score for climate change vulnerability for 134 species. We used these scores to fit a Bayesian mixed effect predictive model that relates the vulnerability with the log-transformed maximum size of fish (extracted from fishbase), the dependence on coral for food (3 categories: not dependent, facultative corralivore, and obligate corralivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent). We also included a random effect for family. This model had a Bayesian R2 of 0.97. We then used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. For species' vulnerability to fishing, we extracted the index from @Cheung2005.
+## 6. Species vulnerability to fishing and clilate change
+For each species, we quantified two measures of vulnerability: vulnerability to climate change and vulnerability to fishing pressure [@Graham2011]. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change is related to diet specialization, habitat specialization, recruitment specialization for live coral and body size [@Graham2011]. Graham et al. (2011) [@Graham2011] developed a score for climate change vulnerability for 134 species. We used these scores to fit a Bayesian mixed effect predictive model that relates the vulnerability with the log-transformed maximum size of fish (extracted from Fishbase @Froese2018), the dependence on coral for food (3 categories: not dependent, facultative corallivore, and obligate corallivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent). We also included a random effect for family. This model had a Bayesian R2 of 0.97. We then used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. For species' vulnerability to fishing, we extracted the index from Cheung et al. (2005) @Cheung2005.
 
 
-
+## References
 
 
 

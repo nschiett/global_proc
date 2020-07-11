@@ -12,135 +12,130 @@ normalize <- function(x){
   100 * (x - min(x, na.rm = TRUE))/(max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
 }
 
-##### calculate multifunctionality #####
-add_multi <- function(summary_transect, herb_pisc){
-  
-  flux <- summary_transect
-  hp <- herb_pisc$summary_herb_pisc
-  sst <- read.csv("data/avSst.csv")
-  flux <- left_join(flux, hp) %>% left_join(sst)
-  
-  # transform into centiles then divide by 100
-  scores <- select(flux, transect_id, Fn, Fp, Gc, I_herb, I_pisc)  %>% 
-    filter(I_herb>0, I_pisc>0) %>%
-    mutate_at(2:6, function(x){normalize(log(x))}) %>%
-    drop_na()
-  # correlation for weighing
-  m <-  cor(scores[2:6])
-  m <- 1-m
-  we <-  rowSums((m))
-  we <- we/sum(we)
-  
 
-  multi <- scores %>%
-    rowwise() %>% 
-    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
-           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
-    group_by() %>%
-    mutate(multi = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
-  
-  flux <- flux %>% left_join(select(multi, transect_id, multi))
-  
-  return(flux)
-  
-}
 
-flux <- left_join(flux, res)
-flux$good <- ( flux$biomass_tot< 50 & flux$multi < quantile(flux$multi, 0.05, na.rm = TRUE))
-
-flux <- flux %>%
-  mutate(cat = case_when(
-    biomass_tot < 50 & 
-      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
-    biomass_tot < 50 & 
-      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
-    biomass_tot > 150 & 
-      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
-    biomass_tot > 150 & 
-      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
-    TRUE~"other"
-  ))
-
-t <-flux %>%
-  group_by(sites, locality) %>% summarise_if(is.numeric, mean)
-
-t <- t %>%
-  mutate(cat = case_when(
-    biomass_tot < 50 & 
-      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
-    biomass_tot < 50 & 
-      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
-    biomass_tot > 150 & 
-      multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
-    biomass_tot > 200 & 
-      multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
-    TRUE~"other"
-  ))
-test <- table(flux$cat, flux$sites) %>% as.data.frame() %>%
-  group_by(Var2) %>%
-  mutate(tot = sum(Freq)) %>%
-  mutate(Freq/tot) %>%
-  filter(!(Var1 %in% c("bb", "bg") & Freq>1))
-
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = imm_m))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = imm_q1))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = imm_q3))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = size_m))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = log(sizemax_m)))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = log(sizemax_q1)))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = log(sizemax_q3)))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = size_q1)) +
-  scale_y_continuous(trans = "log")
-ggplot(flux) +
-  geom_violin(aes(x = cat, y = size_q1))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = size_q3))
-ggplot(flux) +
-  geom_violin(aes(x = cat, y = size_m))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = troph_m))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = troph_q3))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = troph_q1))
-
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = multi))
-
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = log(nspec)))
-ggplot(flux) +
-  geom_boxplot(aes(x = cat, y = mean))
-
-ggplot(flux, aes(x = nspec, y = multi)) +
-  geom_point() +
-  geom_smooth() 
-
-fitm <- brm(standard(multi) ~ standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
-              standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
-            data = flux[!is.na(flux$multi),], chain = 3, cores = 3)
-
-summary(fitm)
-
-t <-flux %>%
-  group_by(sites) %>% summarise_if(is.numeric, mean)
+# flux <- left_join(flux, res)
+# flux$good <- ( flux$biomass_tot< 50 & flux$multi < quantile(flux$multi, 0.05, na.rm = TRUE))
+# 
+# flux <- flux %>%
+#   mutate(cat = case_when(
+#     biomass_tot < 50 & 
+#       multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
+#     biomass_tot < 50 & 
+#       multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
+#     biomass_tot > 150 & 
+#       multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
+#     biomass_tot > 150 & 
+#       multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
+#     TRUE~"other"
+#   ))
+# 
+# t <-flux %>%
+#   group_by(sites, locality) %>% summarise_if(is.numeric, mean)
+# 
+# t <- t %>%
+#   mutate(cat = case_when(
+#     biomass_tot < 50 & 
+#       multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "bb",
+#     biomass_tot < 50 & 
+#       multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "bg",
+#     biomass_tot > 150 & 
+#       multi < quantile(flux$multi, 0.1, na.rm = TRUE) ~ "gb",
+#     biomass_tot > 200 & 
+#       multi > quantile(flux$multi, 0.9, na.rm = TRUE) ~ "gg",
+#     TRUE~"other"
+#   ))
+# test <- table(flux$cat, flux$sites) %>% as.data.frame() %>%
+#   group_by(Var2) %>%
+#   mutate(tot = sum(Freq)) %>%
+#   mutate(Freq/tot) %>%
+#   filter(!(Var1 %in% c("bb", "bg") & Freq>1))
+# 
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = imm_m))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = imm_q1))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = imm_q3))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = size_m))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = log(sizemax_m)))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = log(sizemax_q1)))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = log(sizemax_q3)))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = size_q1)) +
+#   scale_y_continuous(trans = "log")
+# ggplot(flux) +
+#   geom_violin(aes(x = cat, y = size_q1))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = size_q3))
+# ggplot(flux) +
+#   geom_violin(aes(x = cat, y = size_m))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = troph_m))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = troph_q3))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = troph_q1))
+# 
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = multi))
+# 
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = log(nspec)))
+# ggplot(flux) +
+#   geom_boxplot(aes(x = cat, y = mean))
+# 
+# ggplot(flux, aes(x = nspec, y = multi)) +
+#   geom_point() +
+#   geom_smooth() 
+# 
+# fitm <- brm(standard(multi) ~ standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+#               standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+#             data = flux[!is.na(flux$multi),], chain = 3, cores = 3)
+# 
+# summary(fitm)
+# 
+# t <-flux %>%
+#   group_by(sites) %>% summarise_if(is.numeric, mean)
 
 ##### models with biomass, sst, locality, and site effects #######
+# models with only biomass and sst
+run_bmmodels <- function(summary_transect_complete){
+  
+  flux <- summary_transect_complete
+  
+  # run models
+  fit_Fn <- brm(log(Fn) ~ (log(biomass_tot)) + mean, 
+                data = flux, cores = 4)
+  
+  fit_Fp <- brm(log(Fp) ~ log(biomass_tot) + mean, 
+                data = flux, cores = 4)
+  
+  fit_Gc <- brm(log(Gc) ~ log(biomass_tot) + mean, 
+                data = flux[flux$Gc > 0, ], cores = 4)
+  
+  fit_I_herb <- brm(log(I_herb) ~ log(biomass_tot) + mean, 
+                    data = flux[flux$I_herb > 0,], cores = 4)  
+  
+  fit_I_pisc <- brm(log(I_pisc) ~ log(biomass_tot) + mean, 
+                    data = flux[flux$I_pisc > 0,], cores = 4)
+  
+  return(list(fit_Fn = fit_Fn, fit_Fp = fit_Fp, fit_Gc = fit_Gc, 
+              fit_I_herb = fit_I_herb, fit_I_pisc = fit_I_pisc))
+}
+
 
 run_procmodels <- function(summary_transect_complete){
   
   flux <- summary_transect_complete
   
   # run models
-  fit_Fn <- brm(standard(log(Fn)) ~ (log(biomass_tot)) + (mean), data = flux, cores = 4)
+  fit_Fn <- brm(standard(log(Fn)) ~ (log(biomass_tot)) + mean + (1|locality) + (1|sites), 
+                data = flux, cores = 4)
   
   fit_Fp <- brm(standard(log(Fp)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
               data = flux, cores = 4)
@@ -154,11 +149,8 @@ run_procmodels <- function(summary_transect_complete){
   fit_I_pisc <- brm(standard(log(I_pisc)) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
                     data = flux[flux$I_pisc > 0,], cores = 4)
   
-  fit_multi <- brm(standard(multi) ~ log(biomass_tot) + mean + (1|locality) + (1|sites), 
-                    data = flux[flux$multi > 0,], cores = 4)
-  
   return(list(fit_Fn = fit_Fn, fit_Fp = fit_Fp, fit_Gc = fit_Gc, 
-              fit_I_herb = fit_I_herb, fit_I_pisc = fit_I_pisc, fit_multi = fit_multi))
+              fit_I_herb = fit_I_herb, fit_I_pisc = fit_I_pisc))
 }
 
 get_residuals <- function(summary_transect_complete, procmodels){
@@ -170,8 +162,7 @@ get_residuals <- function(summary_transect_complete, procmodels){
   res3 <- residuals(procmodels[[3]], re_formula = "standard(log(Gc)) ~ log(biomass_tot) + mean")
   res4 <- residuals(procmodels[[4]], re_formula = "standard(log(I_herb)) ~ log(biomass_tot) + mean")
   res5 <- residuals(procmodels[[5]], re_formula = "standard(log(I_pisc)) ~ log(biomass_tot) + mean")
-  res6 <- residuals(procmodels[[6]], re_formula = "standard(multi) ~ log(biomass_tot) + mean")
-  
+
   res <- data.frame(
     transect_id = flux$transect_id,
     Fn_r = res1[,1],
@@ -189,26 +180,8 @@ get_residuals <- function(summary_transect_complete, procmodels){
     I_pisc_r = res5[,1]
   )
   
-  res_m <- data.frame(
-    transect_id = flux[!is.na(flux$multi), ]$transect_id,
-    multi_r = res6[,1]
-  )
   
-  res <- res %>% left_join(res_h) %>% left_join(res_p) %>% left_join(res_m)
-  
-  #add multifunctionality
-  scores <- select(res, transect_id, Fn = Fn_r, Fp = Fp_r, Gc = Gc_r, I_herb = I_herb_r, I_pisc = I_pisc_r)  %>% 
-    drop_na() %>%
-    mutate_at(2:6, function(x){normalize(x)}) 
-  
-  multi <- scores %>%
-    rowwise() %>% 
-    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
-           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
-    group_by() %>%
-    mutate(multi2 = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
-  
-  res <- left_join(res, select(multi, transect_id, multi, multi2))
+  res <- res %>% left_join(res_h) %>% left_join(res_p) 
   
   return(res)
 }
@@ -222,7 +195,7 @@ get_location_effect <- function(procmodels, summary_transect){
   }) %>% purrr::reduce(dplyr::left_join, by = "locality")
   
   colnames(result) <- c("locality", "r_loc_Fn", "r_loc_Fp", "r_loc_Gc", 
-                        "r_loc_I_herb", "r_loc_I_pisc", "r_loc_multi")
+                        "r_loc_I_herb", "r_loc_I_pisc")
   
   # add coordinates
   coord <- select(summary_transect, bioregion, locality, lat, lon) %>%
@@ -231,48 +204,48 @@ get_location_effect <- function(procmodels, summary_transect){
     summarize_all(mean)
   
   result <- coord %>% left_join(result) %>% ungroup()
-  
-  #add multifunctionality
-  scores <- select(result, locality, Fn = r_loc_Fn, Fp = r_loc_Fp, Gc = r_loc_Gc, I_herb = r_loc_I_herb, I_pisc = r_loc_I_pisc)  %>% 
-    drop_na() %>%
-    mutate_at(2:6, function(x){normalize(x)}) 
-  
-  multi <- scores %>%
-    rowwise() %>% 
-    mutate(multi = mean(c(Fn, Fp, Gc, I_herb, I_pisc)), 
-           var = var(c( Fn, Fp, Gc, I_herb, I_pisc))) %>%
-    group_by() %>%
-    mutate(multi = multi*(1-(var/3000))/100) # 3000 = maximum theoretical variance
-  
-  result <- left_join(result, select(multi, locality, multi))
-  
+ 
   return(result)
     
 }
 
 
-# summary(fitN)
-# 
-# res_Fn <- 
-#   fitN %>%
-#   spread_draws(r_sites[sites, Intercept]) %>%
-#   median_qi() %>%
-#   select(sites, Fn_r = r_sites)
-# 
-# res_Fp <- 
-#   fitP %>%
-#   spread_draws(r_sites[sites, Intercept]) %>%
-#   median_qi() %>%
-#   select(sites, Fp_r = r_sites)
-# 
-# res <- left_join(res_Fn, res_Fp)
-# 
-# ggplot(res) +
-# geom_point(aes(x = Fn_r, y = Fp_r))
-# 
-# summary(cor(res$Fn_r, res$Fp_r))
 
-
+####### community models ######
+run_commodels <- function(summary_transect_complete){
+  
+  flux <- summary_transect_complete
+  
+  flux$logbiomass <- log(flux$biomass_tot)
+  
+  fit_Fn_st <- brm(standard(log(Fn)) ~ standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                     standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+                   data = flux, chain = 3, cores = 3)
+  
+  fit_Fp_st <- brm(standard(log(Fp)) ~ standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                     standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+                   data = flux, chain = 3, cores = 3)
+  
+  fit_Gc_st <- brm(standard(log(Gc)) ~ standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                     standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+                   data = flux, chain = 3, cores = 3)
+  
+  fit_Iherb_st <- brm(standard(log(I_herb)) ~standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                        standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+                      data = flux[flux$I_herb>0,], chain = 3, cores = 3)
+  
+  fit_Ipisc_st <- brm(standard(log(I_pisc)) ~ standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                        standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+                      data = flux[flux$I_pisc>0,], chain = 3, cores = 3)
+  
+  result <- list(fit_Fn_st, fit_Fp_st, fit_Gc_st, fit_Iherb_st, fit_Ipisc_st)
+  
+  lapply(result, function(x){
+    brms::bayes_R2(x)
+  })
+  
+  return(result)
+}
 
 
 ####### contributions ######
@@ -397,77 +370,24 @@ EE
 
 
 
-##### dominance ######
+##### contributions ######
 
-get_dominance <- function(contributions, herb_pisc){
+get_dd <- function(contributions, herb_pisc){
   
   # combine data
-  con <- left_join(contributions, herb_pisc$contributions_herb_pisc)
+  con <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+    ungroup()
   
-  # dominance function
-  dominance <- function(data, var){
-    test <- data %>% mutate(rank = rank(- .data[[var]], ties.method = c("first"))) %>%
-      filter(.data[[var]] > 0) %>%
-      dplyr::arrange(rank) %>%
-      mutate(cumsum = cumsum(.data[[var]]))
-    
-    if (nrow(test) < 4){
-      return(list(slope = NA, dom = NA))
-    }else{
-    
-    dom <- (length(test$cumsum[test$cumsum > 0.5])/nrow(test))
-    
-    fit <- lm(log(test[[var]])~log(test[["rank"]]))
-    slope <-  fit$coefficients[2]
-    return(list(slope = slope, dom = dom))
-    }
+  ### function to calculate area of ranked function contribution !! 
+  # data has to be ordered
+  # y = cumsum!!
+  rank_area <- function(y) {
+    n <- length(y)
+    a <- y[2:n]
+    b <- y[1:(n-1)]
+    area <- sum(a + b)/2
+    return(area)
   }
-  
-  dom <- parallel::mclapply(unique(con$transect_id), function(x){
-    
-    print(x)
-    t <- dplyr::filter(con, transect_id == x)
-    
-    d_Fn <- dominance(t, "Fn_p")
-    d_Fp <- dominance(t, "Fp_p")
-    d_Gc <- dominance(t, "Gc_p")
-    d_I_herb <- dominance(t, "I_herb_p")
-    d_I_pisc <- dominance(t, "I_pisc_p")
-    
-    result <- data.frame(
-      transect_id = x,
-      Fn_d = d_Fn[[2]],
-      Fn_dslope = d_Fn[[1]],
-      Fp_d = d_Fp[[2]],
-      Fp_dslope = d_Fp[[1]],
-      Gc_d = d_Gc[[2]],
-      Gc_dslope = d_Gc[[1]],
-      I_herb_d = d_I_herb[[2]],
-      I_herb_dslope = d_I_herb[[1]],
-      I_pisc_d = d_I_pisc[[2]],
-      I_pisc_dslope = d_I_pisc[[1]]
-    )
-    return(result)
-  }, mc.cores = 40) %>%plyr::ldply()
-  
-  return(dom)
-}
-
-### calculate area of ranked function contribution !! data has to be ordered
-# y = cumsum!!
-rank_area <- function(y) {
-  n <- length(y)
-  a <- y[2:n]
-  b <- y[1:(n-1)]
-  area <- sum(a + b)/2
-  return(area)
-}
-
-
-get_keystoneness <- function(contributions, herb_pisc){
-  
-  # combine data
-  con <- left_join(contributions, herb_pisc$contributions_herb_pisc)
   
   # dominance function
   ks_area <- function(data, var){
@@ -482,35 +402,36 @@ get_keystoneness <- function(contributions, herb_pisc){
     }else if (nrow(data) == 1){
       return(1)
     }else{
-      test <- data %>% mutate(rank = rank(- .data[[var]], ties.method = c("first"))) %>%
+      drank <- data %>% 
+        mutate(rank = dense_rank(desc(.data[[var]]))) %>%
         dplyr::arrange(rank) %>%
         mutate(cumsum = cumsum(.data[[var]]))
       
-      A <- rank_area(test$cumsum)
+      A <- rank_area(drank$cumsum)
       
       r <- nrow(data) # species richness
       A_max <- 1 * (r - 1) # maximum if first species performs 100% (rectangle)
       A_min <- (r^2-1)/(2*r) # minimum if all sp contribute equally (trapezium)
       
-      ks <- (A - A_min)/(A_max - A_min)
+      dd <- (A - A_min)/(A_max - A_min)
       
-      return(ks)
+      return(dd)
     }
   }
   
   
   key <- parallel::mclapply(unique(con$transect_id), function(x){
     
-    print(x)
+    print(x/9118)
     t <- dplyr::filter(con, transect_id == x)
     
     result <- data.frame(
       transect_id = x,
-      ks_Fn = ks_area(t, "Fn_p"),
-      ks_Fp = ks_area(t, "Fp_p"),
-      ks_Gc = ks_area(t, "Gc_p"),
-      ks_I_herb = ks_area(t, "I_herb_p"),
-      ks_I_pisc = ks_area(t, "I_pisc_p")
+      dd_Fn = ks_area(t, "Fn_p"),
+      dd_Fp = ks_area(t, "Fp_p"),
+      dd_Gc = ks_area(t, "Gc_p"),
+      dd_I_herb = ks_area(t, "I_herb_p"),
+      dd_I_pisc = ks_area(t, "I_pisc_p")
     )
     return(result)
   }, mc.cores = 40) %>%plyr::ldply()
@@ -518,8 +439,86 @@ get_keystoneness <- function(contributions, herb_pisc){
   return(key)
 }
 
+# median contributions families 
+get_cf <- function(contributions, herb_pisc){
+  
+  left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+    group_by(bioregion, locality, sites, transect_id, Family) %>%
+    summarize_at(.vars = vars(ends_with("_p")), sum, na.rm = TRUE) %>%
+    group_by(bioregion, locality, sites, Family) %>%
+    summarize_at(.vars = vars(ends_with("_p")), median, na.rm = TRUE) %>%
+    group_by(bioregion, locality, Family) %>%
+    summarize_at(.vars = vars(ends_with("_p")), median, na.rm = TRUE) %>%
+    group_by(Family) %>%
+    summarize_at(.vars = vars(ends_with("_p")), median, na.rm = TRUE) %>%
+    ungroup() %>%
+    group_by() %>%
+    mutate_at(.vars = vars(ends_with("_p")), function(x){x/sum(x)}) %>%
+    ungroup() 
+  
+}
 
-
+get_importance <- function(contributions, herb_pisc){
+  
+  # if con > 1/N !!
+  
+  con <- left_join(contributions, herb_pisc$contributions_herb_pisc)
+  
+  parallel::mclapply(unique(con$transect_id), function(x){
+    sub <- filter(con, transect_id == x)
+    nherb <- sum(sub$I_herb_p>0)
+    npisc <- sum(sub$I_pisc_p>0)
+    sub <- sub %>%
+      mutate(Gc_i = Gc_p > 1/nspec,
+             Fn_i = Fn_p > 1/nspec,
+             Fp_i = Fp_p > 1/nspec,
+             I_pisc_i = I_pisc_p > 1/npisc,
+             I_herb_i = I_herb_p > 1/nherb) %>%
+      mutate(I_pisc_i = case_when(I_pisc_p == 0 ~ NA, TRUE ~ I_pisc_i),
+             I_herb_i = case_when(I_herb_p == 0 ~ NA, TRUE ~ I_herb_i)) %>%
+      dplyr::select(bioregion, transect_id, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i)
+    return(sub)
+  }, mc.cores = 30) %>% plyr::ldply()
+  
+}
+  
+get_fd <- function(sp_importance){
+  # relative frequency when important 
+  sp_importance %>%
+    dplyr::select(bioregion, locality, sites, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i) %>%
+    group_by(species) %>%
+    mutate(occ = length(Gc_i)) %>%
+    group_by(species, occ) %>%
+    dplyr::summarise_if(is.logical, function(x){sum(x, na.rm = TRUE)/length(x[!is.na(x)])})
+}
+ 
+get_spi_vuln <- function(sp_importance, vulnerability){
+  
+  sp_importance %>%
+    dplyr::select(species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i) %>%
+    unique() %>%
+    group_by(species) %>%
+    dplyr::summarise_if(is.logical, function(x){sum(x)>0}) %>%
+    left_join(vulnerability)%>% 
+    drop_na(vuln_climate, vuln_fi) %>%
+    ungroup() %>%
+    mutate(vulncat = case_when(
+      (vuln_climate > median(vuln_climate) & vuln_fi > median(vuln_fi)) ~ "vuln_high",
+      (vuln_climate > median(vuln_climate) & vuln_fi <= median(vuln_fi)) ~ "vuln_cli",
+      (vuln_climate <= median(vuln_climate) & vuln_fi > median(vuln_fi)) ~ "vuln_fi",
+      (vuln_climate <= median(vuln_climate) & vuln_fi <= median(vuln_fi)) ~ "vuln_low")) %>%
+    dplyr::select(species, Family, vulncat, Gc = Gc_i, Fn = Fn_i, Fp = Fp_i, I_pisc = I_pisc_i, I_herb = I_herb_i) %>%
+    pivot_longer(cols = c(Gc, Fn, Fp, I_pisc, I_herb), names_to = "name", values_to = "ep") %>%
+    group_by(name) %>%
+    mutate(n_spec_tot = sum(!is.na(ep))) %>%
+    dplyr::group_by(vulncat, name, n_spec_tot) %>%
+    dplyr::summarize(ep_n = sum(ep, na.rm = TRUE), 
+                     n = (sum(ep, na.rm = TRUE) + sum(ep == FALSE, na.rm = TRUE))) %>%
+    mutate(ep_prop = ep_n/n_spec_tot, # proportion of important species per process and category
+           n_prop = n/n_spec_tot) %>% # proportion of species in vuln category
+    mutate(perc = 100 * ep_prop/n_prop)
+  
+}
 
 
 

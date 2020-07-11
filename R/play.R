@@ -927,7 +927,7 @@ test <- flux %>%
   filter(!value == 1)
 
 
-ggplot(test, aes(x = biomass_bin, y = value, fill = var, color = var)) +
+ggplot(bins, aes(x = biomass_bin, y = value, fill = var, color = var)) +
   geom_point(size = 1, alpha = 0.8) +
   scale_y_continuous(trans = "log10", breaks = c(2,10,100,1000, 10000)) +
   scale_x_continuous(trans = "log10") +
@@ -1372,8 +1372,9 @@ summary(lm(normalize(log(I_pisc)) ~ log(grav_Nmarket) + log(biomass_tot), data =
 
 
 ###### suppl. gravity markets ######
-tall <- pivot_longer(wild, c(Fn_r, Fp_r, Gc_r, I_herb_r, I_pisc_r)) %>%
+tall <- pivot_longer(fluxs, c(Fn_r, Fp_r, Gc_r, I_herb_r, I_pisc_r)) %>%
   group_by(name) %>%
+  left_join(hum) %>%
   mutate(value = standard(value))
 a <-
 ggplot(tall, aes(x = log(grav_Nmarket), y = value), alpha = 0.2) +
@@ -2406,7 +2407,7 @@ spi <- parallel::mclapply(unique(con$transect_id), function(x){
            I_herb_i = case_when(I_herb_p == 0 ~ NA, TRUE ~ I_herb_i)) %>%
     dplyr::select(bioregion, transect_id, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i)
   return(sub)
-}, mc.cores = 50) %>% plyr::ldply()
+}, mc.cores = 30) %>% plyr::ldply()
 
 
 # proportion when important 
@@ -3278,6 +3279,180 @@ dt <- data.frame(
 dt$y <- dt$x^0.6
 plot(dt)
 plot(dt$y, dt$y/dt$x)
+
+##### Supplemental analysis remote reefs #####
+loadd(summary_transect_complete)
+
+hum <- read_csv("data/humanPopulation.csv") 
+
+remote <- read_csv("data/humanPopulation.csv") %>%
+  mutate(remote = case_when(linear_dist > 200 & pop_100 == 0 ~ "yes",
+         TRUE ~ "no")) %>%
+  select(sites, remote, grav_markets) %>%
+  inner_join(summary_transect_complete) %>%
+  left_join(residuals)
+
+nd <- remote %>%
+  select(mean) %>%
+  unique() %>%
+  mutate(biomass_tot = 100) 
+
+nd <- summary_transect_complete %>%
+  select(mean) %>%
+  unique() %>%
+  mutate(biomass_tot = 100) 
+
+ndp <- nd %>%
+  mutate(Fn_ref = exp(fitted(bmmodels[[1]], nd)[,1])) %>%
+  mutate(Fp_ref = exp(fitted(bmmodels[[2]], nd)[,1])) %>%
+  mutate(Gc_ref = exp(fitted(bmmodels[[3]], nd)[,1])) %>%
+  mutate(I_herb_ref = exp(fitted(bmmodels[[4]], nd)[,1])) %>%
+  mutate(I_pisc_ref = exp(fitted(bmmodels[[5]], nd)[,1]))  %>%
+  select(-biomass_tot) %>%
+  right_join(summary_transect_complete) %>%
+  mutate(multif = as.numeric(Fn > Fn_ref & Fp > Fp_ref& Gc > Gc_ref& I_herb > I_herb_ref& I_pisc > I_pisc_ref)) #%>%
+  #group_by(sites) #%>%
+  #summarize_all(mean)
+
+# ggplot(ndp) +
+#   geom_boxplot(aes(x = as.character(multif), y = log(biomass_tot))) +
+#   geom_hline(yintercept = log(100))
+
+ndp$logbiomass <- log(ndp$biomass_tot)
+
+fit_mf<- brm(multif ~ standard(mean) + standard(logbiomass) + standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+               standard(size_q3) + standard(troph_q3) + standard(imm_q1) + standard(imm_q3) + standard(troph_q1) + standard(size_q1) ,
+             data = ndp, chain = 1, cores = 1, family = "bernoulli")
+summary(fit_mf)
+
+fit_mf1 <- brm(multif ~ mean + logbiomass,
+               data = ndp, chain = 1, cores = 1, family = "bernoulli")
+summary(fit_mf1)
+
+extract_b <- function(x, name){
+  draws <- extract_draws(x)$dpars$mu$fe$b
+  means <- apply(draws, 2, mean)
+  lq <- apply(draws, 2, quantile, 0.025)
+  uq <- apply(draws, 2, quantile, 0.975)
+  result <- 
+    data.frame(
+      model = name,
+      variable = names(means),
+      mean = means,
+      lq = lq,
+      uq = uq
+    )
+}
+
+# extract all slopes for each model
+result <- 
+  extract_b(fit_mf, "mf")
+
+# Indicate which ones overlap with 0
+result <- mutate(result, diff = (uq > 0 & lq < 0)) 
+
+# Specify importance of variables per slope values
+importance <- group_by(result, variable) %>%
+  summarise(tot = max(abs(mean))) 
+
+# filter out variables that we don't need 
+result <- result %>%
+  dplyr::filter(!variable == "b_Intercept") %>%
+  left_join(importance) %>% 
+  mutate(variable = fct_reorder(variable, tot)) %>%
+  filter(diff == FALSE) %>%
+  filter(!variable == "b_standardlogbiomass") %>%
+  filter(!variable == "b_standardmean") 
+
+
+# plot
+slopes <-
+  ggplot(result) +
+  geom_hline(yintercept = 0, size = 1, color = "black") +
+  geom_linerange(aes(x = variable, ymin = 0, ymax = mean), color = "grey40",
+                 position = position_dodge(.7), size = 0.5, linetype = 2) + 
+  geom_linerange(aes(x = variable, ymin = lq, ymax = uq), color = "grey40",
+                 position = position_dodge(.7), size = 1, linetype = 1) + 
+  geom_point(aes(x = variable, y = mean), color = "grey40",
+             position = position_dodge(.7), size = 3) +
+  coord_flip() +
+  theme_minimal() +
+  labs(y = "effect size", x = "") +
+  scale_x_discrete(labels = c("trophic level (median)",
+                              "trophic level (2.5%)",
+                              "size (median)",
+                              "immaturity (median)",
+                              "richness",
+                              "size (2.5%)",
+                              "trophic level (97.5%)",
+                              "sst",
+                              "biomass")) +
+  theme(legend.position = "bottom", axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12), legend.text = element_text(size = 12), 
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()
+  )   
+slopes
+ggsave("output/plots/slopes_mf_mod.png")
+
+fit_mf2 <- brm(multif ~ mean + logbiomass ,
+                 data = ndp, chain = 1, cores = 1, family = "bernoulli")
+summary(fit_mf2)
+
+marginal_effects(fit_mf1, method = "fitted", points = TRUE)
+me <- marginal_effects(fit_mf1, method = "fitted")
+me$logbiomass
+
+ggplot(me$logbiomass) +
+  geom_ribbon(aes(x = logbiomass, ymin = lower__, ymax = upper__), fill = "grey60", alpha = 0.5) +
+  geom_line(aes(x = logbiomass, y = estimate__), size = 1, color = "grey40") +
+  geom_vline(xintercept = log(100), linetype = 3, alpha = 0.7) +
+  geom_vline(xintercept = log(450), linetype = 2) +
+  geom_hline(yintercept = 0.5, linetype = 2) +
+  #geom_vline(xintercept = log(1000), linetype = 3, alpha = 0.7)+
+  labs(x = "log(biomass) (g/m2)", y = "fitted probability of MF") +
+  theme_minimal() +
+  theme(axis.line = element_line(), axis.ticks = element_line())
+ggsave("output/plots/mf_pp_logbiomass.png")
+  
+sum(ndp$biomass_tot > 100)/nrow(ndp)
+sum(ndp$biomass_tot > 450 & ndp$multif>0)/nrow(ndp)
+sum(ndp$biomass_tot > 1000)/nrow(ndp)
+sum(ndp$multif)/nrow(ndp)
+test <- ndp %>%
+  filter(multif>0)
+
+f <- fitted(fit_mf1)
+sum(f[,1]>0.5)/nrow(f)
+
+me_b <- me$logbiomass
+ggplot(ndp) +
+  geom_point(aes(x = logbiomass, y = f[,1]), alpha = 0.2) +
+  geom_smooth(aes(x = logbiomass, y = f[,1]), method = "loess")
+
+ggplot(ndp) +
+  geom_point(aes(x = log(grav_markets), y = f[,1]), alpha = 0.2) +
+  geom_smooth(aes(x = log(grav_markets), y = f[,1]), method = "gam")
+
+
+ggplot(remote) +
+  geom_boxplot(aes(x = remote, y = f[,1]))
+
+fit <- brm(log(Fn) ~ log(biomass_tot), data = summary_transect_complete)
+fit_Fp <- brm(log(Fp) ~ log(biomass_tot) + mean + remote, data = remote, cores = 4)
+fit_Fn <- brm(log(Fn) ~ log(biomass_tot) + mean + remote, data = remote, cores = 4)
+fit_Gc <- brm(log(Gc) ~ log(biomass_tot) + mean + remote, data = remote, cores = 4)
+fit_I_herb <- brm(log(I_herb) ~ log(biomass_tot) + mean + remote, data = remote[remote$I_herb>0,], cores = 4)
+fit_I_pisc <- brm(log(I_pisc) ~ log(biomass_tot) + mean + remote, data = remote[remote$I_herb>0,], cores = 4)
+
+ggplot(summary_transect_complete) +
+  geom_point(aes(x = log(biomass_tot), y = log(Fp)), size = 0.5, alpha = 0.5) +
+  geom_abline(aes(intercept = -11.64, slope = 1.088), color = "green") +
+  geom_abline(aes(intercept = -11.46, slope = 1.05), color = "black")
+
+
+
+
+
 
 
 
