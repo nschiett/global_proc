@@ -11,11 +11,43 @@ csl: nature.csl
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Functional trade-offs reveal coral reef vulnerability
 
+*diego general comments*  
+
+**1) no need to emphasise how misleading it might be to rely solely on standing biomass for conservation targets. Your results are powerful and novel enough without any of that. **
+
+**2) We need to wordsmith the text some more to get readers onboard with the equality fluxes = functions.**
+
+**3) The chosen model predictors. It would help I think if their justifications were intertwined with the early main-text paragraphs. Not drivers, perhaps "predictors" or "potential drivers" might be a safer solution.**
+
+**4) The main text needs a succinct, yet clear description of how the modelling choice outputs a "trade-off" among the five fluxes. While the ugly details can be shoved in the Methods and Supplementary Info, the reader needs those ingredients to appreciate what you mean by the term trade-off, and how important / reliable they are.**
+
+*comments Nick*
+**some circularity in there at present**
+**missing clarity regarding why each step in the analyses (e.g. moving from organismal traits to species level) is a logical progression from the last. **
+
+*comments jake*
+**overall message is a bit vague and you would be better served to pull a few key things out and run with htem. **
+**I think instead of mixing messages about global and local conseravation you just be all out there with it and say: real conservation of coral reefs will require both actions global and local. I think your 70% stat is really really cool and is something to hang your hat on.**
+
+*comments Deron*
+**I wonder if the heat map showing tradeoffs among the ecosystem functions would be worth putting in the main MS. I thought it was really cool! Maybe integrate it into Fig 2 or something if possible. **
+
+**should production be in gC?**
+
+**Nowhere are the actual rates of the different fluxes presented. All that readers get to see are residuals or effect size plots or correlations. **
+
+**I think one thing that would be really nice in the supplement would be to have a figure identical to that of Fig 1. that actually presented the data on the maps instead of the residuals. It would be really informative to be able to look at the residuals in Fig 1 vs. the real data in the supplement. Something to consider. **
+
+**Also on figure 1 maybe putting the units of each flux to emphasize to the reader that you are measuring things in N, P, or C for all of the different metrics. **
+
+# Functional trade-offs redefine global reef fish vulnerability
+
+Nina M. D. Schiettekatte, (core team:) Simon J. Brandl, Jordan M. Casey, Nicholas A. J. Graham, Diego R. Barneche, Deron E. Burkepile, Jacob E. Allgeier, (other data contributors:) Katrina S. Munsterman, Fabien Morat, Alexandre Mercière, Yves Letourneur, Enrico L. Rezende, Graham J. Edgar, Rick D. Stuart-Smith, Jesús E. Arias-Gonzaléz, Alan M. Friedlander, Alison L. Green, Osmar J. Luiz,  F. A. Rodríguez‐Zaragoza, Laurent Vigliola, Michel Kulbicki, Sergio R. Floeter  (supervisors:) Sébastien Villéger, Valeriano Parravicini
 
 Energy and nutrient fluxes underpin the functioning and productivity of all global ecosystems [@Welti2017]. 
-As such, monitoring and conserving energy flow is critical to natural systems and humanity. Due to the efficient cycling of nutrients, coral reefs flourish as hyperdiverse and economically important ecosystems. 
+As such, monitoring and conserving energy flow is critical to natural systems and humanity. 
+Due to the efficient cycling of nutrients, coral reefs flourish as hyperdiverse and economically important ecosystems. 
 Understanding their ability to cycle energy and nutrients is key to conserving coral reefs and the services they provide to humanity, especially under the escalating pressures of fishing [@Graham2017; @Ceccarelli2016: @Stuart-Smith2018] and climate change [@Hughes2017]. 
 Yet, we primarily assess coral reef functioning based on static variables such as fish biomass and the diversity of species traits [e.g. @Mouillot2014; @Cinner2020; @Mora2011plos]. 
 The lack of global quantitative assessments across multiple functions impedes our capacity to define the drivers of functional coral reefs [@Bellwood2019; @Brandl2019front]. 
@@ -28,89 +60,163 @@ The existence of trade-offs between multiple functions and the lack of key speci
 Although it is impossible to maximize all aspects of functioning, we can preserve the integrity of coral reef  fluxes of elements by applying locally administered solutions that go beyond the simple protection of biomass.
          
 The flow of elements through biological communities fuels all life on Earth [@Welti2017] 
-Although there is a strong consensus on the importance of these fluxes, also known as ecosystem functions, our ability to manage for ecosystem functioning remains poor [@Welti2017]. 
+Although there is strong consensus on the importance of these fluxes, also known as ecosystem functions, our ability to manage for ecosystem functioning remains poor [@Welti2017]. 
+*NG: Need to say why remains poor - is it because the flow of elements (or most of them) have been poorly quantified, or because the drivers, trade-offs and vulnerability among different biochemical fluxes are not understood? I think if you can define the problem like this in the first paragraph it sets up what the manuscript then does. *
+*JA: Not a very good citation in my view. There are a handful of papers in science that talk about this more generally interms of management – largely terrestrial. *
 For millennia, humans have managed nature with an economic mindset to maximize desirable components such as plant or animal biomass [@Weisser2017]. 
-However, Earth’s resources are finite, and the existence of multiple ecosystem functions comes with trade-offs, whereby efforts to maximize one function may negatively impact another [@Tallis2008]. 
+*NG:I don't think this sentence is useful - detracts from the flux narrative of the paragraph*
+*JA: It seems you need a transition statement that links plant or animal biomass with the next sentence. This sentence – especially given your last sentence, is critical because it justifies why ‘eco functioning’ is important. *
+However, efforts to maximize one function may negatively impact another [@Tallis2008]. 
 To make informed management decisions that pertain to ecosystem functioning, it is critical to understand the mechanisms that drive these trade-offs [@Rodriguez2006].
        
-In the marine realm, coral reefs are the most diverse and productive ecosystem, and they underpin indispensable ecosystem services to humans. 
-As coral reefs thrive in nutrient-poor waters, efficient nutrient cycling is the key to their productivity. 
+*JA: : I think that the text is quite verbose and has too many fancy words. I will minimize the extent to which I edit out your adjectives moving forward because it is your MS your and your right to word things how you want – and that is fine. But as you see how I have edited things so far that I think there are an excessive number of adjectives (and the ones that are used are a bit over the top) and importantly they distract from the message. Again, that is just my opinion, you do you.*
+Coral reefs are among the most diverse and productive ecosystems on earth, and they provide indispensable ecosystem services to humans. 
+As coral reefs thrive in nutrient-poor waters, efficient nutrient recycling is the key to their productivity. 
+*DRB: Brandl et al. Science would be good to cite here?*
 However, the integrity of coral reefs is threatened by a plethora of anthropogenic stressors, such as intensive exploitation and climate change [@Hughes2017]. 
-Over the past decade, severe biodiversity declines have strained the ability of coral reefs to maintain ecosystem functioning and brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front]. 
+Over the past decade, severe biodiversity declines have brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front].
+
 However, our capacity to quantitatively evaluate, monitor, and compare reef functioning primarily relies on static proxies of functions, such as fish biomass, coral cover, and the richness of species traits [e.g. @Mora2011plos; @Cinner2020; @Mouillot2014]. 
-Consequently, we know little about the co-occurrence of multiple ecosystem functions and their drivers, which provides us with limited guidance for coral reef management in our rapidly changing world. 
+*JA: This is a bit confusing because it sounds like you are saying richness is a static proxy of functions (I totally dig the point you are making though – just don’t want it to be confused)*
+Consequently, we know little about the co-occurrence of biogeochemical fluxes and their drivers, which currently provides us with limited guidance for coral reef management in our rapidly changing world. 
+*JA: You should cite some key papers that have done the multifunction stuff – there is loads of it in the BEF literature in fancy journals.  I am not saying you should my papers, but I have two papers that measure multifunction’s on coral reefs – both of which do speak to conservation issues (one in particular), but neither of which do anything close to what you are doing here. (just a heads up, I comment on citations a lot because I am constantly getting nailed for my citations all the time in review). As with all of my comments feel free to ignore*
          
-Integrating principles of biogeochemistry and traditional ecological assessments provides a promising path toward understanding and conserving the fluxes that underpin reef functioning. 
-Here, we integrate reef fish trait databases across 9,118 communities with bioenergetic modelling to (1) quantify five key ecosystem functions performed by fishes (nitrogen excretion, phosphorous excretion, biomass production, herbivory, and piscivory), (2) disentangle their ecological drivers, and (3) investigate the contribution and vulnerability of different species to each function.
+Here, we integrate principles of biogeochemistry and traditional ecological assessments to advance understanding and conservation of the fluxes that underpin reef functioning.
+We integrate reef fish trait databases across 9,118 communities with bioenergetic modelling to
+*ng: not clear how this fits with the 585 reefs mentioned in the abstract*
+(1) quantify five key ecosystem functions performed by fishes (nitrogen excretion, phosphorous excretion, biomass production, herbivory, and piscivory), 
+*db: In the abstract you pitched this as quantifying ‘five key biogeochemical fluxes’. Its not clear to me here that these are fluxes unless you are presenting them as say the amount of carbon produced/consumed. *
+(2) characterize their potential ecological predictors, and 
+*ng: seems vague? - determine the drivers of variation in ecosystem functions*
+*I do not think this is well worded. I roughly know what you mean, but I think it can be said more clearly. *
+*DB: Also, we do not know for sure if they are truly drivers. Ultimately, we show that these fluxes are correlated with some chosen predictors, so maybe we want to say “predictors” rather than “drivers”. To me “driver” implies an understood mechanistic explanation, whereas “predictor” does not. It doesn’t necessarily mean that some predictors (e.g. body size) are not drivers—they likely are. But I think overall predictor would be a safer choice.*
+(3) investigate the contribution and vulnerability of different species to each function.
+*NG: This seems like 2 aims (spcies contribution, and vulnerability - perhaps add vulnerability as (4) ?*
+*DB: We need a simple sentence summarising how this was done. Up until the figures the reader would not have any idea that used Bayesian hierarchical models. Also, maybe it is worth selling the phylogenetic extrapolation here, which is entirely novel as well?In any case, it is not clear whether you analysed each function separately, or if somehow you used some multivariate approach to estimate the predictors.*
         
 Fish biomass is the most commonly employed indicator of coral reef functioning [@MacNeil2015, @Mora2011plos; @Cinner2020; @Brandl2019front]. 
-However, biomass is a product of nutrient cycling that drives productivity on reefs [@Szmant-Froelich1983]. 
-Although there was a strong relationship between biomass and all five functions, after controlling for biomass, different functions varied up to 10 to 100-fold (see Extended Data Fig. 1a). 
+*NG: I would add a sentence or two at the start to say how emerging / novel approaches have enables these 5 fluxes to be quantified across reefs globally for the first time, showing x and y. The fih biomass comparison is a bit of a dry start, and means the novelty of estimating the fluxes is somewhat buried.*
+However, biomass is a product of nutrient cycling that drives productivity on coral reefs [@Szmant-Froelich1983]. 
+Although there was a strong relationship between biomass and all five functions, after controlling for biomass, different functions varied up to 10 to 100-times (see Extended Data Fig. 1a). 
+*JA: This is a really cool and critical point, but I think you need to spell out what that means to people. When I did this in the nat comms paper it took forever to get people to understand what the significance of this was. I think it is super cool, but to me you should make the point that it provides an absolute species-level effect size per unit mass*
 This striking community-level variability is driven by the species-specific biological traits of fishes [@Schiettekatte2020]. 
-Further, the residual variability of functions revealed strong trade-offs among different functions (see Extended Data Fig. 1b). As a consequence, at a given biomass, no reef can maximize all functions (fig. 1). 
+Further, the residual variability of functions revealed strong trade-offs among different functions (see Extended Data Fig. 1b). 
+*DB: Here I think some specificity would be good. Something that a reviewer could come away with here. Say that there appears to be tradeoffs between herbivory and P excretion or N excretion and P excretion. *
+*JA:Holy shit that matrix is fucking awesome – can you include the error in it? That is, the numbers look amazing, but is there a ton of error in the estimates?*
+As a consequence, at a given biomass, no reef can maximize all functions (fig. 1). 
+*JA: If this is a key ‘goal’ I think it is weakly set up still. I dig it, but I just think it needs better development. *
 For example, when extending the proposed baseline of ~100g/m2 standing fish biomass to define a healthy reef [@MacNeil2015] to our dataset, 46% of global fish communities reached this biomass baseline, yet only 19% showed adequate functioning to satisfy the predicted threshold of each function based on the biomass baseline. 
+*DB: I’m not quite sure I understand how you assessed what ‘adequate functioning’ means. *
+*NG: How are these threshold values defined*
+*JA:I like what you are doing here. The last bit of the sentence is a bit confusing.*
 In fact, due to existing trade-offs between functions, a biomass of ~450g/m2 is necessary to ensure above-threshold levels for each function. 
+*JA: This is something that I think should be in the abstract. I think you need more concrete points in it up there.*
 Our proposed biomass is 450% higher than previously estimated, and, notably, a mere 13% of the fish communities in our dataset meet this threshold (Extended Data Fig. 2).
+*NG: There is a certain amount of circularity in this paragraph - say at the start that biomass is underpinned by the 5 fluxes measured, then relate relate the target levels of the fluxes to biomass targets. Not clear if or why the fluxes may be important in their own right - i.e. need to be clear why they are a step beyond using biomass targets. Perhaps the biomass target side is a red herring that undermines the novelty of quanitifying the 5 fluxes. For example, none of the actual 5 fluxes are named in this paragraph, or the patterns in fig 1 described*  
+*DB: I don’t see this in extended data fig 2. *
            
-What underpins the trade-offs between multiple functions on coral reefs? 
-To explore the ecological drivers of each function, we fit Bayesian mixed models using variables that describe fish community structure, including body size, trophic level, age structure (expressed as immaturity), and species richness. 
+To uncover what underpins the trade-offs between multiple functions on coral reefs, we explored the ecological predictors of each function We fitted Bayesian mixed models using variables that describe fish community structure, including body size, trophic level, age structure (expressed as immaturity), and species richness. 
 We found that functional trade-offs are mediated by contrasting aspects of community structure (fig. 2). 
+*JA/DB: unclear; DB: Adding to this: I don’t quite understand how trade-offs were estimated in your model. This point needs to be crystal clear in the main text, after all it is the main point of the paper.*
+*NG: Based on previous sentence, this is all that was looked at, so a bit of a self explanatory sentence*
 For example, phosphorous excretion is maximized in communities with a high proportion of large-bodied, mature fishes that occupy high trophic levels (See also @Allgeier2014). 
 In contrast, biomass production is maximised in communities dominated by small, immature fishes at lower trophic levels. 
-Metabolic theory predicts that small individuals have a higher mass-specific metabolic rate [@Brown2004], and as a consequence, small individuals have elevated consumption rates and highly contribute to functions that rely on rapid energetic turnover [@Barneche2014]. 
+Metabolic theory predicts that small individuals have a higher mass-specific metabolic rate [@Brown2004], and as a consequence, small individuals have elevated consumption rates and disproportionally contribute to functions that rely on rapid energetic turnover [@Barneche2014].
+*DB: I would drop both Brown et al. 2004 and Barneche et al. 2014 and replace them with Barneche & Allen 2018 which is more relevant to this paper because it measures both metabolic and growth rates and demonstrates the mass-specific scaling issue in fishes.*
 In contrast, fishes in early life stages or with small body sizes feed on nutrient-poor diets that are limited by phosphorus [@Schiettekatte2020], resulting in low contributions to phosphorus excretion. 
+*JA: What evidence do you have for this? I don’t agree with this blanket statement at all. In fact many species feed on higher nutrient content diets as juveniles (eg. Parrotfish do, many species are zooplantivorous as juveniles and zoops are high P content diets). A more probable reason for them not peeing P is high growth rate and they are retaining more P for their bones. That hypothesis is best supported by the literature*
 These results highlight the critical need to integrate organismal biology with community ecology to understand ecosystem-wide biogeochemical fluxes. 
+*JA: I find this statement unnecessary. People have been doing this for ages – re: freshwater ecology, ecological stoichiometry, terrestrial ecology, BEF literature, etc. I think you can just end your paragraph with the last sentence.*
+*DB: I’m still a bit confused by the ‘biogeochemical flux’ framing as only two of the functions are really what I would consider a ‘biogeochemical flux’. That is unless you quantify herbivory in carbon.*
             
 Beyond community structure, species identity profoundly affects rates of functioning [@Ruttenberg2019; @Topor2019]. 
+*NG: How is this related to the organismal biology assessed and described in the previus paragrah. Seems like either a species approach, or a biological trait approach should be used ? Surely the organismal traits should underpin why some species profoundly affect rates. Or does abundance drive more of the species results? Need a linking sentence to explain why this is also important to look at. *
+*JA: Not a big deal, but there are numersou foundational papers that show this (e.g., Paine 1966, Vanni et al. 2002 Eco Letters etc…)– so I found these a bit odd here – I am sure these papers you cite are good, but this concept is very old and citations should reflect that I think*
 To explore whether some species or families consistently contribute more to functioning than expected by their biomass, we estimated the functional dominance of species and their frequency across communities. 
 Across global coral reefs, functions are consistently dominated by a few species (fig. 3b). 
 However, despite evidence for species assuming key functional roles across widely-dispersed locations [@Bellwood2003], the identity of functionally dominant species varies remarkably. 
 In fact, ~70% of all species contribute disproportionally to a function in a given community, but worldwide, the frequency of dominance is strikingly low for each species (fig. 3c). 
+*DB: I’m confused about where this number comes from.*
+*JA: That is totally wild. I would never have guessed that. To me that is a big finding. I see what you were saying in the abstract now, but it just needs to be more clear – i.e., just say it like you do here – very simply. *
+
 Despite high species richness on coral reefs, researchers often report the existence functionally dominant “key species” [e.g. @Bellwood2006]. 
-In contrast, we demonstrate that while dominance is indeed prevalent, the extreme species richness of coral reefs is essential to sustain global functioning [@Topor2019]. 
+*DRB: And they are typically only thinking about one process at a time. The power of this work is that multiple processes are being considered at once. *
+In contrast, we demonstrate that while dominance is indeed prevalent, the identity of the dominant species is unpredictable, suggesting the extreme species richness of coral reefs is essential to sustain global functioning [@Topor2019]. 
           
-Thus, the local decline of a few species can have a large impact if those species are not functionally redundant. 
+The local decline of a few species can have a large impact if those species are not functionally redundant. 
+*NG: Again, the rationale doesn't quite fit with last paragraph. In this case, the previous paragraph said most species important (70%) as it varies among location, and this paragraph starts by saying a few species are important. I know there is more nuance than that, but need to make it really clear for the reader.*
 By coupling species’ functional contributions with their vulnerability to fishing and climate change, we demonstrate that the most profound human-mediated changes are likely to impact piscivory via fishing (fig. 4). 
+*DB: Complicated wording to make a relatively simple point – fishing impacts piscivores. *
 Like piscivory, herbivory is almost exclusively upheld by few key species; therefore, herbivory is also vulnerable to species loss due to lack of redundancy. 
 Given the local nature of species’ functional contributions, the determination of species-based conservation efforts at a global scale will fail to sustain coral reef functioning. 
 Rather, ecosystem functioning can be supported by local actions that avert the functional extinction of species [@Mccauley2015].  
          
-Human impact has already caused severe global declines of reef fish biomass and shifts in community structure [@Mora2011plos; @Hughes2017; @Williams2019], and our findings demonstrate that these changes will continue to fundamentally alter ecosystem functioning on reefs. 
+Human impact has caused severe global declines of reef fish biomass and shifts in community structure [@Mora2011plos; @Hughes2017; @Williams2019], and our findings demonstrate that these changes will continue to fundamentally alter ecosystem functioning on reefs. 
 While the effects of these alterations on ecological processes are more difficult to monitor than declines in biomass, the loss of functioning may have profound consequences for reef ecosystems. 
 For example, intensive fishing leads to biomass declines, which particularly impacts large fishes and consequently changes the size, age, and trophic structure of fish communities [@Graham2017]. 
 These effects can favor nitrogen excretion and production [e.g. @Morais2020glob], while negatively impacting phosphorus excretion, herbivory, and piscivory (Extended Data Fig. 3). 
+*DB: This is because small fishes excrete more N and are P limited right? You might want to bring this back around to the patterns in Fig 2 just so readers get the connections here. *
 On the other hand, changes in community structure triggered by coral cover declines are associated with a shift toward herbivores [@Graham2006; @Ceccarelli2016]. 
 Herbivores have a minor contribution to phosphorus excretion [@Schiettekatte2020], so herbivore dominance and the subsequent community-level decline of phosphorus may induce a negative feedback loop for coral growth [@Shantz2015]. 
+*JA: On a per unit basis, not on a community level. I hate saying this but adding my GCB paper here would bolster this point as that is an important point we make  (the functional groups and how they contribute).  But it may not be a good citation depending on where you are going with this – see next comment*
+*JA: I am not sure you are using ‘negative feedback loop’ correctly. Also this paper you cite (which is great) and Deron’s Sci Rep 2013, are about hotspots – so you have aggregating fishes that make coral and algae grow – these are more behavioral mechanisms, and Deron’s is saying more specifically that this might promote algae.(I just read the sentence after this one so this next point is a bit redundant.) What it seems you are talking about is community-level reductions in P, which is quite different to me. That would cause shifts in ratios. The Weidenmann et al. 2014? Nat Climate Change paper is a rad paper and shows plimitation in corals – there is Ezzats paper about Plimitation. Andy S also has a great Eco Letts paper about nutrients and mutualisms that would be possibly appropriate. We also just had a paper in GCB showing that changes in ratios of NP have negative implications for coral. Also herbivory is what people always say matters so much. You are saying increased herbs is bad, but many would argue top-down is way more important that excretion – so you will likely get kickback on that point without acknowledging that the top down mechanisms are important. *
+*DB: All good points here by Jake. Some places here to tighten this argument. *
+*NG: too vague - say how fish phosphorus excretion increases coral growth*
 This is particularly problematic when considered in conjunction with climate change, as phosphorus starvation in corals reduces their temperature threshold for bleaching [@Ezzat2016]. 
           
 Our results demonstrate the challenges of managing one of Earth’s most diverse and vulnerable ecosystems. 
-Rooted in our agroeconomic history, maximizing ecosystem functioning is the dominant objective of many 21st century conservation initiatives. 
-The revealed functional trade-offs challenges the feasibility of this approach and introduces a conundrum for coral reef conservation. 
+Maximizing ecosystem functioning is the dominant objective of contemporary conservation initiatives. 
+*JA:  I would argue that maintaining biodvierstiy is the “dominant” objective. A motivation for this is maintaining ecosystem function. But if you ask conservation and managers they will not say “maximizing ecosystem function” – in my experience at least. I think you might get a lot of blowback on a statement like this. You can say it is a clear objective or an important objective and that would be fine.*
+The functional trade-offs revealed between key ecosystem functions challenges the feasibility of this approach and introduces a conundrum for coral reef conservation. 
 Traditionally, marine reserves have been the main conservation strategy for coral reefs [@Graham2020].
 While they provide benefits for biomass and herbivory, they provide little insurance for diversity in populated regions [@Cinner2020] and do not protect reefs from the pervasive effects of climate change [@Graham2020]. 
+*DB: not also piscivory?*
 Measuring conservation success with biomass or solely one function (e.g. herbivory) can mask the collapse of other essential energetic pathways. 
 Thus, it is essential to gauge reef “health” based on multiple, complementary, process-based functions [@Brandl2019front]. 
 Furthermore, individual reefs require local management plans to protect species with key roles in multiple functions, and the presence of multiple stakeholders may require the prioritisation of various functions based on local needs and stressors. 
-Globally, given that majority of species are locally important for functioning in a certain community, the conservation of a wide range of species is desirable, in addition to tackling the primary threat to coral reefs, climate change [@Bruno2019].
+*NG: Perhaps tie to some examples, e.g. gear restrictions, co-management, restoring seabird nutrient fluxes. Or tie to the bright spots approach for learning and disseminating successful management approaches*
+Globally, given that the majority of species are locally important for functioning in a certain community, the conservation of a wide range of species is desirable, in addition to tackling the primary threat to coral reefs, climate change [@Bruno2019].
+*NG: Again, need to more clearly delineate the key species and the majority of species approaches. *
+*JA: This sentence is not doing very much. You say above that global efforts are not easy and maybe not useful. Then you say it needs to be local. And now you say it needs to be global again (I realize I am overgeneralizing, but you get my point hopefully). I just sort of think you shoot yourself in the foot a bit here. I think you could either drop it, or make the argument a bit stronger by clarify the need to balance global efforts (climate change, general species conservation) and local efforts (where, how whatmanagement).  *
            
-Biomass alone does not suffice to explain coral reef ecosystem functioning, and, in fact, there is a strong mismatch among different functions performed by coral reef fishes. 
 Our results contribute to an ongoing discussion surrounding the question: what constitutes a healthy reef? 
+*JA: There is some redundancy in this paragraph and the one before. I like this wording and framing, but it seems like this should be up in the paragraph above*
 We posit that the answer cannot be rooted in a purely economic mindset that aims for the maximization of all functions. 
-Rather, a diverse community that supports intermediate levels of each function is ideal, with many species emerging as key local players. 
+Rather, a diverse community that supports intermediate levels of each function is ideal, with many species emerging as key local players.
+*JA: One thing that you can include here is that coral reefs themselves are diverse, so what is a criticl function in one reef is simply less critical in another – context dependence is everything on coral reefs.*
 In light of the rapid degradation of coral reefs worldwide [@Hughes2017], quantitative monitoring beyond biomass is critical to create viable conservation targets and uphold coral reef functioning, as well as associated services to humanity, beyond the 21st century [@Brandl2019front].
+*JA: But you generated all this data form biomass monitoring. So I would say that it is critical, but we need to include scaling these additional processes.*
 
 # Figures
 
 ![Figure 1: World maps of five key ecosystem functions, independent of fish biomass. Dots indicate the localities that are included in this study. Dot size represents the rank of the average of the residuals of each log-transformed function after regression with the log-transformed standing biomass and sea surface temperature. Similarly, the color scales show the value of the residuals categorically (low = lower 25%, medium = 25-75%, high = >75%). Circles highlight the five localities with the highest average residuals of each function respectively.](../output/plots/fig1_multimap.png)
 
+*DB: But you generated all this data form biomass monitoring. So I would say that it is critical, but we need to include scaling these additional processes.*
+*DRB: Indeed. I would also perhaps add the actual flux units at the top-left corners to make this visually clearer.*
+*DB: I don’t see the color scales here unless you mean black, gray, and then the colored dots. *
+*DRB: Good point, it may be best to add different symbols to the different fluxes.*
+
+
 ![Figure 2: Fixed effect values of the Bayesian linear regression for each function with community variables. The log-transformed standing biomass was also included as a covariable, but not shown in this figure. All data was standardized to be able to compare across functions and variables. Functions were log-transformed before standardisation.](../output/plots/fig2_com_slopes.png)
+*JA: What do the numbers in the parentheses mean? What are the dashed lines for? Just help you see? Why do some not have data (eg Immaturity – no estimate for piscivory)*
+*DB: Agree with Jake here. We need some more guidance on the details of the figures. What are the confidence intervals? Why is median size missing two data points? Several other traits are also missing data points. Does that mean they weren’t significant predictors?*
+*DB: I’m also confused about the order of the predictors on the Y axis. All of the Trophic Level predictors are grouped together at the top. But the Immaturity metrics are spread out along the Y axis. Is this meaningful somehow? If not I would suggest grouping predictors by type. *
 
 ![Figure 3: a) Median family-level contributions to each function, relative to their contribution to biomass. Only the 12 most important family’s are shown here, and families are ordered by their median contribution to biomass. b) Distribution of the degree of dominance of communities per function. A degree of dominance of 0 means each species contributes equally to a function, 1 means a single species performs a function. c) Distributions of frequency of being dominant to each function of all species across all communities. A value of 1 means that a species is always important whenever present. A species is counted as being dominant in a community if that species contributes to more than 1 divided by the species richness. Dots represent the median value, while lines indicate the interquartile range.](../output/plots/fig3_contributions.png)
 
+*JA: I like what you did below for B and C and say what a given number means. For A) the axis is not that intuitive – e.g., what a negative number means –  I think you can def present it more simply so people can see it and move on. I like how you did B and C, which are super cool – but I don’t really get how you determined dominant for C. *
+*Just a thought, I would be curious to see how well your package predicts Caribbean fish pee. We only used moorea fish right? They pee on average WAY less than Caribbean fishes – just a random though….*
+
+*DB: So does a negative number mean that taxa contributes less to a function than would be expected based on biomass alone? So that Labridae contribiutes less to P excretion than one would expect based on biomass? I think this needs to be explained in the legend better. *
+*DB: So this is saying that Piscivory is almost always driven by one species on a reef? That each reef has one dominant piscivores species? That is honestly pretty hard to imagine.*
+*DB: What does the shading represent? The distribution of the data?*
+
 ![Figure 4: Vulnerability and importance to each function of fish species included in this study. Transparant bars represent the relative number of species in each category of vulnerability. Filled bars show the proportion of species that are locally important (i.e. perform more than 1/N of the function, where N is the number of species observed in a certain transect).](../figures/figure4_all_species.png)
 
+*DB: I’ll be honest that I really don’t understand what this means. *
 
 ![Extended Data Figure 1: a) Fold variation of each function per biomass class of 50g/m2 across fish communities. b) Correlation matrix od the residuals of the five functions.](../output/plots/annex_fig1_mf_logbiomass.png)
+*DRB: wrong fig, no a and b?*
 
 ![Extended Data Figure 2: Predicted probability of crossing a reference threshold for all five functions with the log-transformed biomass.](../output/plots/annex_fig2.png)
 
@@ -118,4 +224,4 @@ In light of the rapid degradation of coral reefs worldwide [@Hughes2017], quanti
 
 # References
 
-
+check cinner and rodriguez refs!
