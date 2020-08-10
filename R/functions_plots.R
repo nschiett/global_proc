@@ -18,7 +18,7 @@ make_fig1 <- function(location_effect){
             axis.title = element_blank(),
             axis.text.x = element_text(size = 6),
             axis.text.y = element_text(size = 6),
-            plot.title = element_text(size = 8, hjust = 0, face = "bold"), 
+            plot.title = element_text(size = 6, hjust = 0, face = "bold"), 
             plot.margin = unit(c(0.002,0.002,0.002,0.002), units = , "cm"),
             panel.spacing = unit(0, "cm")
       ) 
@@ -60,7 +60,7 @@ make_fig1 <- function(location_effect){
                data = filter(location_effect, r_loc_Fn > quantile(location_effect$r_loc_Fn, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -170, y = 30, label = "N excretion"), size = 4, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "N excretion (g N/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
     theme_worldmap() + 
@@ -90,7 +90,7 @@ make_fig1 <- function(location_effect){
                data = filter(location_effect, r_loc_Fp > quantile(location_effect$r_loc_Fp, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -170, y = 30, label = "P excretion"), size = 4, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "P excretion (g P/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
     theme_worldmap() + 
@@ -120,7 +120,7 @@ make_fig1 <- function(location_effect){
                data = filter(location_effect, r_loc_Gc > quantile(location_effect$r_loc_Gc, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -170, y = 30, label = "Production"), size = 4, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "Production (g C/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
     theme_worldmap() + 
@@ -155,7 +155,7 @@ make_fig1 <- function(location_effect){
                data = filter(location_effect, r_loc_I_herb > quantile(location_effect$r_loc_I_herb, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -170, y = 30, label = "Herbivory"), size = 4, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "Herbivory (g C/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
     theme_worldmap() + 
@@ -188,7 +188,7 @@ make_fig1 <- function(location_effect){
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -170, y = 30, label = "Piscivory"), size = 4, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "Piscivory (g C/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
     theme_worldmap()+ 
@@ -202,7 +202,7 @@ make_fig1 <- function(location_effect){
     a + b + c + d + e +
     plot_layout(ncol = 1)
   
-  multimap
+  #multimap
   ggsave("output/plots/fig1_multimap.png", multimap, width = 8, height = 8)
 }
 
@@ -639,6 +639,7 @@ make_annex_fig2 <- function(summary_transect_complete, residuals){
    
    fcor <- cor(select(fluxs, Fn_r, Fp_r, Gc_r, I_herb_r, I_pisc_r)) %>% 
      as.data.frame() 
+   
    fcor <- fcor %>%
      mutate(x = rownames(fcor)) %>%
      pivot_longer(names_to = "y", values_to = "cor", -x) 

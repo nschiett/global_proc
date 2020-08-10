@@ -3450,7 +3450,341 @@ ggplot(summary_transect_complete) +
   geom_abline(aes(intercept = -11.46, slope = 1.05), color = "black")
 
 
+####### multivariate correlation model ######
 
+# flux <- summary_transect_complete
+# 
+# # run model
+# fit <- brm(
+#   mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc)) ~ (log(biomass_tot)), 
+#               data = flux[flux$I_herb>0 & flux$I_pisc>0,][1:100,], cores = 4)
+# fails
+
+
+##### vulnerability per community #####
+
+loadd(vulnerability)
+loadd(contributions)
+loadd(herb_pisc)
+loadd(summary_transect)
+
+
+con <- left_join(contributions, vulnerability) %>%
+  left_join(herb_pisc$contributions_herb_pisc) %>%
+  group_by(transect_id) %>%
+  dplyr::summarize(
+    vuln_Fn_fi = sum(Fn_p * vuln_fi, na.rm = TRUE),#/sum(vuln_fi, na.rm = TRUE),
+    vuln_Fp_fi = sum(Fp_p * vuln_fi, na.rm = TRUE),#/sum(vuln_fi, na.rm = TRUE),
+    vuln_Gc_fi = sum(Gc_p * vuln_fi, na.rm = TRUE),#/sum(vuln_fi, na.rm = TRUE),
+    vuln_Iherb_fi = sum(I_herb_p[I_herb_p > 0] * vuln_fi[I_herb_p > 0], na.rm = TRUE),#/sum(vuln_fi[I_herb_p > 0], na.rm = TRUE),
+    vuln_Ipisc_fi = sum(I_pisc_p[I_pisc_p > 0] * vuln_fi[I_pisc_p > 0], na.rm = TRUE),#/sum(vuln_fi[I_pisc_p > 0], na.rm = TRUE),
+    vuln_Fn_cl = sum(Fn_p * vuln_climate, na.rm = TRUE),#/sum(vuln_climate, na.rm = TRUE),
+    vuln_Fp_cl = sum(Fp_p * vuln_climate, na.rm = TRUE),#/sum(vuln_climate, na.rm = TRUE),
+    vuln_Gc_cl = sum(Gc_p * vuln_climate, na.rm = TRUE),#/sum(vuln_climate, na.rm = TRUE),
+    vuln_Iherb_cl = sum(I_herb_p[I_herb_p > 0] * vuln_climate[I_herb_p > 0], na.rm = TRUE),#/sum(vuln_climate[I_herb_p > 0], na.rm = TRUE),
+    vuln_Ipisc_cl = sum(I_pisc_p[I_pisc_p > 0] * vuln_climate[I_pisc_p > 0], na.rm = TRUE))
+
+con_long <- con %>%#/sum(vuln_climate[I_pisc_p > 0], na.rm = TRUE)) %>%
+  pivot_longer(cols = 2:11) %>%
+  separate(name, into = c("v", "fun", "impact"), sep = "_", remove = TRUE) %>%
+  filter(value>0) %>%
+  pivot_wider(names_from = impact, values_from = value)
+
+ggplot(con_long) +
+  geom_boxplot(aes(x = fun, y = (value))) +
+  facet_wrap(~impact)
+
+con <- left_join(con, unique(select(ungroup(contributions), transect_id, sites, locality, lat, lon)))
+
+test <- filter(con) %>%
+  group_by(sites, locality) %>%
+  summarise_if(is.numeric, median) %>%
+  group_by(locality) %>%
+  summarise_if(is.numeric, median)
+
+ggplot(test) + 
+  geom_sf(data = world, color = NA, fill = "lightgrey") +
+  geom_point(aes(x = lon, y = lat, color = (value), 
+                 size = get_scores(value)),  alpha = 0.8,
+             position = position_jitter(0,0), shape = 16) +
+  # geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+  #            shape = 1, size = 4,
+  #            data = filter(location_effect, r_loc_Fp > quantile(location_effect$r_loc_Fp, 0.95, na.rm = TRUE))) +
+  scale_color_gradient(low = "green", high = "red", name = "") +
+  coord_sf(ylim = c(-35, 35), expand = FALSE) +
+  geom_text(aes(x = -175, y = 30, label = "P excretion (g P/m²day)"), size = 3, hjust = 0) +
+  scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+  theme_worldmap() + 
+  theme(legend.position = "bottom", 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        plot.title = element_text(vjust = -8, hjust = 0.005),
+        plot.margin = unit(c(0.0001,0.0001,0.0001,0.0001), units = , "cm"))
+
+
+res_long <- pivot_longer(residuals, 2:6, values_to = "residual") %>%
+  mutate(fun = case_when(name == "Fn_r" ~ "Fn",
+                         name == "Fp_r" ~ "Fp",
+                         name == "Gc_r" ~ "Gc",
+                         name == "I_herb_r" ~ "Iherb",
+                         name == "I_pisc_r" ~ "Ipisc")) %>%
+  select(-name)
+
+con_long <- left_join(con_long, res_long)
+
+
+ggplot(con_long) +
+  geom_point(aes(x = fi, y = residual)) +
+  facet_wrap(~fun, ncol = 1, scales = "free_y")
+ggplot(con_long) +
+  geom_point(aes(x = cl, y = residual)) +
+  facet_wrap(~fun, ncol = 1, scales = "free_y")
+
+vu <- data.frame(
+  fun = c("Fn", "Fp", "Gc", "Iherb", "Ipisc"),
+  m_fi = c(
+    median(con$vuln_Fn_fi),
+    median(con$vuln_Fp_fi),
+    median(con$vuln_Gc_fi),
+    median(con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+    median(con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+  ),
+  m_cl = c(
+    median(con$vuln_Fn_cl),
+    median(con$vuln_Fp_cl),
+    median(con$vuln_Gc_cl),
+    median(con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+    median(con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+  )
+) %>%
+  mutate(m_fi = mean(m_fi),
+         m_cl = mean(m_cl))
+
+summary(c(
+  (con$vuln_Fn_cl),
+  (con$vuln_Fp_cl),
+  (con$vuln_Gc_cl),
+  (con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+  (con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+))
+
+q_cl <- quantile(c(
+  (con$vuln_Fn_cl),
+  (con$vuln_Fp_cl),
+  (con$vuln_Gc_cl),
+  (con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+  (con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+), c(0.2, 0.4, 0.6, 0.8))
+q_fi <- quantile(c(
+  (con$vuln_Fn_fi),
+  (con$vuln_Fp_fi),
+  (con$vuln_Gc_fi),
+  (con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+  (con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+), c(0.2, 0.4, 0.6, 0.8))
+
+test <- con_long %>%
+  left_join(res_long) %>%
+  left_join(vu) %>%
+  mutate(cat = case_when(fi > m_fi &
+                           cl > m_cl ~ "High vulnerability to both",
+                         cl > m_cl ~ "High vulnerability to climate change",
+                         fi > m_fi ~ "High vulnerability to fishing",
+                         TRUE ~ "Low vulnerability to both")) %>%
+  mutate(high = residual > 0) %>%
+  group_by(cat, fun) %>%
+  dplyr::summarise(n_high = sum(high), n = length(unique(transect_id))) %>%
+  ungroup() %>% dplyr::group_by(fun) %>%
+  mutate(ntot = sum(n)) %>%
+  mutate(prop_high = n_high / ntot, prop = n/ntot)
+
+ggplot(test) +
+  geom_bar(aes(x = fun, y = prop, fill = fun), 
+           alpha = 0.2, stat = "identity") +
+  geom_bar(aes(x = fun, y = prop_high, fill = fun), 
+           alpha = 1, stat = "identity") +
+  #geom_point(aes(x = fun, y = prop/2), size = 1) +
+  facet_wrap(~cat) +
+  scale_fill_fish_d(option = "Callanthias_australis",
+                    labels = c("N excretion", 
+                               "P excretion", 
+                               "Production",
+                               "Herbivory",
+                               "Piscivory")) +
+  labs(y = "Proportion of communities", x = "", fill = "") +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.text.x = element_blank(), axis.ticks.x = element_blank()) 
+
+test2_fi <- con_long %>%
+  left_join(res_long) %>%
+  left_join(vu) %>%
+  mutate(cat_fi = case_when(fi > q_fi[4] ~ "Very high",
+                            fi > q_fi[3] ~ "High",
+                            fi > q_fi[2] ~ "Medium",
+                            fi > q_fi[1] ~ "Low",
+                            TRUE ~ "Very low")) %>%
+  mutate(high = residual > 0) %>%
+  group_by(cat_fi, fun) %>%
+  dplyr::summarise(n_high_fi = sum(high), n_fi = length(unique(transect_id))) %>%
+  ungroup() %>% dplyr::group_by(fun) %>%
+  mutate(ntot_fi = sum(n_fi)) %>%
+  mutate(prop_high_fi = n_high_fi / ntot_fi, prop_fi = n_fi/ntot_fi) %>%
+  mutate(cat = factor(cat_fi, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+test2_cl <- con_long %>%
+  left_join(res_long) %>%
+  left_join(vu) %>%
+  mutate(cat_cl = case_when(cl > q_cl[4] ~ "Very high",
+                            cl > q_cl[3] ~ "High",
+                            cl > q_cl[2] ~ "Medium",
+                            cl > q_cl[1] ~ "Low",
+                            TRUE ~ "Very low")) %>%
+  mutate(high = residual > 0) %>%
+  group_by(cat_cl, fun) %>%
+  dplyr::summarise(n_high_cl = sum(high), n_cl = length(unique(transect_id))) %>%
+  ungroup() %>% dplyr::group_by(fun) %>%
+  mutate(ntot_cl = sum(n_cl)) %>%
+  mutate(prop_high_cl = n_high_cl / ntot_cl, prop_cl = n_cl/ntot_cl) %>%
+  mutate(cat = factor(cat_cl, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+
+p1 <- ggplot(test2_fi) +
+  # geom_bar(aes(x = cat_fi, y = -(prop - prop_high), fill = fun), 
+  #          alpha = 0.5, stat = "identity", position = "dodge") +
+  geom_bar(aes(x = cat, y = prop_fi, fill = fun), 
+           alpha = 1, stat = "identity", position = "dodge") +
+  scale_fill_fish_d(option = "Callanthias_australis",
+                    labels = c("N excretion", 
+                               "P excretion", 
+                               "Production",
+                               "Herbivory",
+                               "Piscivory")) +
+  labs(y = "Proportion of communities", x = "Vulnerability to fishing", fill = "") +
+  #scale_y_continuous(breaks = c(-0.1, 0, 0.1, 0.2, 0.3), labels = c("0.1", "0", "0.1", "0.2", "0.3")) +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(), 
+        panel.grid.minor = element_blank(), legend.position = "top")  
+
+p2 <- ggplot(test2_cl) +
+  # geom_bar(aes(x = cat_cl, y = -(prop - prop_high), fill = fun), 
+  #          alpha = 0.5, stat = "identity", position = "dodge") +
+  geom_bar(aes(x = cat, y = prop_cl, fill = fun), 
+           alpha = 1, stat = "identity", position = "dodge") +
+  scale_fill_fish_d(option = "Callanthias_australis",
+                    labels = c("N excretion", 
+                               "P excretion", 
+                               "Production",
+                               "Herbivory",
+                               "Piscivory")) +
+  #scale_y_continuous(breaks = c(-0.1, 0, 0.1, 0.2, 0.3), labels = c("0.1", "0", "0.1", "0.2", "0.3")) +
+  labs(y = "Proportion of communities", x = "Vulnerability to climate change", fill = "") +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(), 
+        panel.grid.minor = element_blank(), legend.position = "none")  
+
+p1 + p2 + plot_layout(nrow = 2)
+
+double <- 
+  con_long %>%
+  left_join(res_long) %>%
+  left_join(vu) %>%
+  mutate(cat_double = case_when(fi > q_fi[3] & cl > q_cl[3] ~ "High",
+                                fi < q_fi[2] & cl < q_cl[2] ~ "Low",
+                                TRUE ~ "rest")) %>%
+  group_by(cat_double, fun) %>%
+  dplyr::summarise( n = length(unique(transect_id))) %>%
+  ungroup() %>% dplyr::group_by(fun) %>%
+  mutate(ntot = sum(n)) %>%
+  mutate(prop = n/ntot) %>%
+  filter(!cat_double == "rest") %>%
+  mutate(cat_double = factor(cat_double, levels = c("Low", "High")))
+
+
+p3 <- ggplot(double) +
+  geom_bar(aes(x = cat_double, y = prop, fill = fun), 
+           alpha = 1, stat = "identity", position = "dodge", width = 0.5) +
+  scale_fill_fish_d(option = "Callanthias_australis",
+                    labels = c("N excretion", 
+                               "P excretion", 
+                               "Production",
+                               "Herbivory",
+                               "Piscivory")) +
+  #scale_y_continuous(breaks = c(-0.1, 0, 0.1, 0.2, 0.3), labels = c("0.1", "0", "0.1", "0.2", "0.3")) +
+  labs(y = "Proportion of communities", x = "Vulnerability to both", fill = "") +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        
+        legend.position = "none")  
+
+p3
+
+p1 + p2 + p3 + plot_layout(ncol = 1)
+
+
+test2 <- test %>%
+  mutate(cat = case_when(fi > m_fi &
+                           vl > m_cl ~ "both",
+                         fi < m_fi &
+                           cl > m_cl ~ "climate",
+                         fi > m_fi &
+                           cl < m_cl ~ "fishing",
+                         TRUE ~ "none")) %>%
+  mutate(high = Gc_r > 0) %>%
+  group_by(cat) %>%
+  dplyr::summarise(n_high = sum(Gc_r > 0), n = n()) %>%
+  mutate(prop_high = n_high / n, prop = n/sum(n))
+test2 <- test %>%
+  mutate(cat = case_when(vuln_Fp_fi > m_fi &
+                           vuln_Fp_cl > m_cl ~ "both",
+                         vuln_Fp_fi < m_fi &
+                           vuln_Fp_cl > m_cl ~ "climate",
+                         vuln_Fp_fi > m_fi &
+                           vuln_Fp_cl < m_cl ~ "fishing",
+                         TRUE ~ "none")) %>%
+  mutate(high = Fp_r >0) %>%
+  group_by(cat) %>%
+  dplyr::summarise(n_high = sum(Fp_r > 0), n = n()) %>%
+  mutate(prop_high = n_high / n, prop = n/sum(n))
+test2 <- test %>%
+  mutate(cat = case_when(vuln_Fn_fi > m_fi &
+                           vuln_Fn_cl > m_cl ~ "both",
+                         vuln_Fn_fi < m_fi &
+                           vuln_Fp_cl > m_cl ~ "climate",
+                         vuln_Fn_fi > m_fi &
+                           vuln_Fn_cl < m_cl ~ "fishing",
+                         TRUE ~ "none")) %>%
+  mutate(high = Fn_r >0) %>%
+  group_by(cat) %>%
+  dplyr::summarise(n_high = sum(Fn_r > 0), n = n()) %>%
+  mutate(prop_high = n_high / n, prop = n/sum(n))
+
+test <- filter(con, fun == "Ipisc") %>%
+  left_join(residuals) %>%
+  group_by(sites, locality) %>%
+  summarise_if(is.numeric, median) %>%
+  group_by(locality) %>%
+  summarise_if(is.numeric, median)
+
+
+ggplot(test) + 
+  geom_sf(data = world, color = NA, fill = "lightgrey") +
+  geom_point(aes(x = lon, y = lat, color = (value), 
+                 size = get_scores(value)),  alpha = 0.8,
+             position = position_jitter(0,0), shape = 16) +
+  # geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+  #            shape = 1, size = 4,
+  #            data = filter(location_effect, r_loc_Fp > quantile(location_effect$r_loc_Fp, 0.95, na.rm = TRUE))) +
+  scale_color_gradient(low = "green", high = "red", name = "", trans = "log10") +
+  coord_sf(ylim = c(-35, 35), expand = FALSE) +
+  geom_text(aes(x = -175, y = 30, label = "P excretion (g P/m²day)"), size = 3, hjust = 0) +
+  scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+  theme_worldmap() + 
+  theme(legend.position = "bottom", 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        plot.title = element_text(vjust = -8, hjust = 0.005),
+        plot.margin = unit(c(0.0001,0.0001,0.0001,0.0001), units = , "cm"))
 
 
 
