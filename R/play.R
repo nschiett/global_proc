@@ -740,6 +740,70 @@ pca_wild <-
   )
 pca_wild
 
+## pca with hotspots
+dpca_res<- inner_join(select(res2, transect_id, hot, cold, all_q), dpca)
+
+pca <-
+  ggplot(dpca_res) +
+  geom_hline(yintercept = 0, lty = 2, color = "grey") +
+  geom_vline(xintercept = 0, lty = 2, color = "grey") +
+  geom_point(aes(x = PC1, y = PC2), color = "grey" ,
+             data = dpca, alpha = 0.5, shape = 16)  +
+  geom_point(aes(x = PC1, y = PC2, color = "red"), 
+             data = dpca_res[dpca_res$hot == TRUE ,],  shape = 8, size = 3, alpha = 0.6)  +
+  geom_point(aes(x = PC1, y = PC2, color = "blue"), 
+             data = dpca_res[dpca_res$cold == TRUE ,],  shape = 3, size = 3, alpha = 0.6)  +
+  # stat_density_2d(aes(x = PC1, y = PC2, fill = bioregion, color = bioregion),
+  #                 alpha = 0.3 , geom = "polygon", data = dpca_wild, bins = 2) +
+  labs(x = "PC1", y = "PC2") +
+  
+  theme_minimal() +
+  theme(panel.grid = element_blank(), 
+        panel.border = element_rect(fill= "transparent")) +
+  scale_color_fish_d(option = "Scarus_quoyi",
+                     labels = c("CIP", "CP", "EP", "WA")) +
+  scale_fill_fish_d(option = "Scarus_quoyi",
+                    labels = c("CIP", "CP", "EP", "WA")) +
+  coord_equal() +
+  theme(
+    legend.position = c(0.99, .99),
+    legend.justification = c("right", "top"),
+    legend.box.just = "right",
+    legend.margin = margin(6, 6, 6, 6)
+  ) +
+  facet_wrap(~ bioregion)
+pca
+pca <-
+  ggplot(dpca_res) +
+  geom_hline(yintercept = 0, lty = 2, color = "grey") +
+  geom_vline(xintercept = 0, lty = 2, color = "grey") +
+  geom_point(aes(x = PC3, y = PC4), color = "grey" ,
+             data = dpca, alpha = 0.5, shape = 16)  +
+  geom_point(aes(x = PC3, y = PC4, color = "red"), 
+             data = dpca_res[dpca_res$hot == TRUE ,],  shape = 8, size = 3, alpha = 0.6)  +
+  geom_point(aes(x = PC3, y = PC4, color = "blue"), 
+             data = dpca_res[dpca_res$cold == TRUE ,],  shape = 3, size = 3, alpha = 0.6)  +
+  # stat_density_2d(aes(x = PC1, y = PC2, fill = bioregion, color = bioregion),
+  #                 alpha = 0.3 , geom = "polygon", data = dpca_wild, bins = 2) +
+  labs(x = "PC1", y = "PC2") +
+  
+  theme_minimal() +
+  theme(panel.grid = element_blank(), 
+        panel.border = element_rect(fill= "transparent")) +
+  scale_color_fish_d(option = "Scarus_quoyi",
+                     labels = c("CIP", "CP", "EP", "WA")) +
+  scale_fill_fish_d(option = "Scarus_quoyi",
+                    labels = c("CIP", "CP", "EP", "WA")) +
+  coord_equal() +
+  theme(
+    legend.position = c(0.99, .99),
+    legend.justification = c("right", "top"),
+    legend.box.just = "right",
+    legend.margin = margin(6, 6, 6, 6)
+  ) +
+  facet_wrap(~ bioregion)
+pca
+
 ggplot() +
   geom_histogram(aes(x = multi, y = stat(count) / sum(count)), 
                  bins = 20, data = filter(dpca, !transect_id %in% dpca_wild$transect_id), fill = "black", alpha = 0.6) +
@@ -3720,6 +3784,7 @@ p3 <- ggplot(double) +
 p3
 
 p1 + p2 + p3 + plot_layout(ncol = 1)
+ggsave("output/plots/figure_4_vuln_com.png", width = 8, height = 10)
 
 
 test2 <- test %>%
@@ -3785,6 +3850,82 @@ ggplot(test) +
         axis.ticks.x = element_blank(),
         plot.title = element_text(vjust = -8, hjust = 0.005),
         plot.margin = unit(c(0.0001,0.0001,0.0001,0.0001), units = , "cm"))
+
+
+##### residuals #####
+loadd(residuals)
+human <- read_csv("data/humanPopulation.csv") %>%
+  select(-lat, -lon, - locality, -region )%>%
+  as.data.frame()
+
+res2 <- residuals %>%
+  drop_na() %>%
+  mutate(hot = 
+           Fn_r > mean(Fn_r) & 
+           Fp_r > mean(Fp_r) &
+           Gc_r > mean(Gc_r) &
+           I_herb_r > mean(I_herb_r) &
+           I_pisc_r > mean(I_pisc_r),
+         cold = 
+           Fn_r < median(Fn_r) & 
+           Fp_r < median(Fp_r) &
+           Gc_r < median(Gc_r) &
+           I_herb_r < median(I_herb_r) &
+           I_pisc_r < median(I_pisc_r),
+         all_q = 
+           Fn_r > uquar(Fn_r) & 
+           Fp_r > uquar(Fp_r) &
+           Gc_r > uquar(Gc_r) &
+           I_herb_r > uquar(I_herb_r) &
+           I_pisc_r > uquar(I_pisc_r))
+  #        ) %>%
+  # left_join(summary_transect)
+
+uquar <- function(x) {
+  quantile(x, 0.75)
+}
+
+sum(res2$hot) /nrow(res2)
+sum(res2$cold) /nrow(res2)
+sum(res2$all_q) /nrow(res2)
+
+idhot <- res2 %>%
+  filter(hot == TRUE) %>%
+  left_join(summary_transect) %>%
+  left_join(human)
+
+idcold <- res2 %>%
+  filter(cold == TRUE) %>%
+  left_join(summary_transect) %>%
+  left_join(human)
+
+summary(log1p(idhot$pop_50))
+summary(log1p(idcold$pop_50))
+
+ggplot() +
+  geom_density(aes(x = ((idhot$size_m))), fill = "red", alpha = 0.5) +
+  geom_density(aes(x = ((idcold$size_m))), fill = "blue", alpha = 0.5) +
+  geom_density(aes(x = ((res2$size_m))), fill = "grey", alpha = 0.5) 
+  
+ggplot() +
+  geom_density(aes(x = ((idhot$troph_m))), fill = "red", alpha = 0.5) +
+  geom_density(aes(x = ((idcold$troph_m))), fill = "blue", alpha = 0.5) +
+  geom_density(aes(x = ((res2$troph_m))), fill = "grey", alpha = 0.5) 
+ggplot() +
+  geom_density(aes(x = ((idhot$troph_q3))), fill = "red", alpha = 0.5) +
+  geom_density(aes(x = ((idcold$troph_q3))), fill = "blue", alpha = 0.5) +
+  geom_density(aes(x = ((res2$troph_q3))), fill = "grey", alpha = 0.5) 
+
+ggplot() +
+  geom_density(aes(x = ((idhot$imm_m))), fill = "red", alpha = 0.5) +
+  geom_density(aes(x = ((idcold$imm_m))), fill = "blue", alpha = 0.5) +
+  geom_density(aes(x = ((res2$imm_m))), fill = "grey", alpha = 0.5) 
+
+ggplot() +
+  geom_density(aes(x = ((idhot$troph_q1))), fill = "red", alpha = 0.5) +
+  geom_density(aes(x = ((idcold$troph_q1))), fill = "blue", alpha = 0.5) +
+  geom_density(aes(x = ((res2$troph_q1))), fill = "grey", alpha = 0.5) 
+
 
 
 

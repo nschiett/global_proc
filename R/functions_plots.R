@@ -269,8 +269,8 @@ make_fig2 <- function(commodels){
     geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey", 
                size = 0.5, linetype = 1, alpha = 0.7) +
     geom_hline(yintercept = 0, size = 1, color = "black") +
-    geom_linerange(aes(x = variable, ymin = 0, ymax = mean, color = model),
-                   position = position_dodge(.7), size = 0.5, linetype = 2) + 
+    # geom_linerange(aes(x = variable, ymin = 0, ymax = mean, color = model),
+    #                position = position_dodge(.7), size = 0.5, linetype = 2) + 
     geom_linerange(aes(x = variable, ymin = lq, ymax = uq, color = model),
                    position = position_dodge(.7), size = 1, linetype = 1) + 
     geom_point(aes(x = variable, y = mean, color = model), position = position_dodge(.7), size = 3) +
