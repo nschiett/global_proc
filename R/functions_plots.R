@@ -250,14 +250,14 @@ make_fig2 <- function(commodels){
   result <- mutate(result, diff = (uq > 0 & lq < 0)) 
   
   # Specify importance of variables per slope values
-  importance <- group_by(result, variable) %>%
-    summarise(tot = max(abs(mean))) 
+  tot <- group_by(result, model) %>%
+    summarise(tot = sum(abs(mean))) 
   
   # filter out variables that we don't need 
   result <- result %>%
     dplyr::filter(!variable == "b_Intercept") %>%
-    left_join(importance) %>% 
-    mutate(variable = fct_reorder(variable, tot)) %>%
+    left_join(tot) %>% 
+    #mutate(variable = fct_reorder(variable, tot)) %>%
     filter(diff == FALSE) %>%
     filter(!variable == "b_standardlogbiomass") %>%
     filter(!variable == "b_standardmean") 
@@ -280,10 +280,12 @@ make_fig2 <- function(commodels){
                        labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
                        name = "")  + 
     labs(y = "Effect size", x = "") +
-    scale_x_discrete(labels = c(  "Immaturity (2.5%)", "Size (median)",  "Immaturity (97.5%)", 
-                                  "Size (2.5%)", "Richness",  "Immaturity (median)",
-                                  "Size (97.5%)", "Trophic level (2.5%)",  "Trophic level (median)",
-                                  "Trophic level (97.5%)")) +
+    scale_x_discrete(
+      labels = c(   "Immaturity (median)", "Immaturity (2.5%)",  "Immaturity (97.5%)",
+                                  "Richness",  "Size (median)", "Size (2.5%)",
+                                  "Size (97.5%)",  "Trophic level (median)", "Trophic level (2.5%)",
+                                  "Trophic level (97.5%)")
+      ) +
    
     theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
           axis.title = element_text(size = 12), legend.text = element_text(size = 12), 

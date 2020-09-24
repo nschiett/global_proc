@@ -157,6 +157,41 @@ run_commodels <- function(summary_transect_complete){
   return(result)
 }
 
+####### community models absolute values ######
+run_commodels_abs <- function(summary_transect_complete){
+  
+  flux <- summary_transect_complete
+  
+  flux$logbiomass <- log(flux$biomass_tot)
+  
+  fit_Fn <- brm(log(Fn) ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+                     size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
+                   data = flux, chain = 3, cores = 1)
+  
+  fit_Fp <- brm(log(Fp)~ ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+                  size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
+                   data = flux, chain = 3, cores = 1)
+  
+  fit_Gc <- brm(log(Gc) ~ ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+                  size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
+                   data = flux, chain = 3, cores = 1)
+  
+  fit_Iherb <- brm(log(I_herb) ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+                     size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
+                      data = flux[flux$I_herb>0,], chain = 3, cores = 1)
+  
+  fit_Ipisc <- brm(log(I_pisc) ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+                     size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
+                      data = flux[flux$I_pisc>0,], chain = 3, cores = 1)
+  
+  result <- list(fit_Fn, fit_Fp, fit_Gc, fit_Iherb, fit_Ipisc)
+  
+  lapply(result, function(x){
+    brms::bayes_R2(x)
+  })
+  
+  return(result)
+}
 
 ####### contributions ######
 

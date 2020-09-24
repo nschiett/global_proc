@@ -407,7 +407,7 @@ get_herb_pisc <- function(tfish, cnpflux, params, summary_transect){
 tfish <- left_join(tfish, unique(dplyr::select(cnpflux, species, v_m, size_cm, (ends_with("_median"))))) %>% 
   left_join(select(params, Species, v_m, diet_cat, Dc_m)) %>% 
   mutate(Ic = Ic_median * abun) %>%
-  mutate(I = 100 * Ic/Dc_m/area) # convert to dry mass
+  mutate(I = Ic/area) 
 
 
 tfish$herb <- "no"
