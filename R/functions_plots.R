@@ -456,99 +456,174 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
   
 }
 
-make_fig4 <- function(spi_vuln){
-  
-  # barplots for each function with labels at angles
-  
-  bp1 <-
-    ggplot(filter(spi_vuln, vulncat == "vuln_high") %>% drop_na()) +
-    geom_bar(aes(x = name, y = n_prop, fill = name), stat = "identity", alpha = 0.5) +
-    geom_bar(aes(x = name, y = ep_prop, fill = name), stat = "identity") +
-    geom_text(aes(x = name, y = n_prop + 0.1, label = paste0(round(perc), "%")), angle = 45) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", "P excretion",
-                                 "Production", "Herbivory", "Piscivory"),
-                      name = "Function") +
-    scale_y_continuous(limits = c(0, 1)) +
-    theme_void() +
-    theme(legend.position = "none",
-          text = element_text(angle = 45), plot.margin = unit(c(0,0,0,0), "cm")
-    )
-  ggsave("output/plots/fig4_glob_vuln_high.png", bp1, width = 4, height = 4)
-  
-  bp2 <-
-    ggplot(filter(spi_vuln, vulncat == "vuln_cli") %>% drop_na()) +
-    geom_bar(aes(x = name, y = n_prop, fill = name), stat = "identity", alpha = 0.5) +
-    geom_bar(aes(x = name, y = ep_prop, fill = name), stat = "identity") +
-    geom_text(aes(x = name, y = n_prop + 0.1, label = paste0(round(perc), "%")), angle = 135) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", "P excretion",
-                                 "Production", "Herbivory", "Piscivory"),
-                      name = "Function") +
-    scale_y_continuous(limits = c(0, 1)) +
-    theme_void() +
-    theme(legend.position = "none", plot.margin = unit(c(0,0,0,0), "cm")
-    )
-  
-  ggsave("output/plots/fig4_glob_vuln_cc.png", bp2, width = 4, height = 4)
-  
-  bp3 <-
-    ggplot(filter(spi_vuln, vulncat == "vuln_low")) +
-    geom_bar(aes(x = name, y = n_prop, fill = name), stat = "identity", alpha = 0.5) +
-    geom_bar(aes(x = name, y = ep_prop, fill = name), stat = "identity") +
-    geom_text(aes(x = name, y = n_prop + 0.1, label = paste0(round(perc), "%")), angle = -135) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", "P excretion",
-                                 "Production", "Herbivory", "Piscivory"),
-                      name = "Function") +
-    scale_y_continuous(limits = c(0, 1)) +
-    theme_void() +
-    theme(legend.position = "none",
-          text = element_text(angle = 45), plot.margin = unit(c(0,0,0,0), "cm")
-    )
-  
-  bp3
-  ggsave("output/plots/fig4_glob_vuln_low.png", bp3, width = 4, height = 4)
-  
-  
-  bp4 <-
-    ggplot(filter(spi_vuln,  vulncat == "vuln_fi")) +
-    geom_bar(aes(x = name, y = n_prop, fill = name), stat = "identity", alpha = 0.5) +
-    geom_bar(aes(x = name, y = ep_prop, fill = name), stat = "identity") +
-    geom_text(aes(x = name, y = n_prop + 0.1, label = paste0(round(perc), "%")), angle = -45) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", "P excretion",
-                                 "Production", "Herbivory", "Piscivory"),
-                      name = "Function") +
-    theme_void() +
-    theme(legend.position = "none",
-          text = element_text(angle = 45), plot.margin = unit(c(0,0,0,0), "cm")
-    )
-  
-  bp4
-  ggsave("output/plots/fig4_glob_vuln_fi.png", bp4, width = 4, height = 4)
-  
-  ## center
-  
-  middle <- ggplot() +
-    geom_polygon(aes(x = c(0, 0, 0, 1), y = c(0, 1,1,0)), 
-                 color = "black", fill = "grey60") +
-    geom_polygon(aes(x = c(0, 0, 0, -1), y = c(0, 1,1,0)),  
-                 color = "black", fill = "grey80") +
-    geom_polygon(aes(x = c(0, 0, 0, 1), y = c(0, -1,-1,0)), 
-                 color = "black", fill = "grey80") +
-    geom_polygon(aes(x = c(0, 0, 0, -1), y = c(0, -1,-1,0)), 
-                 color = "black", fill = "grey90") +
-    scale_x_continuous(limits = c(-2,2), expand = c(0,0)) +
-    scale_y_continuous(limits = c(-2,2), expand = c(0,0)) +
-    geom_text(aes(x = -0.33, y = -0.33, label = "Low \n vulnerability \n to both"), angle = -45, size = 2.5) +
-    geom_text(aes(x = 0.33, y = 0.33, label = "High \n vulnerability \n to both"), angle = -45, size = 2.5) +
-    geom_text(aes(x = -0.33, y = 0.33, label = "High \n vulnerability \n to fishing"), angle = 45, size = 2.5) +
-    geom_text(aes(x = 0.33, y = -0.33, label = "High \n vulnerability \n to climate change"), angle = 45, size = 2.5) +
-    coord_fixed() +
-    theme_void()
+make_fig4 <- function(contributions, vulnerability, herb_pisc, residuals){
 
-  ggsave("output/plots/fig4_middle.png", middle, width = 4, height = 4)
+  
+  con <- left_join(contributions, vulnerability) %>%
+    left_join(herb_pisc$contributions_herb_pisc) %>%
+    group_by(transect_id) %>%
+    dplyr::summarize(
+      vuln_Fn_fi = sum(Fn_p * vuln_fi, na.rm = TRUE),
+      vuln_Fp_fi = sum(Fp_p * vuln_fi, na.rm = TRUE),
+      vuln_Gc_fi = sum(Gc_p * vuln_fi, na.rm = TRUE),
+      vuln_Iherb_fi = sum(I_herb_p[I_herb_p > 0] * vuln_fi[I_herb_p > 0], na.rm = TRUE),
+      vuln_Ipisc_fi = sum(I_pisc_p[I_pisc_p > 0] * vuln_fi[I_pisc_p > 0], na.rm = TRUE),
+      vuln_Fn_cl = sum(Fn_p * vuln_climate, na.rm = TRUE),
+      vuln_Fp_cl = sum(Fp_p * vuln_climate, na.rm = TRUE),
+      vuln_Gc_cl = sum(Gc_p * vuln_climate, na.rm = TRUE),
+      vuln_Iherb_cl = sum(I_herb_p[I_herb_p > 0] * vuln_climate[I_herb_p > 0], na.rm = TRUE),
+      vuln_Ipisc_cl = sum(I_pisc_p[I_pisc_p > 0] * vuln_climate[I_pisc_p > 0], na.rm = TRUE))
+  
+  con_long <- con %>%
+    pivot_longer(cols = 2:11) %>%
+    separate(name, into = c("v", "fun", "impact"), sep = "_", remove = TRUE) %>%
+    filter(value>0) %>%
+    pivot_wider(names_from = impact, values_from = value)
+  
+  
+  res_long <- pivot_longer(residuals, 2:6, values_to = "residual") %>%
+    mutate(fun = case_when(name == "Fn_r" ~ "Fn",
+                           name == "Fp_r" ~ "Fp",
+                           name == "Gc_r" ~ "Gc",
+                           name == "I_herb_r" ~ "Iherb",
+                           name == "I_pisc_r" ~ "Ipisc")) %>%
+    select(-name)
+  
+  vu <- data.frame(
+    fun = c("Fn", "Fp", "Gc", "Iherb", "Ipisc"),
+    m_fi = c(
+      median(con$vuln_Fn_fi),
+      median(con$vuln_Fp_fi),
+      median(con$vuln_Gc_fi),
+      median(con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+      median(con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+    ),
+    m_cl = c(
+      median(con$vuln_Fn_cl),
+      median(con$vuln_Fp_cl),
+      median(con$vuln_Gc_cl),
+      median(con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+      median(con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+    )
+  ) %>%
+    mutate(m_fi = mean(m_fi),
+           m_cl = mean(m_cl))
+  
+  
+  q_cl <- quantile(c(
+    (con$vuln_Fn_cl),
+    (con$vuln_Fp_cl),
+    (con$vuln_Gc_cl),
+    (con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+    (con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+  ), c(0.25, 0.4, 0.6, 0.75))
+  q_fi <- quantile(c(
+    (con$vuln_Fn_fi),
+    (con$vuln_Fp_fi),
+    (con$vuln_Gc_fi),
+    (con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+    (con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+  ), c(0.25, 0.4, 0.6, 0.75))
+  
+
+  
+  prop_fi <- con_long %>%
+    left_join(res_long) %>%
+    left_join(vu) %>%
+    mutate(cat_fi = case_when(fi > q_fi[4] ~ "High",
+                              fi > q_fi[3] ~ "Medium",
+                              fi > q_fi[2] ~ "Medium",
+                              fi > q_fi[1] ~ "Medium",
+                              TRUE ~ "Low")) %>%
+    mutate(high = residual > 0) %>%
+    group_by(cat_fi, fun) %>%
+    dplyr::summarise(n_high_fi = sum(high), n_fi = length(unique(transect_id))) %>%
+    ungroup() %>% dplyr::group_by(fun) %>%
+    mutate(ntot_fi = sum(n_fi)) %>%
+    mutate(prop_high_fi = n_high_fi / ntot_fi, prop_fi = n_fi/ntot_fi) %>%
+    mutate(cat = factor(cat_fi, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+  
+  prop_cl <- con_long %>%
+    left_join(res_long) %>%
+    left_join(vu) %>%
+    mutate(cat_cl = case_when(cl > q_cl[4] ~ "High",
+                              cl > q_cl[3] ~ "Medium",
+                              cl > q_cl[2] ~ "Medium",
+                              cl > q_cl[1] ~ "Medium",
+                              TRUE ~ "Low")) %>%
+    mutate(high = residual > 0) %>%
+    group_by(cat_cl, fun) %>%
+    dplyr::summarise(n_high_cl = sum(high), n_cl = length(unique(transect_id))) %>%
+    ungroup() %>% dplyr::group_by(fun) %>%
+    mutate(ntot_cl = sum(n_cl)) %>%
+    mutate(prop_high_cl = n_high_cl / ntot_cl, prop_cl = n_cl/ntot_cl) %>%
+    mutate(cat = factor(cat_cl, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+  
+  p1 <- ggplot(prop_fi[!prop_fi$cat_fi == "Medium",]) +
+    geom_bar(aes(x = cat, y = prop_fi, fill = fun), 
+             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+    scale_fill_fish_d(option = "Callanthias_australis",
+                      labels = c("N excretion", 
+                                 "P excretion", 
+                                 "Production",
+                                 "Herbivory",
+                                 "Piscivory")) +
+    labs(y = "Proportion of communities", x = "Vulnerability to fishing", fill = "") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(), 
+          panel.grid.minor = element_blank(), legend.position = "top",
+          text = element_text(size = 12))  
+  
+  p2 <- ggplot(prop_cl[!prop_cl$cat_cl == "Medium",]) +
+    geom_bar(aes(x = cat, y = prop_cl, fill = fun), 
+             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+    scale_fill_fish_d(option = "Callanthias_australis",
+                      labels = c("N excretion", 
+                                 "P excretion", 
+                                 "Production",
+                                 "Herbivory",
+                                 "Piscivory")) +
+    labs(y = "Proportion of communities", x = "Vulnerability to climate change", fill = "") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(), 
+          panel.grid.minor = element_blank(), legend.position = "none",
+          text = element_text(size = 12))  
+  
+  double <- 
+    con_long %>%
+    left_join(res_long) %>%
+    left_join(vu) %>%
+    mutate(cat_double = case_when(fi > q_fi[4] & cl > q_cl[4] ~ "High",
+                                  fi < q_fi[1] & cl < q_cl[1] ~ "Low",
+                                  TRUE ~ "Medium")) %>%
+    group_by(cat_double, fun) %>%
+    dplyr::summarise( n = length(unique(transect_id))) %>%
+    ungroup() %>% dplyr::group_by(fun) %>%
+    mutate(ntot = sum(n)) %>%
+    mutate(prop = n/ntot) %>%
+    mutate(cat_double = factor(cat_double, levels = c("Low", "Medium", "High")))
+  
+  
+  p3 <- ggplot(double[!double$cat_double == "Medium",]) +
+    geom_bar(aes(x = cat_double, y = prop, fill = fun), 
+             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+    scale_fill_fish_d(option = "Callanthias_australis",
+                      labels = c("N excretion", 
+                                 "P excretion", 
+                                 "Production",
+                                 "Herbivory",
+                                 "Piscivory")) +
+    labs(y = "Proportion of communities", x = "Vulnerability to both", fill = "") +
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(), 
+          panel.grid.minor = element_blank(), 
+          legend.position = "none",
+          text = element_text(size = 12))  
+  
+  p3
+  
+  p1 + p2 + p3 + plot_layout(ncol = 1)
+  ggsave("output/plots/figure_4_vuln_com.png", width = 6, height = 8)
   
 }
 

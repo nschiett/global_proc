@@ -39,7 +39,7 @@ plan <- drake_plan(
   contributions = get_contributions(tfish, cnpflux, params, summary_transect),
   sp_loc = unique(select(ungroup(contributions), bioregion, species)),
   
-  # herbivory, piscivory --> in g dry mass
+  # herbivory, piscivory 
   herb_pisc = get_herb_pisc(tfish, cnpflux, params, summary_transect),
   
   # combine summary data, sst 
@@ -57,31 +57,6 @@ plan <- drake_plan(
   # run models proc ~ community vars
   commodels = run_commodels(summary_transect_complete),
   
-  # run models to get relative contribution of each ecosystem process
-  #models_contributions_Fp = fit_contribution_Fp(contributions, sp_loc),
-  #models_contributions_Fn = fit_contribution_Fn(contributions, sp_loc),
-  #models_contributions_Fc = fit_contribution_Fc(contributions, sp_loc),
-  #models_contributions_Ic = fit_contribution_Ic(contributions, sp_loc),
-  #models_contributions_Gc = fit_contribution_Gc(contributions, sp_loc),
-  
-  # run models to get relative contribution herbivory piscivory
-  #models_contributions_I_herb = fit_contribution_I_herb(herb_pisc, sp_loc),
-  #models_contributions_I_pisc = fit_contribution_I_pisc(herb_pisc, sp_loc),
-  
-  # extract contributions from model
-  # contributions_Fn = extract_contr(models_contributions_Fn),
-  # contributions_Fp = extract_contr(models_contributions_Fp),
-  # contributions_Gc = extract_contr(models_contributions_Gc),
-  # contributions_I_herb = extract_contr(models_contributions_I_herb),
-  # contributions_I_pisc = extract_contr(models_contributions_I_pisc),
-
-  # combine contributions
-  # contributions_sp_loc = combine_contributions(
-  #   sp_loc, contributions_Fn, contributions_Fp,
-  #   contributions_Gc, contributions_I_herb, contributions_I_pisc, herb_pisc),
-
-  #contributions_sp_loc_occ = add_occurence(contributions, contributions_sp_loc, herb_pisc),
-  
   ##### contribution analysis #####
   contr_family = get_cf(contributions, herb_pisc),
   degree_dominance = get_dd(contributions, herb_pisc),
@@ -93,19 +68,28 @@ plan <- drake_plan(
   spi_vuln = get_spi_vuln(sp_importance, vulnerability),
   
   ##### FIGURES #####
+  # main
   fig1 = make_fig1(location_effect),
   fig2 = make_fig2(commodels),
   fig3 = make_fig3(contributions, herb_pisc, degree_dominance, freq_dominance),
-  fig4 = make_fig4(spi_vuln),
-  #plot_covu = plot_con_vuln_all(contributions_sp_loc_occ, vulnerability),
+  fig4 = make_fig4(contributions, vulnerability, herb_pisc, residuals),
   
+  # annex
   annex_fig1 = make_annex_fig1(summary_transect_complete, bmmodels),
   annex_fig2 = make_annex_fig2(summary_transect_complete, residuals),
   annex_fig3 = make_annex_fig3(summary_transect_complete, residuals),
   
   ##### TEXT #####
-  main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"), 
-                                    output_format = "word_document", 
-                                    output_dir = "./output/text/",
-                                    output_file = "Schiettekatte_global_functions_main.docx")
+  # main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"), 
+  #                                   output_format = "word_document", 
+  #                                   output_dir = "./output/text/",
+  #                                   output_file = "Schiettekatte_global_functions_main.docx"),
+  # methods_text_doc = rmarkdown::render(knitr_in("text/methods.Rmd"), 
+  #                                   output_format = "word_document", 
+  #                                   output_dir = "./output/text/",
+  #                                   output_file = "Schiettekatte_global_functions_methods.docx"),
+  # suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"), 
+  #                                   output_format = "word_document", 
+  #                                   output_dir = "./output/text/",
+  #                                   output_file = "Schiettekatte_global_functions_suppl_methods.docx")
 )

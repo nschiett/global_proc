@@ -3664,7 +3664,7 @@ ggplot(con_long[con_long$fun == "Fp",]) +
   geom_point(aes(x = cl, y = fi), size = 1, alpha = 0.1) +
   theme_bw()
 
-test2_fi <- con_long %>%
+prop_fi <- con_long %>%
   left_join(res_long) %>%
   left_join(vu) %>%
   mutate(cat_fi = case_when(fi > q_fi[4] ~ "High",
@@ -3679,7 +3679,7 @@ test2_fi <- con_long %>%
   mutate(ntot_fi = sum(n_fi)) %>%
   mutate(prop_high_fi = n_high_fi / ntot_fi, prop_fi = n_fi/ntot_fi) %>%
   mutate(cat = factor(cat_fi, levels = c("Very low", "Low", "Medium", "High", "Very high")))
-test2_cl <- con_long %>%
+prop_cl <- con_long %>%
   left_join(res_long) %>%
   left_join(vu) %>%
   mutate(cat_cl = case_when(cl > q_cl[4] ~ "High",
@@ -3695,7 +3695,7 @@ test2_cl <- con_long %>%
   mutate(prop_high_cl = n_high_cl / ntot_cl, prop_cl = n_cl/ntot_cl) %>%
   mutate(cat = factor(cat_cl, levels = c("Very low", "Low", "Medium", "High", "Very high")))
 
-p1 <- ggplot(test2_fi[!test2_fi$cat_fi == "Medium",]) +
+p1 <- ggplot(prop_fi[!prop_fi$cat_fi == "Medium",]) +
   # geom_bar(aes(x = cat_fi, y = -(prop - prop_high), fill = fun), 
   #          alpha = 0.5, stat = "identity", position = "dodge") +
   geom_bar(aes(x = cat, y = prop_fi, fill = fun), 
@@ -3713,7 +3713,7 @@ p1 <- ggplot(test2_fi[!test2_fi$cat_fi == "Medium",]) +
         panel.grid.minor = element_blank(), legend.position = "top",
         text = element_text(size = 12))  
 
-p2 <- ggplot(test2_cl[!test2_cl$cat_cl == "Medium",]) +
+p2 <- ggplot(prop_cl[!prop_cl$cat_cl == "Medium",]) +
   # geom_bar(aes(x = cat_cl, y = -(prop - prop_high), fill = fun), 
   #          alpha = 0.5, stat = "identity", position = "dodge") +
   geom_bar(aes(x = cat, y = prop_cl, fill = fun), 

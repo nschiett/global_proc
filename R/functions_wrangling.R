@@ -55,12 +55,47 @@ get_cnp <- function(){
 
 ##### cnpdiet #####
 get_cnpdiet <- function(){
-  cnpdiet <- read.csv("data/cnpdiet_glob.csv") 
-  cnpdiet[,3:8] <- cnpdiet[,3:8] * 100
-  colnames(cnpdiet) <-
+  
+  cnpdiet <- read.csv("data/cnp_per_trophic_guild_1000draws.csv")
+  diet <- read.csv("data/extrapolation_trophic_guilds.csv")
+  
+  diets <- diet %>%
+    select(family, species, intersect(ends_with("_m"), starts_with("p"))) %>%
+    pivot_longer(cols = intersect(ends_with("_m"), starts_with("p")),
+                 names_to = "pred_cat", values_to = "probability") %>%
+    mutate(pred_cat = as.factor(pred_cat)) %>%
+    mutate(pred_cat = fct_recode(pred_cat, 
+                                 "1" = "p1_m",
+                                 "2" = "p2_m",
+                                 "3" = "p3_m",
+                                 "4" = "p4_m",
+                                 "5" = "p5_m",
+                                 "6" = "p6_m",
+                                 "7" = "p7_m",
+                                 "8" = "p8_m")) %>%
+    right_join(mutate(cnpdiet, pred_cat = as.factor(pred_cat)))
+  
+  result <- diets %>%
+    group_by(family, species, draw) %>%
+    summarise(c = sum(probability * c)/100,
+              n = sum(probability * n)/100,
+              p = sum(probability * p)/100) %>%
+    ungroup() %>%
+    group_by(family, species) %>%
+    summarise(c_m = mean(c), c_sd = sd(c),
+              n_m = mean(n), n_sd = sd(n),
+              p_m = mean(p), p_sd = sd(p)) 
+  
+  result <- result %>% 
+    left_join(select(diet, species, diet_cat = trophic_guild_predicted)) %>%
+    ungroup()
+  
+  result[,3:8] <- result[,3:8] * 100
+  colnames(result) <-
     c("family", "species", "Dc_m", "Dc_sd", 
       "Dn_m", "Dn_sd", "Dp_m", "Dp_sd", "diet_cat")
-  return(cnpdiet)
+  
+  return(result)
 }
 
 ##### growth #####
@@ -395,7 +430,7 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
 }
 
 
-##### supplement herbivory carnivory #####
+##### herbivory carnivory #####
 
 get_herb_pisc <- function(tfish, cnpflux, params, summary_transect){
 
@@ -403,34 +438,37 @@ get_herb_pisc <- function(tfish, cnpflux, params, summary_transect){
   sst <- read.csv("data/avSst.csv")
   tfish <- left_join(tfish, sst)
   tfish$v_m <- round(tfish$mean)
-  
+
+diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
+
+diets <- diet %>%
+  select(family, species, p2_m, p4_m, trophic_guild_predicted) %>% 
+  mutate(herb = trophic_guild_predicted == 2 & p2_m > 0.5,
+         pisc = trophic_guild_predicted == 4 & p4_m > 0.5)
+
 tfish <- left_join(tfish, unique(dplyr::select(cnpflux, species, v_m, size_cm, (ends_with("_median"))))) %>% 
-  left_join(select(params, Species, v_m, diet_cat, Dc_m)) %>% 
+  left_join(diets) %>%
   mutate(Ic = Ic_median * abun) %>%
   mutate(I = Ic/area) 
 
-
-tfish$herb <- "no"
-tfish[tfish$diet_cat == 2, "herb"] <- "yes"
-tfish[tfish$Family == "Mugilidae", "herb"] <- "no"
-tfish$pisc <- "no"
-tfish[tfish$diet_cat == 4, "pisc"] <- "yes"
-
-contr <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
-  dplyr::summarise(
-    I_herb_s = sum(I[herb == "yes"], na.rm = TRUE),
-    I_pisc_s = sum(I[pisc == "yes"], na.rm = TRUE)
-  ) %>% dplyr::ungroup() %>% unique() %>% dplyr::right_join(tfish)  %>%
-  dplyr::group_by(region, locality, sites, area, transect_id, species, I_herb_s, I_pisc_s) %>%
-  dplyr::summarise(
-    I_herb_p = sum(I[herb == "yes"], na.rm = TRUE)/unique(I_herb_s),
-    I_pisc_p = sum(I[pisc == "yes"], na.rm = TRUE)/unique(I_pisc_s)
-  ) %>% ungroup()
+#tfish[tfish$Family == "Mugilidae", "herb"] <- FALSE
 
 tfs <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
   dplyr::summarise(
-    I_herb = sum(I[herb == "yes"], na.rm = TRUE),
-    I_pisc = sum(I[pisc == "yes"], na.rm = TRUE)
+    I_herb = sum(I[herb == TRUE], na.rm = TRUE),
+    I_pisc = sum(I[pisc == TRUE], na.rm = TRUE),
+  ) %>% ungroup() 
+
+
+contr <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
+  dplyr::summarise(
+    I_herb_s = sum(I[herb == TRUE], na.rm = TRUE),
+    I_pisc_s = sum(I[pisc == TRUE], na.rm = TRUE)
+  ) %>% dplyr::ungroup() %>% unique() %>% dplyr::right_join(tfish)  %>%
+  dplyr::group_by(region, locality, sites, area, transect_id, species, I_herb_s, I_pisc_s) %>%
+  dplyr::summarise(
+    I_herb_p = sum(I[herb == TRUE], na.rm = TRUE)/unique(I_herb_s),
+    I_pisc_p = sum(I[pisc == TRUE], na.rm = TRUE)/unique(I_pisc_s)
   ) %>% ungroup()
 
 contr <- left_join(contr, select(summary_transect, transect_id, nspec, bioregion)) %>% 
@@ -454,436 +492,108 @@ combine_summary <- function(summary_transect, herb_pisc){
   
 }
 
-
-##### fit contribution models #####
-fit_contribution_Fp <- function(contributions, sp_loc){
+####### extra analysis diets #######
+alt_diet <- function(tfish, cnpflux){
   
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Fp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
   
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
+  diet_experts <- read.csv("data/original_experts_classification.csv")%>%
+    select(species = Genus_and_species_, Gaspar, Siquiera)
   
-  return(Fp = list)
-}
-
-fit_contribution_Fn <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Fn_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(Fn = list)
-}
-
-fit_contribution_Fc <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Fc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(Fc = list)
-}
-
-fit_contribution_Ic <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Ic_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(Ic = list)
-}
-
-fit_contribution_In <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("In_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(In = list)
-}
-
-fit_contribution_Ip <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Ip_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(Ip = list)
-}
-
-
-
-
-fit_contribution_Gn <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Gn_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  subsp[1:10, "Gn_p"] <- 0
-  fitzi <- brm("Gn_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "zero_inflated_beta", data = subsp)
+  diets <- diet %>%
+    select(family, species, p2_m, p4_m, trophic_guild_predicted) %>% 
+    left_join(diet_experts) %>%
+    mutate(herb = trophic_guild_predicted == 2,
+           herb_gas = Gaspar == "HD",
+           herb_siq = Siquiera == "HD",
+           herb_t1 = trophic_guild_predicted == 2 & p2_m > 0.5,
+           pisc = trophic_guild_predicted == 4,
+           pisc_gas = Gaspar == "FC",
+           pisc_siq = Siquiera == "GC",
+           pisc_t1 = trophic_guild_predicted == 4 & p4_m > 0.5
+    )
   
   
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    if(min(subsp$Gn_p) == 0){
-      fit_new <- update(fitzi, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }else{
-      fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }
-    return(fit_new)
-  }, mc.cores = 6)
-  
-  return(Gn = list)
-}
-
-
-fit_contribution_Gc <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Gc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  subsp[1:10, "Gc_p"] <- 0
-  fitzi <- brm("Gc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "zero_inflated_beta", data = subsp)
+  tfish <- left_join(tfish, unique(dplyr::select(cnpflux, species, v_m, size_cm, (ends_with("_median"))))) %>% 
+    left_join(diets) %>%
+    mutate(Ic = Ic_median * abun) %>%
+    mutate(I = Ic/area) 
   
   
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    if(min(subsp$Gc_p) == 0){
-      fit_new <- update(fitzi, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }else{
-      fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }
-    return(fit_new)
-  }, mc.cores = 6)
+  tfs <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
+    dplyr::summarise(
+      I_herb = sum(I[herb == TRUE], na.rm = TRUE),
+      I_pisc = sum(I[pisc == TRUE], na.rm = TRUE),
+      I_herb_t1 = sum(I[herb_t1 == TRUE], na.rm = TRUE),
+      I_pisc_t1 = sum(I[pisc_t1 == TRUE], na.rm = TRUE),
+      I_herb_gas= sum(I[herb_gas == TRUE], na.rm = TRUE),
+      I_pisc_gas = sum(I[pisc_gas == TRUE], na.rm = TRUE),
+      I_herb_siq = sum(I[herb_siq == TRUE], na.rm = TRUE),
+      I_pisc_siq = sum(I[pisc_siq == TRUE], na.rm = TRUE)
+    ) %>% ungroup() %>%
+    mutate(d_herb1 =  (I_herb_t1 - I_herb),
+           d_pisc1 =  (I_pisc_t1 - I_pisc),
+           d_herb_gas = (I_herb_gas - I_herb),
+           d_pisc_gas = (I_pisc_gas - I_pisc),
+           d_herb_siq = (I_herb_siq - I_herb),
+           d_pisc_siq = (I_pisc_siq - I_pisc))
+  a <- ggplot(tfs) +
+    geom_histogram(aes(x = I_herb_gas - I_herb_siq, y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "Comparison Gaspar Siquiera") +
+    theme_bw()
   
-  return(Gc = list)
-}
-
-fit_contribution_Gp <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Gp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  subsp[1:10, "Gp_p"] <- 0
-  fitzi <- brm("Gp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "zero_inflated_beta", data = subsp)
-  
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    if(min(subsp$Gp_p) == 0){
-      fit_new <- update(fitzi, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }else{
-      fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    }
-    return(fit_new)
-  }, mc.cores = 6)
-  
-  return(Gp = list)
-}
-
-
-fit_contribution_Wp <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Wp_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  return(Wp = list)
-}
-
-fit_contribution_Wn <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Wn_p ~1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  return(Wn = list)
-}
-
-fit_contribution_Wc <- function(contributions, sp_loc){
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("Wc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  return(Wc = list)
-}
-
-fit_contribution_I_herb <- function(herb_pisc, sp_loc){
-  
-  # get herbivores
-  contributions <- herb_pisc$contributions_herb_pisc %>%
-    filter(I_herb_p > 0) %>%
-    mutate(I_herb_p = case_when(I_herb_p == 1 ~ 0.999999, !I_herb_p == 1 ~ I_herb_p))
-
-  sp_loc <- filter(sp_loc, species %in% unique(contributions$species))
+  b <- ggplot(tfs) +
+    geom_histogram(aes(x = I_pisc_gas - I_pisc_siq, y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "Comparison Gaspar Siquiera") +
+    theme_bw()
+  a + b
     
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "c_indopacific", species == "Acanthurus_leucocheilus")
-  fit <- brm("I_herb_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
+  a1 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_herb1), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "A) Comparison threshold = 0.5") +
+    theme_bw()
+  a2 <-ggplot(tfs) +
+    geom_histogram(aes(x = (d_pisc1), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "B) Comparison threshold = 0.5") +
+    theme_bw()
+  b1 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_herb_gas), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "C) Comparison Gaspar") +
+    theme_bw()
+  b2 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_pisc_gas), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "D) Comparison Gaspar") +
+    theme_bw()
+  c1 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_herb_siq), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "E) Comparison Siquiera") +
+    theme_bw()
+  c2 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_pisc_siq), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "F) Comparison Siquiera") +
+    theme_bw()
   
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
+  p <- a1 + a2 + b1 + b2 + c1 + c2 +plot_layout(ncol = 2)
   
-  return(I_herb = list)
-}
+  ggsave("output/plots/Supplemental_herbivory_piscivory_alternative_classification.png", 
+         plot = p, 
+         height = 10, width = 8)
 
-fit_contribution_I_pisc <- function(herb_pisc, sp_loc){
-  
-  # get carnivores
-  contributions <- herb_pisc$contributions_herb_pisc %>%
-    filter(I_pisc_p > 0) %>%
-    mutate(I_pisc_p = case_when(I_pisc_p == 1 ~ 0.999999, !I_pisc_p == 1 ~ I_pisc_p))
-  
-  sp_loc <- filter(sp_loc, species %in% unique(contributions$species))
-  
-  ## compile model once 
-  subsp <- filter(contributions, bioregion == "w_atlantic", species == "Cephalopholis_cruentata")
-  fit <- brm("I_pisc_p ~ 1 + (1|locality) + (1|sites)", chains = 1, family = "beta", data = subsp)
-  
-  # run same model on all species
-  list <- parallel::mclapply(1:nrow(sp_loc), function(x){
-    print(x)
-    subsp <- filter(contributions, bioregion == sp_loc$bioregion[x], species == sp_loc$species[x])
-    fit_new <- update(fit, newdata = subsp, recompile = FALSE, chains = 2, control = list(adapt_delta = 0.99), save_ranef = FALSE)
-    return(fit_new)
-  }, mc.cores = 7)
-  
-  return(I_pisc = list)
-}
+  }
 
-
-####### extract contributions from models ######
-expit <- function(x){exp(x)/(1 + exp(x))}
-
-extract_contr <- function(list){
-summary <- parallel::mclapply(list, function(x){
-  post <- expit(brms::posterior_samples(x, "b_Intercept"))
-  phi <- brms::posterior_samples(x, "phi")
-  result <- data.frame(
-    contr_m = median(post$b_Intercept),
-    contr_sd = sd(post$b_Intercept),
-    contr_q1 = quantile(post$b_Intercept, 0.025),
-    contr_q3 = quantile(post$b_Intercept, 0.975),
-    phi_m = median(phi$phi),
-    phi_sd = sd(phi$phi)
-  )
-  
-  return(result)
-}, mc.cores = 50) %>% plyr::ldply()
-
-n <- names(list[[1]]$data)[1]
-
-colnames(summary) <- c(
-  paste0(n, "_m"), 
-  paste0(n, "_sd"), 
-  paste0(n, "_q1"), 
-  paste0(n, "_q3"),
-  paste0(n, "phi_m"),
-  paste0(n, "phi_sd"))
-
-return(summary)
-}
-
-combine_contributions <- function(sp_loc, contributions_Fn, 
-                                  contributions_Fp, contributions_Gc, 
-                                  contributions_I_herb, contributions_I_pisc, herb_pisc){
-  
-  herb <-  herb_pisc$contributions_herb_pisc %>%
-    filter(I_herb_p > 0) 
-  
-  sploc_h <- filter(sp_loc, species %in% unique(herb$species)) %>%
-    cbind(contributions_I_herb)
-  
-  pisc <-  herb_pisc$contributions_herb_pisc %>%
-    filter(I_pisc_p > 0) 
-  
-  sploc_p <- filter(sp_loc, species %in% unique(pisc$species)) %>%
-    cbind(contributions_I_pisc)
-  
-  comb <- cbind(
-    sp_loc, contributions_Fn, contributions_Fp,
-    contributions_Gc
-  ) %>% left_join(sploc_h) %>% left_join(sploc_p) %>% replace(., is.na(.), 0)
-  
-  return(comb)
-  
-}
-
-add_occurence <- function(contributions, contributions_sp_loc, herb_pisc){
-  tot <- contributions %>%
-    group_by(bioregion) %>%
-    summarise(
-      tot = n()) 
-  occ <- contributions %>%
-    group_by(bioregion, species) %>%
-    summarise(occurence = n()) %>%
-    left_join(tot) %>% mutate(rel_occ = occurence/tot) %>% 
-    dplyr::select(-tot)
-  result <- left_join(contributions_sp_loc, occ)
-  
-  correct <-  select(result, 1:2) %>%
-    inner_join(select(ungroup(contributions), bioregion, species, Fn_p, Fp_p, Gc_p)) %>%
-    left_join(herb_pisc$contributions_herb_pisc) %>%
-    group_by(bioregion, species) %>%
-    summarise(
-      # Fc_p_m = median(Fc_p),
-      # Fc_p_sd = sd(Fc_p),
-      # Fc_p_q1 = quantile(Fc_p, 0.025),
-      # Fc_p_q3 = quantile(Fc_p, 0.975),
-      Fn_p_m = median(Fn_p),
-      Fn_p_sd = sd(Fp_p),
-      Fn_p_q1 = quantile(Fn_p, 0.025),
-      Fn_p_q3 = quantile(Fn_p, 0.975),
-      Fp_p_m = median(Fp_p),
-      Fp_p_sd = sd(Fp_p),
-      Fp_p_q1 = quantile(Fp_p, 0.025),
-      Fp_p_q3 = quantile(Fp_p, 0.975),  
-      # Ic_p_m = median(Ic_p),
-      # Ic_p_sd = sd(Ic_p),
-      # Ic_p_q1 = quantile(Ic_p, 0.025),
-      # Ic_p_q3 = quantile(Ic_p, 0.975),
-      Gc_p_m = median(Gc_p),
-      Gc_p_sd = sd(Gc_p),
-      Gc_p_q1 = quantile(Gc_p, 0.025),
-      Gc_p_q3 = quantile(Gc_p, 0.975),
-      I_herb_p_m = median(I_herb_p),
-      I_herb_p_sd = sd(I_herb_p),
-      I_herb_p_q1 = quantile(I_herb_p, 0.025),
-      I_herb_p_q3 = quantile(I_herb_p, 0.975),
-      I_pisc_p_m = median(I_pisc_p),
-      I_pisc_p_sd = sd(I_pisc_p),
-      I_pisc_p_q1 = quantile(I_pisc_p, 0.025),
-      I_pisc_p_q3 = quantile(I_pisc_p, 0.975)
-    ) %>% left_join(select(result, species, bioregion, occurence, rel_occ)) 
-  
-  
-  return(correct)
-}
-
-# res <- sp_loc %>% mutate(con_Fp = unlist(l3))
-
-# 
-# # 
-# summary(fit_new)
-# 
-# me <- marginal_effects(fit_new)
-# 
-# np <- nuts_params(fit_new)
-# sum(subset(np, Parameter == "divergent__")$Value)
-
-# l2 <- parallel::mclapply(models_contributions_Fn, function(x){
-#   np <- nuts_params(x)
-#   return(sum(subset(np, Parameter == "divergent__")$Value))
-# }, mc.cores = 50)
-# hist(unlist(l2))
-
-
-
-
-# test <- pivot_longer(low, cols = c(Fn_p_m, Fp_p_m, Gc_p_m, I_herb_p_m, I_pisc_p_m)) %>%
-#   filter(!value == 0)
-# 
-# ggplot(test, aes(x = (rel_occ), y = (value), color = bioregion, fill = bioregion)) +
-#   geom_point(size = 0.5, alpha = 0.5) +
-#   geom_smooth(formula = y ~ x + I(x^2), method = "lm", alpha = 0.2, se = FALSE) +
-#   facet_wrap(~name, scales = "free") +
-#   theme_bw() +
-#   scale_color_fish_d(option = "Scarus_quoyi") 
-# 
-# ggplot(low, aes(y = log(Fp_p_m), x = log(rel_occ*100))) +
-#   geom_point() + geom_smooth(formula = y ~ 1 + x + I(x^2)+ I(x^3) , method = "lm")
-# 
-# fit <- brm(data = contributions_sp_loc_occ, log(Fp_p_m) ~ 1 + log(occurence) + I(log(occurence)^2))  
-# fit2 <- brm(data = contributions_sp_loc_occ, (Fp_p_m) ~ 1 + log(occurence) + I(log(occurence)^2) +  I(log(occurence)^3))  
-# 
-# marginal_effects(fit) +
-#   scale_x_continuous(trans = "log")
-# p <- fitted(fit2) %>% as.data.frame()
-# 
-# ggplot(contributions_sp_loc_occ, aes(y = (Fp_p_m), x = log(occurence))) +
-#   geom_point() + 
-#   geom_line(aes(y = (p$Estimate)), color = "red")
-# 
-# bayes_R2(fit2)
-# marginal_effects(fit2) 
-#   
