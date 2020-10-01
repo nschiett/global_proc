@@ -37,7 +37,8 @@ get_metpar <- function(kmax, sptl){
   colnames(spt) <- c("sst", "Family")
   
   param <- left_join(spt, metpar)
-  param$B0_adj <- 0.1 *   # adjusting unit
+  # temperature adjustment of metabolic constant 
+  param$B0_adj <- 
     param$B0 * exp(0.59 / 8.62e-5 * (1 / (28 + 273.15) - 1 / (param$sst + 273.15)))
   metpar <- dplyr::select(param, Family, sst,
                    alpha_m = alpha, alpha_sd,
