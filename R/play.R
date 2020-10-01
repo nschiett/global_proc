@@ -4078,4 +4078,12 @@ plot(data$x, data$y)
 library(brms)
 ftest <- brm(y ~ x, data = data)
 
+##########" test species ######
+loadd(cnpflux)
+loadd(cnpdiet)
+
+test <- left_join(cnpflux, cnpdiet)
+
+
+
 
