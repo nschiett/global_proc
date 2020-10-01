@@ -56,15 +56,17 @@ get_cnp <- function(){
 ##### cnpdiet #####
 get_cnpdiet <- function(){
   
-  cnpdiet <- read.csv("data/cnp_per_trophic_guild_1000draws.csv")
-  diet <- read.csv("data/extrapolation_trophic_guilds.csv")
+  cnpdiet <- read.csv("data/cnp_per_trophic_guild_1000draws.csv") %>%
+    rename(trophic_guild_predicted = pred_cat)
+  diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
+  
   
   diets <- diet %>%
     select(family, species, intersect(ends_with("_m"), starts_with("p"))) %>%
     pivot_longer(cols = intersect(ends_with("_m"), starts_with("p")),
-                 names_to = "pred_cat", values_to = "probability") %>%
-    mutate(pred_cat = as.factor(pred_cat)) %>%
-    mutate(pred_cat = fct_recode(pred_cat, 
+                 names_to = "trophic_guild_predicted", values_to = "probability") %>%
+    mutate(trophic_guild_predicted = as.factor(trophic_guild_predicted)) %>%
+    mutate(trophic_guild_predicted = fct_recode(trophic_guild_predicted, 
                                  "1" = "p1_m",
                                  "2" = "p2_m",
                                  "3" = "p3_m",
@@ -73,7 +75,7 @@ get_cnpdiet <- function(){
                                  "6" = "p6_m",
                                  "7" = "p7_m",
                                  "8" = "p8_m")) %>%
-    right_join(mutate(cnpdiet, pred_cat = as.factor(pred_cat)))
+    right_join(mutate(cnpdiet, trophic_guild_predicted = as.factor(trophic_guild_predicted)))
   
   result <- diets %>%
     group_by(family, species, draw) %>%
@@ -86,14 +88,14 @@ get_cnpdiet <- function(){
               n_m = mean(n), n_sd = sd(n),
               p_m = mean(p), p_sd = sd(p)) 
   
-  result <- result %>% 
-    left_join(select(diet, species, diet_cat = trophic_guild_predicted)) %>%
+  result <- ungroup(result) %>% 
+    left_join(select(diet, species, trophic_guild_predicted)) %>%
     ungroup()
   
   result[,3:8] <- result[,3:8] * 100
   colnames(result) <-
     c("family", "species", "Dc_m", "Dc_sd", 
-      "Dn_m", "Dn_sd", "Dp_m", "Dp_sd", "diet_cat")
+      "Dn_m", "Dn_sd", "Dp_m", "Dp_sd", "trophic_guild_predicted")
   
   return(result)
 }
@@ -178,7 +180,7 @@ combine_params <- function(sptl, kmax, lw, cnp, cnpdiet, metpar, artr){
     dplyr::left_join(lw) %>% 
     dplyr::left_join(artr) %>%
     mutate(v_m = sst, linf_m = sizemax) %>% select(-sst, -sizemax) %>% 
-    mutate( F0nz_m = 0.0037, F0nz_sd = 0.0046, F0pz_m = 0.00037, F0pz_sd = 0.00051,
+    mutate(F0nz_m = 0.0037, F0nz_sd = 0.0046, F0pz_m = 0.00037, F0pz_sd = 0.00051,
             ac_m = 0.8, an_m = 0.8, ap_m = 0.7)
   return(params)
 }
@@ -196,13 +198,13 @@ run_fishflux <- function(tfish_unique, params){
   tfish_unique$v_m <- round(tfish_unique$sst)
   tfish_unique <- unique(tfish_unique) %>% select(-sst)
   
-  data <- left_join(select(tfish_unique, species, size_cm, v_m), params)
+  data <- left_join(select(tfish_unique, species, size_cm, v_m), params) 
   
   cnpflux <- parallel::mclapply(1:nrow(tfish_unique), function(x){
     print(x)
     
     dt <- data[x,] 
-    par <- dt %>% select(-species, - Family, - size_cm, -Species, -diet_cat) %>% as.list()
+    par <- dt %>% select(-species, - Family, - size_cm, -Species, -trophic_guild_predicted) %>% as.list()
     mod <- fishflux::cnp_model_mcmc(TL = dt$size_cm,
                                     param = par, iter = 2000, seed = x)
     
@@ -227,7 +229,7 @@ sst <- read.csv("data/avSst.csv")
 tfish <- left_join(tfish, sst)
 tfish$v_m <- round(tfish$mean)
 
-tfi <- left_join(tfish, params)
+tfi <- inner_join(tfish, params)
 
 tfi <- mutate(tfi, biomass = abun * (lwa_m * size_cm ^ lwb_m))
 
@@ -260,7 +262,7 @@ tf_sum <- left_join(tf_sum, ll)
 
 ##### nutrient fluxes #####
 
-tfish <- left_join(tfish, cnpflux) %>% left_join(select(params, Species, v_m, diet_cat)) %>% mutate(
+tfish <- left_join(tfish, cnpflux) %>% left_join(select(params, Species, v_m, trophic_guild_predicted)) %>% mutate(
   Fc = Fc_median * abun,
   Fn = Fn_median * abun,
   Fp = Fp_median * abun,
@@ -361,7 +363,7 @@ return(tfs)
 get_contributions <- function(tfish, cnpflux, params, summary_transect){
   
   tfish <- left_join(tfish, cnpflux) %>% 
-    left_join(select(params, Species, lwa_m, lwb_m, diet_cat)) %>% 
+    left_join(select(params, Species, lwa_m, lwb_m, trophic_guild_predicted)) %>% 
     mutate(
       Fc = Fc_median * abun,
       Fn = Fn_median * abun,
@@ -392,11 +394,11 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
       Wn_s = sum(Wn),
       Wp_s = sum(Wp),
       biomass_s = sum(biomass),
-      biomass_h_s = sum(biomass[diet_cat == 2 & Family != "Mugilidae"]),
-      biomass_p_s = sum(biomass[diet_cat == 4])
+      biomass_h_s = sum(biomass[trophic_guild_predicted == 2 & Family != "Mugilidae"]),
+      biomass_p_s = sum(biomass[trophic_guild_predicted == 4])
     ) %>% right_join(tfish) %>% 
     group_by(studyName, region, locality, sites, area, transect_id, lon, lat, 
-             Family, species, diet_cat) %>%
+             Family, species, trophic_guild_predicted) %>%
     dplyr::summarise(
       Fn_p = sum(Fn)/unique(Fn_s),
       Fp_p = sum(Fp)/unique(Fp_s),
@@ -417,10 +419,10 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
     # 
     mutate(
       biomass_herb_p = case_when(
-        diet_cat == 2 & Family != "Mugilidae" ~ biomass_herb_p,
+        trophic_guild_predicted == 2 & Family != "Mugilidae" ~ biomass_herb_p,
         TRUE ~ 0),
       biomass_pisc_p = case_when(
-        diet_cat == 4 ~ biomass_pisc_p,
+        trophic_guild_predicted == 4 ~ biomass_pisc_p,
         TRUE ~ 0))
   
   tfss <- left_join(tfs, select(summary_transect, transect_id, nspec, bioregion)) %>% 
@@ -442,7 +444,7 @@ get_herb_pisc <- function(tfish, cnpflux, params, summary_transect){
 diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
 
 diets <- diet %>%
-  select(family, species, p2_m, p4_m, trophic_guild_predicted) %>% 
+  select(family, species, p2_m, p4_m, trophic_guild_predicted = trophic_guild_predicted) %>% 
   mutate(herb = trophic_guild_predicted == 2 & p2_m > 0.5,
          pisc = trophic_guild_predicted == 4 & p4_m > 0.5)
 

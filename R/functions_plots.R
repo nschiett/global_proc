@@ -257,20 +257,29 @@ make_fig2 <- function(commodels){
   result <- result %>%
     dplyr::filter(!variable == "b_Intercept") %>%
     left_join(tot) %>% 
-    #mutate(variable = fct_reorder(variable, tot)) %>%
     filter(diff == FALSE) %>%
     filter(!variable == "b_standardlogbiomass") %>%
-    filter(!variable == "b_standardmean") 
+    filter(!variable == "b_standardmean") %>%
+    mutate(variable = fct_relevel(variable, 
+                                  "b_standardimm_q1",
+                                  "b_standardimm_m",
+                                  "b_standardimm_q3",
+                                  "b_standardsize_q1",
+                                  "b_standardsize_m",
+                                  "b_standardsize_q3",
+                                  "b_standardtroph_q1",
+                                  "b_standardtroph_m",
+                                  "b_standardtroph_q3",
+                                  "b_standardnspec"
+                                  ))
     
   
   # plot
   slopes <-
     ggplot(result) +
-    geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey", 
+    geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey",
                size = 0.5, linetype = 1, alpha = 0.7) +
     geom_hline(yintercept = 0, size = 1, color = "black") +
-    # geom_linerange(aes(x = variable, ymin = 0, ymax = mean, color = model),
-    #                position = position_dodge(.7), size = 0.5, linetype = 2) + 
     geom_linerange(aes(x = variable, ymin = lq, ymax = uq, color = model),
                    position = position_dodge(.7), size = 1, linetype = 1) + 
     geom_point(aes(x = variable, y = mean, color = model), position = position_dodge(.7), size = 3) +
@@ -281,10 +290,10 @@ make_fig2 <- function(commodels){
                        name = "")  + 
     labs(y = "Effect size", x = "") +
     scale_x_discrete(
-      labels = c(   "Immaturity (median)", "Immaturity (2.5%)",  "Immaturity (97.5%)",
-                                  "Richness",  "Size (median)", "Size (2.5%)",
-                                  "Size (97.5%)",  "Trophic level (median)", "Trophic level (2.5%)",
-                                  "Trophic level (97.5%)")
+      labels = rev(c( "Richness", "Trophic level (97.5%)", "Trophic level (median)", "Trophic level (2.5%)",
+                  "Size (97.5%)", "Size (median)", "Size (2.5%)",
+                  "Immaturity (97.5%)", "Immaturity (median)", "Immaturity (2.5%)"
+                   ))
       ) +
    
     theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
