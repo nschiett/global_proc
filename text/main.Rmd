@@ -27,9 +27,9 @@ Therefore, trade-offs between functions, their drivers, and vulnerability are po
 Coral reefs are among the most diverse and productive ecosystems on earth, and they provide indispensable ecosystem services to humans [@Teh2013]. 
 As coral reefs thrive in nutrient-poor waters, efficient cycling of elements is key to their characteristic productivity [@Brandl2019science]. 
 Importantly, the integrity of coral reefs is threatened by a plethora of anthropogenic stressors, such as intensive exploitation and climate change [@Hughes2017]. 
-Over the past decade, severe declines in coral reef habitat quality and fish biomass, and community structure shifts have brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front].
+Over the past decades, severe declines in coral reef habitat quality and fish biomass, and community structure shifts have brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front].
 Yet, our capacity to quantitatively evaluate, monitor, and compare reef functioning primarily relies on static proxies of functions, such as relative live coral cover, standing biomass of reef fishes, or functional richness based on qualitative species traits [e.g. @Mora2011plos; @Cinner2020; @Mouillot2014]. 
-Conversely, we know comparatively little about elemental fluxes and their drivers (but see [@Allgeier2016]), which currently hinders effective management [@Brandl2019front].
+Conversely, we know comparatively little about elemental fluxes and their drivers (but see [@Allgeier2016]), which currently limits effective management [@Brandl2019front].
         
 Here, we integrate biogeochemistry and community ecology to advance our understanding of the fluxes of elements that underpin reef fish functioning. 
 Using species-specific data on basic organismal processes and phylogenetic extrapolation techniques, we parametrize individual-level bioenergetic models to estimate five key ecosystem functions: nitrogen (N) excretion, phosphorus (P) excretion, biomass production, herbivory (daily consumption of primary producers, expressed in mass of carbon), and piscivory (daily consumption of fishes, expressed in mass of carbon). 
@@ -61,14 +61,15 @@ These results emphasize the importance of fish community structure for ecosystem
           
 Alongside features of community structure, specific dominant and/or high-performing species strongly affect ecosystem functioning.   
 Due to species-specific characteristics, certain species or entire families tend to contribute more or less to a particular function, relative to their contribution to standing biomass (Fig. 3a).
+For example, because Serranidae feed on P-rich preys, they contribute disproportionally to P excretion, and many Labridae have a high growth rates making them important contributors to biomass production.
 Further, abundant species can profoundly affect rates of functioning at the community level [@Ruttenberg2019; @Topor2019]. 
 Therefore, we assessed the role of species by quantifying the degree to which they disproportionally induce (i.e. dominate) different functions for each community. 
-We demonstrate that for most communities, functions are consistently dominated by a few species (Fig. 3b). This means for example that on average ~12% of the species in a community contribute to more than 50% of a function.
+We demonstrate that for most communities, functions are consistently dominated by a few species (Fig. 3b). This means for example that on average ~12% of the species in a local community contribute to more than 50% of a function.
 However, the identity of these species varies dramatically (Fig. 3c), despite evidence for species assuming key functional roles across widely-dispersed locations [@Bellwood2003].
 Thus, while there are almost no globally important species for a given function, most species are locally important somewhere.
 Indeed, ~70% of all species contributed disproportionally to a specific function in at least one reef fish community.
 Despite high species richness on coral reefs, researchers often report the existence functionally-dominant “key species” [e.g. @Bellwood2006]. 
-Our results imply that while functional dominance is indeed prevalent, the identity of the dominant species can be unpredictable, suggesting that maintaining high levels of species richness across coral reefs is essential to sustain ecosystem functioning at the global scale [@Topor2019]. 
+Our results imply that while functional dominance is indeed prevalent, the identity of local dominant species can be unpredictable, suggesting that maintaining high levels of species richness across coral reefs is essential to sustain ecosystem functioning at the global scale [@Topor2019]. 
 
 
 The critical importance of both reef fish community structure and species-specific contributions shines new light on the vulnerability of coral reef functioning in the Anthropocene. 
@@ -98,7 +99,7 @@ Finally, while there is a general consensus on the role of diversity in enhancin
 While, it seems clear that maintaining diversity of fishes appears critical for functioning of reefs, our results suggest that species richness only has minor effects on individual functions at local scales. Rather, it may be beta-diversity and local differences in community structure that are most critical for maintaining function at the seascape scale, as no species appears to consistently provide high contributions for all functions simultaneously or across all sites it occurs [@Duffy2009; @Zavaleta2010].    
 
 
-Overall, our results demonstrate that managing coral reefs for ecosystem functioning is, in its simplest form, unlikely to be possible 
+Overall, our results demonstrate that managing coral reefs for ecosystem functioning is, in its simplest form, unlikely to be possible. 
 While enhancing fish biomass is important, the variability of reef fish communities in the rates of functions representing cycling of critical elements is striking. 
 Conserving these elemental fluxes in the 21st century will require a more nuanced approach to coral reef management. 
 

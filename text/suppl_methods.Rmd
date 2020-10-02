@@ -30,7 +30,7 @@ For each species, otoliths were cut transversely, using a diamond disc saw (Pres
 
 A standardized transect across the otoliths (from the nucleus to the edge) was chosen for each species, and distances between annual growth increments were measured using the software ImageJ. This procedure was performed twice by two independent researchers to prevent biases induced by a single observer. When the coefficient of variation between the two observers was greater than 5%, a common reading was reached by averaging the measurements for each section. 
 
-We then used a back-calculation procedure to estimate fish length at previous ages, modified to also quantify the uncertainty around the obtained length estimates using a Bayesian approach (fishgrowbot, ref).
+We then used the Modified Fry back-calculation model (MF) [@Vigliola2000]. to estimate fish length at previous ages, modified to also investigate the uncertainty around the obtained length estimates using a Bayesian approach (fishgrowbot, ref).
 
 Finally, we fitted the Von Bertalanffy growth models to all species at each location for which there were at least 3 individuals. We fitted the models using Bayesian hierarchical regression models provided by the R package fishgrowbot (ref). 
 
@@ -61,7 +61,7 @@ There is currently no streamlined method to make predictions to new species from
 
 ### 2.2 Data analysis and extrapolation  
 
-\noindent We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
+\noindent The CNP\% content of organisms is known to be highly conserved within families (REF). We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
 
 <!-- \begin{equation} -->
 $$\begin{bmatrix}Y_1 \\ Y_2 \\ Y_3\end{bmatrix} \sim MVNormal(\begin{bmatrix}mu1 \\ mu2 \\ mu3\end{bmatrix}, S),$$
@@ -86,9 +86,9 @@ $$mu_{\textrm{n}\times\textrm{k}} = \beta_\textrm{0 k} + \gamma_{\textrm{0phy}\t
 
 ### 3.2 Data analysis and extrapolation  
 \noindent We used trophic guilds defined by @Parravicini2020. We fitted a multivariate Bayesian regression model to summarize CNP\% content data per trophic guild with random effects at the species level. This model had a median Bayesian R2 of 0.62, 0.62, and 0.48 for C, N and P respectively.           
-Next, we extracted 1000 draws of the predicted the CNP\% per trophic guild. Parravicini et al. 2020 [@Parravicini2020] provides the probability of reef fish species to be assigned to each of the eight defined trophic guilds(i.e. sessile invertivores; herbivores, microvores, and detrivores; corallivores; piscivores; microinvertivores; macroinvertivores; crustacivores; planktivores). By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. We then took the average and standard deviation across all 1000 draws. 
+Next, we extracted 1000 draws of the predicted the CNP\% per trophic guild. Parravicini et al. 2020 [@Parravicini2020] provides the probability of reef fish species to be assigned to each of the eight defined trophic guilds(i.e. sessile invertivores; herbivores, microvores, and detrivores; corallivores; piscivores; microinvertivores; macroinvertivores; crustacivores; planktivores). By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. We then took the average and standard deviation across all 1000 draws. While we recognize the bias of using diet CNP\% estimates of a dataset in one region, we argue that variability between food categories e.g. animal material and primary producers is likely to be higher than regional differences within trophic categorizations. Further, as the used trophic guild classification includes probabilities to belong to each group, variation is included when the trophic categorization is not well known. For example, if a species has a 50% probability to be a herbivore and a 50% probability to be a sessile invertivore this uncertainty will be reflected the estimation of the diet CNP\%.
 
-### 4 Metabolic parameters    
+## 4 Metabolic parameters    
 ### 4.1 Data collection    
 In the period between 2018 and 2019, we collected 1393 individuals of 61 species and 18 families with a minimum of 3 replicates per species. Individuals were collected using handnets and clove oil by scuba divers. 
 
