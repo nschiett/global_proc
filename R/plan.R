@@ -56,6 +56,7 @@ plan <- drake_plan(
   
   # run models proc ~ community vars
   commodels = run_commodels(summary_transect_complete),
+  commodels_real = run_commodels_abs(summary_transect_complete),
   
   ##### contribution analysis #####
   contr_family = get_cf(contributions, herb_pisc),
@@ -74,10 +75,15 @@ plan <- drake_plan(
   fig3 = make_fig3(contributions, herb_pisc, degree_dominance, freq_dominance),
   fig4 = make_fig4(contributions, vulnerability, herb_pisc, residuals),
   
-  # annex
-  annex_fig1 = make_annex_fig1(summary_transect_complete, bmmodels),
-  annex_fig2 = make_annex_fig2(summary_transect_complete, residuals),
-  annex_fig3 = make_annex_fig3(summary_transect_complete, residuals),
+  # Supplemental data figures
+  SI_fig1 = make_annex_fig1(summary_transect_complete, residuals, bmmodels),
+  SI_fig2 = make_annex_fig2(summary_transect_complete, residuals),
+  
+  # Supplemental information figures
+  SI_rank_plots = make_rank_plots(contributions, herb_pisc),
+  SI_pp_plots = make_pp_plots(bmmodels, procmodels, commodels)
+  
+  
   
   ##### TEXT #####
   # main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"), 

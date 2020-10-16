@@ -19,5 +19,8 @@ library(ggrepel)
 library(tidyr)
 library(readr)
 library(Rcpp)
+library(broom)
+library(flextable)
+library(officer)
 
 Sys.setlocale("LC_MESSAGES", "en_US.utf8")

@@ -168,11 +168,11 @@ run_commodels_abs <- function(summary_transect_complete){
                      size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
                    data = flux, chain = 3, cores = 1)
   
-  fit_Fp <- brm(log(Fp)~ ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+  fit_Fp <- brm(log(Fp) ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
                   size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
                    data = flux, chain = 3, cores = 1)
   
-  fit_Gc <- brm(log(Gc) ~ ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
+  fit_Gc <- brm(log(Gc)  ~ mean + logbiomass + nspec + size_m + troph_m + imm_m +
                   size_q3 + troph_q3 + imm_q1 + imm_q3 + troph_q1 + size_q1 ,
                    data = flux, chain = 3, cores = 1)
   

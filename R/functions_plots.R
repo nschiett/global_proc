@@ -342,6 +342,7 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
   con_fam <- con_fam %>%
     arrange(biomass_p) %>%
     filter(biomass_p > 0.025) %>%
+    filter(!Family == "Fistulariidae") %>%
     mutate(Family = factor(Family, unique(Family)))
 
   
@@ -362,27 +363,27 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
                        name = "") +
     
     add_fishape(family = "Acanthuridae", option = NA, alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 11.75, ymax = 12.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 11.75, ymax = 12.25) +
     add_fishape(family = "Labridae", option = NA, alpha = 0.7,
-                xmax = -0.07, xmin = -0.11, ymin = 10.75, ymax = 11.25) +
+                xmax = -0.075, xmin = -0.11, ymin = 10.75, ymax = 11.25) +
     add_fishape(family = "Pomacentridae", option = NA,  alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 9.75, ymax = 10.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 9.75, ymax = 10.25) +
     add_fishape(family = "Haemulidae", option = NA,  alpha = 0.7,
                 xmax = -0.075, xmin = -0.11, ymin = 8.75, ymax = 9.25) +
     add_fishape(family = "Lutjanidae", option = NA,  alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 7.75, ymax = 8.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 7.75, ymax = 8.25) +
     add_fishape(family = "Serranidae", option = "Cephalopholis_argus",  alpha = 0.7,
                 xmax = -0.075, xmin = -0.11, ymin = 6.75, ymax = 7.25) +
     add_fishape(family = "Balistidae", option = NA,  alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 5.75, ymax = 6.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 5.75, ymax = 6.25) +
     add_fishape(family = "Mullidae", option = NA,  alpha = 0.7,
                 xmax = -0.075, xmin = -0.11, ymin = 4.75, ymax = 5.25) +
     add_fishape(family = "Kyphosidae", option = NA,  alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 3.75, ymax = 4.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 3.75, ymax = 4.25) +
     add_fishape(family = "Holocentridae", option = NA,  alpha = 0.7,
                 xmax = -0.075, xmin = -0.11, ymin = 2.75, ymax = 3.25) +
     add_fishape(family = "Chaetodontidae", option = NA,  alpha = 0.7,
-                xmin = 0.075, xmax = 0.11, ymin = 1.75, ymax = 2.25) +
+                xmin = -0.075, xmax = -0.11, ymin = 1.75, ymax = 2.25) +
     add_fishape(family = "Lethrinidae", option = NA,  alpha = 0.7,
                 xmax = -0.075, xmin = -0.11, ymin = 0.75, ymax = 1.25) +
     
@@ -472,239 +473,406 @@ make_fig4 <- function(contributions, vulnerability, herb_pisc, residuals){
     left_join(herb_pisc$contributions_herb_pisc) %>%
     group_by(transect_id) %>%
     dplyr::summarize(
+      vuln_bm_fi = sum(biomass_p * vuln_fi, na.rm = TRUE),
       vuln_Fn_fi = sum(Fn_p * vuln_fi, na.rm = TRUE),
       vuln_Fp_fi = sum(Fp_p * vuln_fi, na.rm = TRUE),
       vuln_Gc_fi = sum(Gc_p * vuln_fi, na.rm = TRUE),
       vuln_Iherb_fi = sum(I_herb_p[I_herb_p > 0] * vuln_fi[I_herb_p > 0], na.rm = TRUE),
       vuln_Ipisc_fi = sum(I_pisc_p[I_pisc_p > 0] * vuln_fi[I_pisc_p > 0], na.rm = TRUE),
+      vuln_bm_cl = sum(biomass_p * vuln_climate, na.rm = TRUE),
       vuln_Fn_cl = sum(Fn_p * vuln_climate, na.rm = TRUE),
       vuln_Fp_cl = sum(Fp_p * vuln_climate, na.rm = TRUE),
       vuln_Gc_cl = sum(Gc_p * vuln_climate, na.rm = TRUE),
       vuln_Iherb_cl = sum(I_herb_p[I_herb_p > 0] * vuln_climate[I_herb_p > 0], na.rm = TRUE),
-      vuln_Ipisc_cl = sum(I_pisc_p[I_pisc_p > 0] * vuln_climate[I_pisc_p > 0], na.rm = TRUE))
+      vuln_Ipisc_cl = sum(I_pisc_p[I_pisc_p > 0] * vuln_climate[I_pisc_p > 0], na.rm = TRUE)) %>%
+    filter(vuln_Ipisc_cl > 0, vuln_Iherb_cl > 0) %>%
+    mutate(dv_Fn_fi = vuln_bm_fi - vuln_Fn_fi,
+           dv_Fp_fi = vuln_bm_fi - vuln_Fp_fi,
+           dv_Gc_fi = vuln_bm_fi - vuln_Gc_fi,
+           dv_Iherb_fi = vuln_bm_fi - vuln_Iherb_fi,
+           dv_Ipisc_fi = vuln_bm_fi - vuln_Ipisc_fi,
+           dv_Fn_cl = vuln_bm_cl - vuln_Fn_cl,
+           dv_Fp_cl = vuln_bm_cl - vuln_Fp_cl,
+           dv_Gc_cl = vuln_bm_cl - vuln_Gc_cl,
+           dv_Iherb_cl = vuln_bm_cl - vuln_Iherb_cl,
+           dv_Ipisc_cl = vuln_bm_cl - vuln_Ipisc_cl)
   
   con_long <- con %>%
-    pivot_longer(cols = 2:11) %>%
+    pivot_longer(cols = 14:23) %>%
     separate(name, into = c("v", "fun", "impact"), sep = "_", remove = TRUE) %>%
-    filter(value>0) %>%
-    pivot_wider(names_from = impact, values_from = value)
+    pivot_wider(names_from = impact, values_from = value) %>%
+    mutate(high_fi = fi < 0, 
+           high_cl = cl < 0,
+           high_both = cl < 0 & fi < 0)
   
+  sum <- con_long %>%
+    group_by(fun) %>%
+    summarize(fi_high = sum(high_fi)/n(),
+              cl_high = sum(high_cl)/n(),
+              both_high = sum(high_both)/n()) %>%
+    pivot_longer(c(fi_high, cl_high, both_high)) %>%
+    mutate(name = fct_relevel(name, (unique(name))))
   
-  res_long <- pivot_longer(residuals, 2:6, values_to = "residual") %>%
-    mutate(fun = case_when(name == "Fn_r" ~ "Fn",
-                           name == "Fp_r" ~ "Fp",
-                           name == "Gc_r" ~ "Gc",
-                           name == "I_herb_r" ~ "Iherb",
-                           name == "I_pisc_r" ~ "Ipisc")) %>%
-    select(-name)
+  # ggplot(sum) + 
+  #   geom_bar(aes(name, value, fill = fun), stat = "identity",
+  #            position = position_dodge(), alpha = 0.9) +
+  #   labs(y = "Proportion communities with increased vulnerability", x = "") +
+  #   scale_x_discrete(labels = c("Fishing", "Climate change", "Both")) +
+  #   scale_fill_fish_d(option = "Callanthias_australis",
+  #                     labels = c("N excretion", 
+  #                                "P excretion", 
+  #                                "Production",
+  #                                "Herbivory",
+  #                                "Piscivory")) +
+  #   theme_classic() +
+  #   theme(panel.grid.major.x = element_blank(),
+  #         panel.grid.major.y = element_line(color = "lightgrey"),
+  #         panel.grid.minor = element_blank(), legend.position = "none", 
+  #         text = element_text(size = 12))  
   
-  vu <- data.frame(
-    fun = c("Fn", "Fp", "Gc", "Iherb", "Ipisc"),
-    m_fi = c(
-      median(con$vuln_Fn_fi),
-      median(con$vuln_Fp_fi),
-      median(con$vuln_Gc_fi),
-      median(con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
-      median(con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
-    ),
-    m_cl = c(
-      median(con$vuln_Fn_cl),
-      median(con$vuln_Fp_cl),
-      median(con$vuln_Gc_cl),
-      median(con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
-      median(con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
-    )
-  ) %>%
-    mutate(m_fi = mean(m_fi),
-           m_cl = mean(m_cl))
+  sum <- con_long %>%
+    group_by(fun) %>%
+    summarize(fi_high = sum(high_fi)/n(),
+              cl_high = sum(high_cl)/n(),
+              both_high = sum(high_both)/n()) %>%
+    pivot_longer(c(fi_high, cl_high, both_high)) %>%
+    mutate(name = fct_relevel(name, c("fi_high", "both_high", "cl_high")))
   
-  
-  q_cl <- quantile(c(
-    (con$vuln_Fn_cl),
-    (con$vuln_Fp_cl),
-    (con$vuln_Gc_cl),
-    (con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
-    (con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
-  ), c(0.25, 0.4, 0.6, 0.75))
-  q_fi <- quantile(c(
-    (con$vuln_Fn_fi),
-    (con$vuln_Fp_fi),
-    (con$vuln_Gc_fi),
-    (con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
-    (con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
-  ), c(0.25, 0.4, 0.6, 0.75))
-  
-
-  
-  prop_fi <- con_long %>%
-    left_join(res_long) %>%
-    left_join(vu) %>%
-    mutate(cat_fi = case_when(fi > q_fi[4] ~ "High",
-                              fi > q_fi[3] ~ "Medium",
-                              fi > q_fi[2] ~ "Medium",
-                              fi > q_fi[1] ~ "Medium",
-                              TRUE ~ "Low")) %>%
-    mutate(high = residual > 0) %>%
-    group_by(cat_fi, fun) %>%
-    dplyr::summarise(n_high_fi = sum(high), n_fi = length(unique(transect_id))) %>%
-    ungroup() %>% dplyr::group_by(fun) %>%
-    mutate(ntot_fi = sum(n_fi)) %>%
-    mutate(prop_high_fi = n_high_fi / ntot_fi, prop_fi = n_fi/ntot_fi) %>%
-    mutate(cat = factor(cat_fi, levels = c("Very low", "Low", "Medium", "High", "Very high")))
-  
-  prop_cl <- con_long %>%
-    left_join(res_long) %>%
-    left_join(vu) %>%
-    mutate(cat_cl = case_when(cl > q_cl[4] ~ "High",
-                              cl > q_cl[3] ~ "Medium",
-                              cl > q_cl[2] ~ "Medium",
-                              cl > q_cl[1] ~ "Medium",
-                              TRUE ~ "Low")) %>%
-    mutate(high = residual > 0) %>%
-    group_by(cat_cl, fun) %>%
-    dplyr::summarise(n_high_cl = sum(high), n_cl = length(unique(transect_id))) %>%
-    ungroup() %>% dplyr::group_by(fun) %>%
-    mutate(ntot_cl = sum(n_cl)) %>%
-    mutate(prop_high_cl = n_high_cl / ntot_cl, prop_cl = n_cl/ntot_cl) %>%
-    mutate(cat = factor(cat_cl, levels = c("Very low", "Low", "Medium", "High", "Very high")))
-  
-  p1 <- ggplot(prop_fi[!prop_fi$cat_fi == "Medium",]) +
-    geom_bar(aes(x = cat, y = prop_fi, fill = fun), 
-             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", 
-                                 "P excretion", 
-                                 "Production",
-                                 "Herbivory",
-                                 "Piscivory")) +
-    labs(y = "Proportion of communities", x = "Vulnerability to fishing", fill = "") +
-    theme_bw() +
-    theme(panel.grid.major.x = element_blank(), 
-          panel.grid.minor = element_blank(), legend.position = "top",
-          text = element_text(size = 12))  
-  
-  p2 <- ggplot(prop_cl[!prop_cl$cat_cl == "Medium",]) +
-    geom_bar(aes(x = cat, y = prop_cl, fill = fun), 
-             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", 
-                                 "P excretion", 
-                                 "Production",
-                                 "Herbivory",
-                                 "Piscivory")) +
-    labs(y = "Proportion of communities", x = "Vulnerability to climate change", fill = "") +
-    theme_bw() +
-    theme(panel.grid.major.x = element_blank(), 
-          panel.grid.minor = element_blank(), legend.position = "none",
-          text = element_text(size = 12))  
-  
-  double <- 
-    con_long %>%
-    left_join(res_long) %>%
-    left_join(vu) %>%
-    mutate(cat_double = case_when(fi > q_fi[4] & cl > q_cl[4] ~ "High",
-                                  fi < q_fi[1] & cl < q_cl[1] ~ "Low",
-                                  TRUE ~ "Medium")) %>%
-    group_by(cat_double, fun) %>%
-    dplyr::summarise( n = length(unique(transect_id))) %>%
-    ungroup() %>% dplyr::group_by(fun) %>%
-    mutate(ntot = sum(n)) %>%
-    mutate(prop = n/ntot) %>%
-    mutate(cat_double = factor(cat_double, levels = c("Low", "Medium", "High")))
-  
-  
-  p3 <- ggplot(double[!double$cat_double == "Medium",]) +
-    geom_bar(aes(x = cat_double, y = prop, fill = fun), 
-             alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
-    scale_fill_fish_d(option = "Callanthias_australis",
-                      labels = c("N excretion", 
-                                 "P excretion", 
-                                 "Production",
-                                 "Herbivory",
-                                 "Piscivory")) +
-    labs(y = "Proportion of communities", x = "Vulnerability to both", fill = "") +
-    theme_bw() +
-    theme(panel.grid.major.x = element_blank(), 
-          panel.grid.minor = element_blank(), 
-          legend.position = "none",
-          text = element_text(size = 12))  
-  
-  p3
-  
-  p1 + p2 + p3 + plot_layout(ncol = 1)
-  ggsave("output/plots/figure_4_vuln_com.png", width = 6, height = 8)
-  
-}
-
-make_annex_fig1 <- function(summary_transect_complete, bmmodels){
-
-  nd <- summary_transect_complete %>%
-    select(mean) %>%
-    unique() %>%
-    mutate(biomass_tot = 100) 
-  
-  ndp <- nd %>%
-    mutate(Fn_ref = exp(fitted(bmmodels[[1]], nd)[,1])) %>%
-    mutate(Fp_ref = exp(fitted(bmmodels[[2]], nd)[,1])) %>%
-    mutate(Gc_ref = exp(fitted(bmmodels[[3]], nd)[,1])) %>%
-    mutate(I_herb_ref = exp(fitted(bmmodels[[4]], nd)[,1])) %>%
-    mutate(I_pisc_ref = exp(fitted(bmmodels[[5]], nd)[,1]))  %>%
-    select(-biomass_tot) %>%
-    right_join(summary_transect_complete) %>%
-    mutate(multif = as.numeric(Fn > Fn_ref & 
-                                 Fp > Fp_ref & 
-                                 Gc > Gc_ref & 
-                                 I_herb > I_herb_ref & 
-                                 I_pisc > I_pisc_ref)) %>%
-    mutate(logbiomass = log(biomass_tot))
-
- fit_mf1 <- brm(multif ~ mean + logbiomass,
-                 data = ndp, chain = 1, cores = 1, family = "bernoulli")
-
- 
-  me <- marginal_effects(fit_mf1, method = "fitted")
-
   plot <- 
-  ggplot(me$logbiomass) +
-    geom_ribbon(aes(x = logbiomass, ymin = lower__, ymax = upper__), fill = "grey60", alpha = 0.5) +
-    geom_line(aes(x = logbiomass, y = estimate__), size = 1, color = "grey40") +
-    geom_vline(xintercept = log(100), linetype = 3, alpha = 0.7) +
-    geom_vline(xintercept = log(450), linetype = 2) +
-    geom_hline(yintercept = 0.5, linetype = 2) +
-    #geom_vline(xintercept = log(1000), linetype = 3, alpha = 0.7)+
-    labs(x = "log(biomass) (g/m2)", y = "fitted probability of MF") +
-    theme_minimal() +
-    theme(axis.line = element_line(), axis.ticks = element_line())
+  ggplot(sum) + 
+    geom_hline(yintercept = 0.5, color = "lightgrey", size = 0.4) +
+    geom_hline(yintercept = 0.75, color = "lightgrey", size = 0.4) +
+    geom_hline(yintercept = 0.25, color = "lightgrey", size = 0.4) +
+    annotate("text", x = -Inf, y = c(0.3, 0.55, 0.8), 
+             label = c("0.25", "0.50", "0.75") , color="grey", size=3 , angle=0, fontface="bold", hjust=1) +
+    #geom_text(aes(x = "fi_high", y = 0.6, label = "0.5")) +
+    geom_bar(aes(name, value, fill = fun), stat = "identity",
+             position = position_dodge(), alpha = 0.9, width = 0.7) +
+    labs(y = "Proportion communities with increased vulnerability", x = "") +
+    annotate("text", x = c("fi_high", "both_high", "cl_high"), y = c(0.9, 0.9, 0.9), 
+             label = c("Fishing", "Both", "Climate change"), angle = c(-60, 0, 60), size = 5) +
+    scale_fill_fish_d(option = "Callanthias_australis",
+                      labels = c("N excretion", 
+                                 "P excretion", 
+                                 "Production",
+                                 "Herbivory",
+                                 "Piscivory"),
+                      name = "Proportion communities with increased functional vulnerability") +
+    theme_void() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = c(0.5, 0.95), 
+          text = element_text(size = 12),
+          legend.margin = margin(0,0,0,0), panel.spacing = unit(c(0,0,0,0), units = "cm"), 
+          legend.direction = "horizontal",
+          )  +
+    scale_y_continuous(limits = c(-0.3, 0.95), breaks = c(0,0.5, 1)) +
+    guides(fill = guide_legend(title.position="top", legend.title.align = 0.5, title.vjust = 1,)) +
+    coord_polar()
   
-  ggsave("output/plots/annex_fig1_mf_logbiomass.png", plot, width = 8, height = 6)
   
-  # sum(ndp$biomass_tot > 100)/nrow(ndp)
-  # sum(ndp$biomass_tot > 450 & ndp$multif>0)/nrow(ndp)
-  # sum(ndp$biomass_tot > 1000)/nrow(ndp)
-  # sum(ndp$multif)/nrow(ndp)
-  # test <- ndp %>%
-  #   filter(multif>0)
   # 
-  # f <- fitted(fit_mf1)
-  # sum(f[,1]>0.5)/nrow(f)
+  # res_long <- pivot_longer(residuals, 2:6, values_to = "residual") %>%
+  #   mutate(fun = case_when(name == "Fn_r" ~ "Fn",
+  #                          name == "Fp_r" ~ "Fp",
+  #                          name == "Gc_r" ~ "Gc",
+  #                          name == "I_herb_r" ~ "Iherb",
+  #                          name == "I_pisc_r" ~ "Ipisc")) %>%
+  #   select(-name)
+  # 
+  # vu <- data.frame(
+  #   fun = c("Fn", "Fp", "Gc", "Iherb", "Ipisc"),
+  #   m_fi = c(
+  #     median(con$vuln_Fn_fi),
+  #     median(con$vuln_Fp_fi),
+  #     median(con$vuln_Gc_fi),
+  #     median(con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+  #     median(con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+  #   ),
+  #   m_cl = c(
+  #     median(con$vuln_Fn_cl),
+  #     median(con$vuln_Fp_cl),
+  #     median(con$vuln_Gc_cl),
+  #     median(con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+  #     median(con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+  #   )
+  # ) %>%
+  #   mutate(m_fi = mean(m_fi),
+  #          m_cl = mean(m_cl))
+  # 
+  # 
+  # q_cl <- quantile(c(
+  #   (con$vuln_Fn_cl),
+  #   (con$vuln_Fp_cl),
+  #   (con$vuln_Gc_cl),
+  #   (con[con$vuln_Iherb_cl>0,]$vuln_Iherb_cl),
+  #   (con[con$vuln_Ipisc_cl>0,]$vuln_Ipisc_cl)
+  # ), c(0.25, 0.4, 0.6, 0.75))
+  # q_fi <- quantile(c(
+  #   (con$vuln_Fn_fi),
+  #   (con$vuln_Fp_fi),
+  #   (con$vuln_Gc_fi),
+  #   (con[con$vuln_Iherb_fi>0,]$vuln_Iherb_fi),
+  #   (con[con$vuln_Ipisc_fi>0,]$vuln_Ipisc_fi)
+  # ), c(0.25, 0.4, 0.6, 0.75))
+  # 
+  # 
+  # 
+  # prop_fi <- con_long %>%
+  #   left_join(res_long) %>%
+  #   left_join(vu) %>%
+  #   mutate(cat_fi = case_when(fi > q_fi[4] ~ "High",
+  #                             fi > q_fi[3] ~ "Medium",
+  #                             fi > q_fi[2] ~ "Medium",
+  #                             fi > q_fi[1] ~ "Medium",
+  #                             TRUE ~ "Low")) %>%
+  #   mutate(high = residual > 0) %>%
+  #   group_by(cat_fi, fun) %>%
+  #   dplyr::summarise(n_high_fi = sum(high), n_fi = length(unique(transect_id))) %>%
+  #   ungroup() %>% dplyr::group_by(fun) %>%
+  #   mutate(ntot_fi = sum(n_fi)) %>%
+  #   mutate(prop_high_fi = n_high_fi / ntot_fi, prop_fi = n_fi/ntot_fi) %>%
+  #   mutate(cat = factor(cat_fi, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+  # 
+  # prop_cl <- con_long %>%
+  #   left_join(res_long) %>%
+  #   left_join(vu) %>%
+  #   mutate(cat_cl = case_when(cl > q_cl[4] ~ "High",
+  #                             cl > q_cl[3] ~ "Medium",
+  #                             cl > q_cl[2] ~ "Medium",
+  #                             cl > q_cl[1] ~ "Medium",
+  #                             TRUE ~ "Low")) %>%
+  #   mutate(high = residual > 0) %>%
+  #   group_by(cat_cl, fun) %>%
+  #   dplyr::summarise(n_high_cl = sum(high), n_cl = length(unique(transect_id))) %>%
+  #   ungroup() %>% dplyr::group_by(fun) %>%
+  #   mutate(ntot_cl = sum(n_cl)) %>%
+  #   mutate(prop_high_cl = n_high_cl / ntot_cl, prop_cl = n_cl/ntot_cl) %>%
+  #   mutate(cat = factor(cat_cl, levels = c("Very low", "Low", "Medium", "High", "Very high")))
+  # 
+  # p1 <- ggplot(prop_fi[!prop_fi$cat_fi == "Medium",]) +
+  #   geom_bar(aes(x = cat, y = prop_fi, fill = fun), 
+  #            alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+  #   scale_fill_fish_d(option = "Callanthias_australis",
+  #                     labels = c("N excretion", 
+  #                                "P excretion", 
+  #                                "Production",
+  #                                "Herbivory",
+  #                                "Piscivory")) +
+  #   labs(y = "Proportion of communities", x = "Vulnerability to fishing", fill = "") +
+  #   theme_bw() +
+  #   theme(panel.grid.major.x = element_blank(), 
+  #         panel.grid.minor = element_blank(), legend.position = "top",
+  #         text = element_text(size = 12))  
+  # 
+  # p2 <- ggplot(prop_cl[!prop_cl$cat_cl == "Medium",]) +
+  #   geom_bar(aes(x = cat, y = prop_cl, fill = fun), 
+  #            alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+  #   scale_fill_fish_d(option = "Callanthias_australis",
+  #                     labels = c("N excretion", 
+  #                                "P excretion", 
+  #                                "Production",
+  #                                "Herbivory",
+  #                                "Piscivory")) +
+  #   labs(y = "Proportion of communities", x = "Vulnerability to climate change", fill = "") +
+  #   theme_bw() +
+  #   theme(panel.grid.major.x = element_blank(), 
+  #         panel.grid.minor = element_blank(), legend.position = "none",
+  #         text = element_text(size = 12))  
+  # 
+  # double <- 
+  #   con_long %>%
+  #   left_join(res_long) %>%
+  #   left_join(vu) %>%
+  #   mutate(cat_double = case_when(fi > q_fi[4] & cl > q_cl[4] ~ "High",
+  #                                 fi < q_fi[1] & cl < q_cl[1] ~ "Low",
+  #                                 TRUE ~ "Medium")) %>%
+  #   group_by(cat_double, fun) %>%
+  #   dplyr::summarise( n = length(unique(transect_id))) %>%
+  #   ungroup() %>% dplyr::group_by(fun) %>%
+  #   mutate(ntot = sum(n)) %>%
+  #   mutate(prop = n/ntot) %>%
+  #   mutate(cat_double = factor(cat_double, levels = c("Low", "Medium", "High")))
+  # 
+  # 
+  # p3 <- ggplot(double[!double$cat_double == "Medium",]) +
+  #   geom_bar(aes(x = cat_double, y = prop, fill = fun), 
+  #            alpha = 0.9, stat = "identity", position = "dodge", width = 0.9) +
+  #   scale_fill_fish_d(option = "Callanthias_australis",
+  #                     labels = c("N excretion", 
+  #                                "P excretion", 
+  #                                "Production",
+  #                                "Herbivory",
+  #                                "Piscivory")) +
+  #   labs(y = "Proportion of communities", x = "Vulnerability to both", fill = "") +
+  #   theme_bw() +
+  #   theme(panel.grid.major.x = element_blank(), 
+  #         panel.grid.minor = element_blank(), 
+  #         legend.position = "none",
+  #         text = element_text(size = 12))  
+  # 
+  # p3
+  # 
+  # p1 + p2 + p3 + plot_layout(ncol = 1)
   
-  return(plot)
+  ggsave("output/plots/figure_4_vuln_com.png", plot,  width = 6, height = 6)
   
 }
 
-make_annex_fig2 <- function(summary_transect_complete, residuals){
- 
+# make_annex_fig1 <- function(summary_transect_complete, bmmodels){
+# 
+#   nd <- summary_transect_complete %>%
+#     select(mean) %>%
+#     unique() %>%
+#     mutate(biomass_tot = 100) 
+#   
+#   ndp <- nd %>%
+#     mutate(Fn_ref = exp(fitted(bmmodels[[1]], nd)[,1])) %>%
+#     mutate(Fp_ref = exp(fitted(bmmodels[[2]], nd)[,1])) %>%
+#     mutate(Gc_ref = exp(fitted(bmmodels[[3]], nd)[,1])) %>%
+#     mutate(I_herb_ref = exp(fitted(bmmodels[[4]], nd)[,1])) %>%
+#     mutate(I_pisc_ref = exp(fitted(bmmodels[[5]], nd)[,1]))  %>%
+#     select(-biomass_tot) %>%
+#     right_join(summary_transect_complete) %>%
+#     mutate(multif = as.numeric(Fn > Fn_ref & 
+#                                  Fp > Fp_ref & 
+#                                  Gc > Gc_ref & 
+#                                  I_herb > I_herb_ref & 
+#                                  I_pisc > I_pisc_ref)) %>%
+#     mutate(logbiomass = log(biomass_tot))
+# 
+#  fit_mf1 <- brm(multif ~ mean + logbiomass,
+#                  data = ndp, chain = 1, cores = 1, family = "bernoulli")
+# 
+#  
+#   me <- marginal_effects(fit_mf1, method = "fitted")
+# 
+#   plot <- 
+#   ggplot(me$logbiomass) +
+#     geom_ribbon(aes(x = logbiomass, ymin = lower__, ymax = upper__), fill = "grey60", alpha = 0.5) +
+#     geom_line(aes(x = logbiomass, y = estimate__), size = 1, color = "grey40") +
+#     geom_vline(xintercept = log(100), linetype = 3, alpha = 0.7) +
+#     geom_vline(xintercept = log(450), linetype = 2) +
+#     geom_hline(yintercept = 0.5, linetype = 2) +
+#     #geom_vline(xintercept = log(1000), linetype = 3, alpha = 0.7)+
+#     labs(x = "log(biomass) (g/m2)", y = "fitted probability of MF") +
+#     theme_minimal() +
+#     theme(axis.line = element_line(), axis.ticks = element_line())
+#   
+#   ggsave("output/plots/annex_fig1_mf_logbiomass.png", plot, width = 8, height = 6)
+#   
+#   # sum(ndp$biomass_tot > 100)/nrow(ndp)
+#   # sum(ndp$biomass_tot > 450 & ndp$multif>0)/nrow(ndp)
+#   # sum(ndp$biomass_tot > 1000)/nrow(ndp)
+#   # sum(ndp$multif)/nrow(ndp)
+#   # test <- ndp %>%
+#   #   filter(multif>0)
+#   # 
+#   # f <- fitted(fit_mf1)
+#   # sum(f[,1]>0.5)/nrow(f)
+#   
+#   return(plot)
+#   
+# }
+
+########### Figures supplemental ###########
+
+make_annex_fig1 <- function(summary_transect_complete, residuals, bmmodels){
+  
+  fold <- function(x){max(x, na.rm = TRUE)/min(x,na.rm = TRUE)}
+  ma <- function(x){max(x , na.rm = TRUE)}
+  mi <- function(x){min(x , na.rm = TRUE)}
+  
    bins <- summary_transect_complete %>%
-    mutate(bin = cut(biomass_tot, breaks = seq(0, 36200, by = 50))) %>%
+    select(biomass_tot, Fn, Fp, Gc, I_herb, I_pisc) %>%
+    mutate(bin = cut(biomass_tot, breaks = seq(0, 36200, by = 100))) %>%
     group_by(bin) %>%
     mutate(biomass_bin = mean(biomass_tot)) %>%
     group_by(bin, biomass_bin) %>%
-    summarise_if(is.numeric, function(x){max(x, na.rm = TRUE)/min(x,na.rm = TRUE)}) %>%
-    pivot_longer(names_to = "var", values_to = "value", cols = c(Fn, Fp, Gc, I_herb, I_pisc)) %>%
+    summarise_if(is.numeric, funs(fold, ma, mi))%>%
+    filter(biomass_bin < 4000)
+   
+   # predicted relationship
+
+   pdata <- data.frame(
+     biomass_tot = seq(50, 4000, by = 50)
+   ) %>%
+     mutate(mean = 26)
+   
+   pred1 <- predict(bmmodels[[1]], newdata = pdata) %>%
+     as.data.frame() %>%
+     cbind(pdata)
+   pred2 <- predict(bmmodels[[2]], newdata = pdata) %>%
+     as.data.frame() %>%
+     cbind(pdata)
+   pred3 <- predict(bmmodels[[3]], newdata = pdata) %>%
+     as.data.frame() %>%
+     cbind(pdata)
+   pred4 <- predict(bmmodels[[4]], newdata = pdata) %>%
+     as.data.frame() %>%
+     cbind(pdata)
+   pred5 <- predict(bmmodels[[5]], newdata = pdata) %>%
+     as.data.frame() %>%
+     cbind(pdata)
+   
+   p1 <- ggplot(bins) +
+     geom_ribbon(aes(x = biomass_tot, ymin = exp(`Q2.5`), ymax = exp(`Q97.5`)), 
+                 data = pred1, alpha = 0.3, fill = "#003366") +
+     geom_line(aes(x = biomass_tot, y = exp(Estimate)), 
+                 data = pred1, alpha = 0.8, color = "#003366") +
+     # geom_point(aes(x = biomass_tot, y = Fn), 
+     #            size = 0.5, alpha = 0.1,
+     #            data = filter(summary_transect_complete, biomass_tot < 4000)) +
+     geom_linerange(aes(x = biomass_bin, ymin = Fn_mi, ymax = Fn_ma),
+                    size = 1.5 , alpha = 0.7) +
+     labs(x = "bins of biomass (g/m2)", y = "N excretion (gN/m2/day)") +
+     theme_bw()
+   
+   
+   p2 <- ggplot(bins) +
+     geom_ribbon(aes(x = biomass_tot, ymin = exp(`Q2.5`), ymax = exp(`Q97.5`)), 
+                 data = pred2, alpha = 0.3, fill = "#003366") +
+     geom_line(aes(x = biomass_tot, y = exp(Estimate)), 
+               data = pred2, alpha = 0.8, color = "#003366") +
+     geom_linerange(aes(x = biomass_bin, ymin = Fp_mi, ymax = Fp_ma),
+                    size = 1.5 , alpha = 0.7) +
+     labs(x = "bins of biomass (g/m2)", y = "P excretion (gP/m2/day)") +
+     theme_bw()
+   p3 <- ggplot(bins) +
+     geom_ribbon(aes(x = biomass_tot, ymin = exp(`Q2.5`), ymax = exp(`Q97.5`)), 
+                 data = pred3, alpha = 0.3, fill = "#003366") +
+     geom_line(aes(x = biomass_tot, y = exp(Estimate)), 
+               data = pred3, alpha = 0.8, color = "#003366") +
+     geom_linerange(aes(x = biomass_bin, ymin = Gc_mi, ymax = Gc_ma),
+                    size = 1.5 , alpha = 0.7) +
+     labs(x = "bins of biomass (g/m2)", y = "Production (gC/m2/day)") +
+     theme_bw()
+   p4 <- ggplot(bins) +
+     geom_ribbon(aes(x = biomass_tot, ymin = exp(`Q2.5`), ymax = exp(`Q97.5`)), 
+                 data = pred4, alpha = 0.3, fill = "#003366") +
+     geom_line(aes(x = biomass_tot, y = exp(Estimate)), 
+               data = pred4, alpha = 0.8, color = "#003366") +
+     geom_linerange(aes(x = biomass_bin, ymin = I_herb_mi, ymax = I_herb_ma),
+                    size = 1.5 , alpha = 0.7) +
+     labs(x = "bins of biomass (g/m2)", y = "Herbivory (gC/m2/day)") +
+     theme_bw()
+   p5 <- ggplot(bins) +
+     geom_ribbon(aes(x = biomass_tot, ymin = exp(`Q2.5`), ymax = exp(`Q97.5`)), 
+                 data = pred5, alpha = 0.3, fill = "#003366") +
+     geom_line(aes(x = biomass_tot, y = exp(Estimate)), 
+               data = pred5, alpha = 0.8, color = "#003366") +
+     geom_linerange(aes(x = biomass_bin, ymin = I_pisc_mi, ymax = I_pisc_ma),
+                    size = 1.5 , alpha = 0.7) +
+     labs(x = "bins of biomass (g/m2)", y = "Piscivory (gC/m2/day)") +
+     theme_bw()
+   
+   
+   bins_long <- bins %>%
+    pivot_longer(names_to = "var", values_to = "value", cols = c(Fn_fold, Fp_fold, Gc_fold, I_herb_fold, I_pisc_fold)) %>%
     filter(!value == 1)
    
+   
    plot_biomass <-
-     ggplot(bins, aes(x = var, y = value)) +
+     ggplot(bins_long, aes(x = var, y = value)) +
      geom_violin(size = 0.5, alpha = 0.7, fill = "darkgrey", color = "black", draw_quantiles = c(0.25, 0.5, 0.75)) +
      scale_y_continuous(trans = "log10", breaks = c(2,10,100,1000, 10000)) +
      theme_bw() +
@@ -750,16 +918,26 @@ make_annex_fig2 <- function(summary_transect_complete, residuals){
            text = element_text(size = 10),
            axis.ticks = element_blank())
    
-   plot <-
-     plot_biomass + cplot  +  
-     plot_annotation(tag_levels = 'a', tag_suffix = ")")
+   layout <-
+   "AAAA
+   BBBB
+   CCCC
+   DDDD
+   EEEE
+   FFGG
+   FFGG"
    
-   ggsave("output/plots/annex_fig2.png", plot, width = 10, height = 6)
+   plot <- p1 + p2 + p3 + p4 + p5 +
+     plot_biomass + cplot  +  
+     plot_annotation(tag_levels = 'a', tag_suffix = ")") +
+     plot_layout(design = layout)
+   
+   ggsave("output/plots/annex_fig1.png", plot, width = 10, height = 16)
    
    return(plot)
 }
 
-make_annex_fig3 <- function(summary_transect_complete, residuals){
+make_annex_fig2 <- function(summary_transect_complete, residuals){
   
   
   hum <- read_csv("data/humanPopulation.csv") 
@@ -790,12 +968,277 @@ make_annex_fig3 <- function(summary_transect_complete, residuals){
     theme_classic() +
     theme(legend.position = "bottom")
   
-  ggsave("output/plots/annex_fig3_gravity_markets.png", plot, width = 8, height = 6)
+  ggsave("output/plots/annex_fig2_gravity_markets.png", plot, width = 8, height = 6)
   
   
 }
 
 
+
+make_rank_plots <- function(contributions, herb_pisc){
+
+  con <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+    ungroup() %>%
+    dplyr::group_by(bioregion) %>%
+    dplyr::mutate(n_transect = length(unique(as.character(transect_id)))) %>%
+    group_by(bioregion, Family, species) %>%
+    summarize(rel_occ = length(Fn_p)/unique(n_transect),
+              Fn_p_m = median(Fn_p),
+              Fp_p_m = median(Fp_p),
+              Gc_p_m = median(Gc_p),
+              I_herb_p_m = median(I_herb_p),
+              I_pisc_p_m = median(I_pisc_p))
+  
+  main_fam <- dplyr::select(con, species, Family, bioregion) %>%
+    group_by(Family) %>%
+    summarize(n = n()) %>%
+    mutate(
+      rank = row_number(desc(n) )
+    ) %>%
+    filter(rank < 12) %>%
+    filter(!Family == "Pomacanthidae")
+  
+  
+  rank <- con %>%
+    filter(Family %in% main_fam$Family) %>%
+    filter(rel_occ > 0.01) %>%
+    group_by(bioregion) %>%
+    mutate(
+      Fn_r = dense_rank(desc(Fn_p_m)),
+      Fp_r = dense_rank(desc(Fp_p_m)),
+      Gc_r = dense_rank(desc(Gc_p_m)),
+      I_herb_r = dense_rank(desc(I_herb_p_m)),
+      I_pisc_r = dense_rank(desc(I_pisc_p_m))
+    ) %>%
+    ungroup() %>%
+    filter(
+      Fn_r < 11 |
+        Fp_r < 11 |
+        Gc_r < 11 |
+        I_herb_r < 11|
+        I_pisc_r < 11
+    ) %>% pivot_longer(
+      c(Fn_p_m, Fp_p_m, Gc_p_m, I_herb_p_m, I_pisc_p_m),
+      names_to = "name",
+      values_to = "value"
+    ) %>%
+    group_by(name, bioregion) %>%
+    mutate(
+      rank = row_number(desc(value) )
+    ) %>%
+    filter(rank < 11) %>%
+    mutate(Family = as_factor(as.character(Family))) %>%
+    filter(value> 0) %>%
+    group_by(bioregion, name) %>%
+    dplyr::mutate(value2 = value/max(value))%>%
+    ungroup() %>%
+    mutate(Family = as_factor(as.character(Family)))
+  
+  rank_fam <- con %>%
+    group_by(bioregion, Family) %>%
+    summarise_if(is.numeric, sum
+    ) %>%
+    ungroup() %>%
+    pivot_longer(
+      c(Fn_p_m, Fp_p_m, Gc_p_m, I_herb_p_m, I_pisc_p_m),
+      names_to = "name",
+      values_to = "value"
+    ) %>%
+    group_by(name, bioregion) %>%
+    mutate(
+      rank = dense_rank(desc(value))
+    ) %>%
+    filter(rank < 11) %>%
+    mutate(Family = as_factor(as.character(Family))) %>%
+    filter(value> 0) %>%
+    group_by(bioregion, name) %>%
+    dplyr::mutate(value2 = value/max(value))  %>%
+    ungroup() %>%
+    mutate(Family = as_factor(as.character(Family)))
+  
+ 
+  ggplot(rank) +
+    geom_bar(aes(y = value2, x = as.character(1/rank), fill = Family), stat = "identity", alpha = 0.8) +
+    geom_text(aes(y = 0.5, x = as.character(1/rank), label = species), size = 2) +
+    facet_grid(bioregion~name, scales="free", space="free",
+               labeller = labeller(
+                 name = c(Fn_p_m = "N excretion",
+                          Fp_p_m = "P excretion",
+                          Gc_p_m = "Production",
+                          I_herb_p_m = "Herbovory",
+                          I_pisc_p_m = "Piscivory"),
+                 bioregion = c(c_indopacific = "CIP",
+                               c_pacific = "CP",
+                               e_atlantic = "EA",
+                               e_pacific = "EP",
+                               w_atlantic = "WA",
+                               w_indian = "WI")
+               )) + coord_flip() +
+    scale_fill_fish_d(option = "Pseudocheilinus_tetrataenia") +
+    labs(y = "Rescaled contribution") +
+    theme_bw() +
+    theme(axis.title.y=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(), panel.grid = element_blank())
+  ggsave("output/plots/con_species_rank.png",  width = 8, height = 8)
+  
+  
+  ggplot(rank_fam) +
+    geom_bar(aes(y = value2, x = as.character(1/rank), fill = Family), alpha = 0.8, stat = "identity") +
+    geom_text(aes(y = 0.5, x = as.character(1/rank), label = Family), size = 2) +
+    facet_grid(bioregion~name, scales="free", space="free",
+               labeller = labeller(
+                 name = c(Fn_p_m = "N excretion",
+                          Fp_p_m = "P excretion",
+                          Gc_p_m = "Production",
+                          I_herb_p_m = "Herbovory",
+                          I_pisc_p_m = "Piscivory"),
+                 bioregion = c(c_indopacific = "CIP",
+                               c_pacific = "CP",
+                               e_atlantic = "EA",
+                               e_pacific = "EP",
+                               w_atlantic = "WA",
+                               w_indian = "WI")
+               )) + coord_flip() +
+    scale_fill_fish_d(option = "Pseudocheilinus_tetrataenia") +
+    labs(y = "Rescaled contribution") +
+    theme_bw() +
+    theme(axis.title.y=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(), 
+          panel.grid = element_blank())
+  
+  ggsave("output/plots/con_family_rank.png",  width = 8, height = 8)
+}
+
+
+make_pp_plots <- function(bmmodels, procmodels, commodels){
+  
+  a1 <- pp_check(bmmodels[[1]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_bmmodel_Fn.png", width = 8, height = 6)
+  a2 <- pp_check(bmmodels[[2]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_bmmodel_Fn.png", width = 8, height = 6)
+  a3 <- pp_check(bmmodels[[3]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_bmmodel_Gc.png", width = 8, height = 6)
+  a4 <- pp_check(bmmodels[[4]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_bmmodel_herb.png", width = 8, height = 6)
+  a5 <- pp_check(bmmodels[[5]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_bmmodel_pisc.png", width = 8, height = 6)
+  
+
+  
+  # pp_check(procmodels[[1]], nsamples = 50)
+  # ggsave("output/plots/pp_plot_procmodel_Fn.png", width = 8, height = 6)
+  # pp_check(procmodels[[2]], nsamples = 50)
+  # ggsave("output/plots/pp_plot_procmodel_Fp.png", width = 8, height = 6)
+  # pp_check(procmodels[[3]], nsamples = 50)
+  # ggsave("output/plots/pp_plot_procmodel_Gc.png", width = 8, height = 6)
+  # pp_check(procmodels[[4]], nsamples = 50)
+  # ggsave("output/plots/pp_plot_procmodel_herb.png", width = 8, height = 6)
+  # pp_check(procmodels[[5]], nsamples = 50)
+  # ggsave("output/plots/pp_plot_procmodel_pisc.png", width = 8, height = 6)
+  
+  b1 <- pp_check(commodels[[1]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_commodel_Fn.png", width = 8, height = 6)
+  b2 <- pp_check(commodels[[2]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_commodel_Fp.png", width = 8, height = 6)
+  b3 <- pp_check(commodels[[3]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_commodel_Gc.png", width = 8, height = 6)
+  b4 <- pp_check(commodels[[4]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_commodel_herb.png", width = 8, height = 6)
+  b5 <- pp_check(commodels[[5]], nsamples = 50)
+  #ggsave("output/plots/pp_plot_commodel_pisc.png", width = 8, height = 6)
+
+  pp_plots <- a1 + a2 + a3 + a4 + a5 + b1 + b2 + b3 + b4 + b5 + 
+    plot_layout(ncol = 2) +
+    plot_annotation(tag_levels = 'a', tag_suffix = ")")
+  
+  ggsave("output/plots/pp_plots.png", pp_plots, width = 6, height = 10)
+  
+}
+
+####### extra analysis diets #######
+alt_diet <- function(tfish, cnpflux){
+  
+  diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
+  
+  diet_experts <- read.csv("data/original_experts_classification.csv")%>%
+    select(species = Genus_and_species_, Gaspar, Siquiera)
+  
+  diets <- diet %>%
+    select(family, species, p2_m, p4_m, trophic_guild_predicted) %>% 
+    left_join(diet_experts) %>%
+    mutate(herb = trophic_guild_predicted == 2,
+           herb_gas = Gaspar == "HD",
+           herb_siq = Siquiera == "HD",
+           herb_t1 = trophic_guild_predicted == 2 & p2_m > 0.5,
+           pisc = trophic_guild_predicted == 4,
+           pisc_gas = Gaspar == "FC",
+           pisc_siq = Siquiera == "GC",
+           pisc_t1 = trophic_guild_predicted == 4 & p4_m > 0.5
+    )
+  
+  
+  tfish <- left_join(tfish, unique(dplyr::select(cnpflux, species, v_m, size_cm, (ends_with("_median"))))) %>% 
+    left_join(diets) %>%
+    mutate(Ic = Ic_median * abun) %>%
+    mutate(I = Ic/area) 
+  
+  
+  tfs <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
+    dplyr::summarise(
+      I_herb = sum(I[herb == TRUE], na.rm = TRUE),
+      I_pisc = sum(I[pisc == TRUE], na.rm = TRUE),
+      I_herb_t1 = sum(I[herb_t1 == TRUE], na.rm = TRUE),
+      I_pisc_t1 = sum(I[pisc_t1 == TRUE], na.rm = TRUE),
+      I_herb_gas= sum(I[herb_gas == TRUE], na.rm = TRUE),
+      I_pisc_gas = sum(I[pisc_gas == TRUE], na.rm = TRUE),
+      I_herb_siq = sum(I[herb_siq == TRUE], na.rm = TRUE),
+      I_pisc_siq = sum(I[pisc_siq == TRUE], na.rm = TRUE)
+    ) %>% ungroup() %>%
+    mutate(d_herb1 =  (I_herb_t1 - I_herb),
+           d_pisc1 =  (I_pisc_t1 - I_pisc),
+           d_herb_gas = (I_herb_gas - I_herb),
+           d_pisc_gas = (I_pisc_gas - I_pisc),
+           d_herb_siq = (I_herb_siq - I_herb),
+           d_pisc_siq = (I_pisc_siq - I_pisc))
+  
+  b1 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_herb_gas), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "C) Comparison Gaspar") +
+    theme_bw()
+  b2 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_pisc_gas), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "D) Comparison Gaspar") +
+    theme_bw()
+  c1 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_herb_siq), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "E) Comparison Siqueira") +
+    theme_bw()
+  c2 <- ggplot(tfs) +
+    geom_histogram(aes(x = (d_pisc_siq), y = stat(count) / sum(count)), bins = 30) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "F) Comparison Siqueira") +
+    theme_bw()
+  
+  p <-  b1 + b2 + c1 + c2 +plot_layout(ncol = 2)
+  
+  ggsave("output/plots/Supplemental_herbivory_piscivory_alternative_classification.png", 
+         plot = p, 
+         height = 6, width = 8)
+  
+}
 
 
 

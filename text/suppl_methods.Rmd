@@ -21,10 +21,10 @@ To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N
 ### 1.1 Data compilation
 We first compiled maximum lengths for all species with Fishbase [@Froese2018] and used these lengths for the $l_{\infty}$ . For $\kappa$, we used a standardized coefficient that describes the potential growth trajectory of an individual if $l_{\infty}$ were to be equal to its maximum length [i.e. $k_{max}$, @Morais2018]. $t0$ was kept constant at 0 for all species. 
 
-We extracted the data for $k_{max}$ from Morais et al. (2018) @Morais2018 and filtered out only the species of our species list. As the Lenth-Frequency method consistently overestimates kmax, we omitted the $k_{max}$ estimates coming from this method. In total, this selection process resulted in 439 observations of kmax for different species and temperatures. 
+We extracted the data for $k_{max}$ from Morais et al. (2018) [@Morais2018] and filtered out only the species of our species list. As the Lenth-Frequency method consistently overestimates kmax, we omitted the $k_{max}$ estimates coming from this method. In total, this selection process resulted in 439 observations of kmax for different species and temperatures. 
 
 Further, we collected additional otolith data, including measurements of fishes from five Polynesian islands. 
-We collected data across four archipelagos, including six distinct islands: Moorea and Manuae (Society Islands), Hao and Mataiva (Tuamotus), Mangareva (Gambiers), and Nuku Hiva (Marquesas) between 2014 and 2018. All fishes were collected in the lagoon and/or outer slope, depending on the accessibility of the respective habitats. 
+We collected data across four archipelagos, including six distinct islands: Mo'orea and Manuae (Society Islands), Hao and Mataiva (Tuamotus), Mangareva (Gambiers), and Nuku Hiva (Marquesas) between 2014 and 2018. All fishes were collected in the lagoon and/or outer slope, depending on the accessibility of the respective habitats. 
         
 For each species, otoliths were cut transversely, using a diamond disc saw (Presi Mecatome T210) to obtain a section of 500 μm. Sections were then fixed on a glass side with thermoplastic glue (Crystalbond TM). Small otoliths were directly embedded in the thermoplastic glue and polished until obtaining a transversal section. Otoliths were sanded with abrasive discs of decreasing grain size (2,400 and 1,200 grains cm- 130 2) and polished with a 0.25 μm diamond suspension in order to be closest to the nucleus. All sections were photographed under a Leica DM750 light microscope with a Leica ICC50 HD microscope camera and LAS software (Leica Microsystems).
 
@@ -57,7 +57,7 @@ There is currently no streamlined method to make predictions for new species fro
 
 ## 2 Body stoichiometry    
 ### 2.1 Data collection    
-\noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Moorea, the Caribbean, and Palmyra. Their gut contents were removed, and the whole body was freeze-dried and ground to powder with a Precellys homogenizer. $Q_\textrm{k}$ (\%) were then measured in the lab using standard methods. Ground samples were analysed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500) for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis [@Allen1974]. Elemental content was calculated based on dry mass. 
+\noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Mo'orea, the Caribbean, and Palmyra. Their gut contents were removed, and the whole body was freeze-dried and ground to powder with a Precellys homogenizer. $Q_\textrm{k}$ (\%) were then measured in the lab using standard methods. Ground samples were analysed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500) for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis [@Allen1974]. Elemental content was calculated based on dry mass. 
 
 ### 2.2 Data analysis and extrapolation  
 
@@ -80,7 +80,7 @@ $$mu_{\textrm{n}\times\textrm{k}} = \beta_\textrm{0 k} + \gamma_{\textrm{0phy}\t
                 
 \noindent As before, we used 1000 fitted draws for each species, and 100 phylogenetic trees to extrapolate to all species with unknown body stoichiometry. Specifically, we used the phylopars function from the Rphylopars package [@Bruggeman2009]. This function uses ancectral state reconstruction and brownian motion, and takes the correlation between C, N and P into account.      
 
-## 3 Diet stoichiometry    
+## 3 Diet     
 ### 3.1 Data collection 
 \noindent We collected 571 adult individuals of 51 species between 2018 and 2019 in Mo'orea and Tetiaroa, and Mangareva, three Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab for CNP content analysis using similar methods as for the fish body stoichiometry. 
 

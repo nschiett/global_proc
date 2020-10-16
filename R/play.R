@@ -413,14 +413,33 @@ ggsave("output/plots/phyloplot_vuln.pdf", p1, height = 12, width = 12)
 
 
 ####### rank barplots #####
+con <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+  ungroup() %>%
+  dplyr::group_by(bioregion) %>%
+  dplyr::mutate(n_transect = length(unique(as.character(transect_id)))) %>%
+  group_by(bioregion, Family, species) %>%
+  summarize(rel_occ = length(Fn_p)/unique(n_transect),
+            Fn_p_m = median(Fn_p),
+            Fp_p_m = median(Fp_p),
+            Gc_p_m = median(Gc_p),
+            I_herb_p_m = median(I_herb_p),
+            I_pisc_p_m = median(I_pisc_p))
+
 con[con$Family == "Scaridae", "Family"] <- "Labridae"
 
 main_fam <- dplyr::select(con, species, Family, bioregion) %>%
   group_by(Family) %>%
-  summarize(n())
+  summarize(n = n()) %>%
+  mutate(
+    rank = row_number(desc(n) )
+  ) %>%
+  filter(rank < 12) %>%
+  filter(!Family == "Pomacanthidae")
+  
 
 rank <- con %>%
-  filter(rel_occ > 0.001) %>%
+  filter(Family %in% main_fam$Family) %>%
+  filter(rel_occ > 0.01) %>%
   group_by(bioregion) %>%
   mutate(
     Fn_r = dense_rank(desc(Fn_p_m)),
@@ -449,7 +468,9 @@ rank <- con %>%
   mutate(Family = as_factor(as.character(Family))) %>%
   filter(value> 0) %>%
   group_by(bioregion, name) %>%
-  dplyr::mutate(value2 = value/max(value))
+  dplyr::mutate(value2 = value/max(value))%>%
+  ungroup() %>%
+  mutate(Family = as_factor(as.character(Family)))
 
 rank_fam <- con %>%
   group_by(bioregion, Family) %>%
@@ -469,7 +490,9 @@ rank_fam <- con %>%
   mutate(Family = as_factor(as.character(Family))) %>%
   filter(value> 0) %>%
   group_by(bioregion, name) %>%
-  dplyr::mutate(value2 = value/max(value))
+  dplyr::mutate(value2 = value/max(value))  %>%
+  ungroup() %>%
+  mutate(Family = as_factor(as.character(Family)))
 
 freq  <- table(rank_fam$Family) %>% as.data.frame()
 library(forcats)
@@ -505,9 +528,22 @@ comb <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plots[[
 ggsave("output/plots/con_species_rank.pdf", comb, width = 8, height = 12)
 
 ggplot(rank) +
-  geom_bar(aes(y = value2, x = as.character(1/rank), fill = Family), stat = "identity") +
+  geom_bar(aes(y = value2, x = as.character(1/rank), fill = Family), stat = "identity", alpha = 0.7) +
   geom_text(aes(y = 0.5, x = as.character(1/rank), label = species), size = 2) +
-  facet_grid(bioregion~name, scales="free", space="free") +coord_flip() +
+  facet_grid(bioregion~name, scales="free", space="free",
+             labeller = labeller(
+               name = c(Fn_p_m = "N excretion",
+                        Fp_p_m = "P excretion",
+                        Gc_p_m = "Production",
+                        I_herb_p_m = "Herbovory",
+                        I_pisc_p_m = "Piscivory"),
+               bioregion = c(c_indopacific = "CIP",
+                             c_pacific = "CP",
+                             e_atlantic = "EA",
+                             e_pacific = "EP",
+                             w_atlantic = "WA",
+                             w_indian = "WI")
+             )) + coord_flip() +
   scale_fill_fish_d(option = "Pseudocheilinus_tetrataenia") +
   labs(y = "Rescaled contribution") +
   theme_bw() +
@@ -515,14 +551,27 @@ ggplot(rank) +
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank(),
         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
-ggsave("output/plots/con_species_rank.pdf",  width = 8, height = 8)
+        axis.ticks.x=element_blank(), panel.grid = element_blank())
+ggsave("output/plots/con_species_rank.png",  width = 8, height = 8)
 
 
 ggplot(rank_fam) +
   geom_bar(aes(y = value2, x = as.character(1/rank), fill = Family), stat = "identity") +
   geom_text(aes(y = 0.5, x = as.character(1/rank), label = Family), size = 2) +
-  facet_grid(bioregion~name, scales="free", space="free") +coord_flip() +
+  facet_grid(bioregion~name, scales="free", space="free",
+             labeller = labeller(
+               name = c(Fn_p_m = "N excretion",
+                        Fp_p_m = "P excretion",
+                        Gc_p_m = "Production",
+                        I_herb_p_m = "Herbovory",
+                        I_pisc_p_m = "Piscivory"),
+               bioregion = c(c_indopacific = "CIP",
+                             c_pacific = "CP",
+                             e_atlantic = "EA",
+                             e_pacific = "EP",
+                             w_atlantic = "WA",
+                             w_indian = "WI")
+             )) + coord_flip() +
   scale_fill_fish_d(option = "Pseudocheilinus_tetrataenia") +
   labs(y = "Rescaled contribution") +
   theme_bw() +
@@ -530,9 +579,10 @@ ggplot(rank_fam) +
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank(),
         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+        axis.ticks.x=element_blank(), 
+        panel.grid = element_blank())
 
-ggsave("output/plots/con_family_rank.pdf",  width = 8, height = 8)
+ggsave("output/plots/con_family_rank.png",  width = 8, height = 8)
 
 
 ######## entropy of contribution #####
