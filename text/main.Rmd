@@ -41,20 +41,20 @@ Nina M. D. Schiettekatte^1,2^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas 
 
 
 
-**The high diversity and productivity of coral reefs, despite their location in generally nutrient-poor waters, provides invaluable protection, nutrition, and services to millions of people [@Teh2013]. Protecting reef function (cycling of elements) under the escalating pressures of fishing [@Graham2017; @Ceccarelli2016: @Stuart-Smith2018] and climate change [@Hughes2017] represents the cornerstone of reef conservation. Here, we quantify five key functions—nitrogen and phosphorus cycling, biomass production, herbivory, and piscivory—mediated by reef fishes across the world’s tropical oceans. We demonstrate that critical trade-offs exist among functions (e.g. biomass production and phosphorous cycling), and that no reef fish community worldwide can sustain high values for all five functions simultaneously. Further, functions tend to be dominated by few species, where on average ~12% of species in a community provide more than 50% of a function. However, despite such local dominance of functions by few species, most species were important somewhere; ~70% of all species contribute disproportionally to functioning in at least one local community. Finally, we highlight unbalanced vulnerability across functions, suggesting that certain functions are disproportionally affected by anthropogenic stressors, destabilizing the integrity of coral reef ecosystem functioning. Our findings introduce a challenge for coral reef conservation, in that we cannot maximize all functions simultaneously, thus stressing the need for quantitative assessment of multiple functions to make informed management decisions.**
+**The high diversity and productivity of coral reefs, despite their location in generally nutrient-poor waters, provides invaluable protection, nutrition, and services to millions of people [@Teh2013]. Protecting ecosystem functions of reefs under the escalating pressures of fishing [@Graham2017; @Ceccarelli2016: @Stuart-Smith2018] and climate change [@Hughes2017] represents the cornerstone of reef conservation. Here, we quantify five key functions—nitrogen and phosphorus cycling, biomass production, herbivory, and piscivory—mediated by reef fishes across the world’s tropical oceans. We demonstrate that critical trade-offs exist among functions (e.g. biomass production and phosphorous cycling), and that no reef fish community worldwide can sustain high values for all five functions simultaneously. Further, functions tend to be dominated by few species, where on average ~12% of species in a community provide more than 50% of a function. However, despite such local dominance of functions by few species, most species were important somewhere; ~70% of all species contribute disproportionally to functioning in at least one local community. Finally, we highlight unbalanced vulnerability across functions, suggesting that certain functions are disproportionally affected by anthropogenic stressors, destabilizing the integrity of coral reef ecosystem functioning. Our findings introduce a challenge for coral reef conservation, in that we cannot maximize all ecosystem functions simultaneously, thus stressing the need for quantitative assessment of multiple functions to make informed management decisions.**
 
-The flow of elements through biological communities fuels all life on Earth [@Welti2017]. There is now strong consensus on the importance of preserving these fluxes, a set of processes often termed ecosystem functions [@Welti2017].
-For millennia, resources have been managed with an economic mindset to maximize desirable functions such as plant or animal biomass production [@Weisser2017].
-Sustaining multiple functions, likely requires both high species richness and a variety of species assemblages across the landscape [@Zavaleta2010].
-However, in agro-ecological settings, efforts to maximize one function have been shown to negatively impact another (e.g. timber vs. erosion control), shedding light on the existence of trade-offs between functions [@Tallis2008; @Zavaleta2010].
+The flow of elements through biological communities fuels all life on Earth [@Welti2017]. Preserving these fluxes, often termed ecosystem functions, is critical for the integrity of ecosystems [@Welti2017].
+For millennia, resources have been managed with an economic mindset to maximize desirable functions such as the production of plant or animal biomass [@Weisser2017].
+Sustaining multiple functions likely requires both high species richness and a variety of species assemblages across the landscape [@Zavaleta2010].
+However, in agro-ecological settings, efforts to maximize one function have been shown to negatively impact another (e.g. timber production vs. erosion control), shedding light on the existence of trade-offs between functions [@Tallis2008; @Zavaleta2010].
 An understanding of such trade-offs is required to make informed management decisions [@Rodriguez2006], but simultaneously quantifying multiple ecosystem functions is challenging.
-Therefore, trade-offs between functions, their drivers, and vulnerability are poorly understood for many ecosystems [@Brandl2019front].
+Therefore, trade-offs between functions, their drivers, and functional vulnerability are poorly understood for many ecosystems [@Brandl2019front].
 
 Coral reefs are among the most diverse and productive ecosystems on earth, that provide essential ecosystem services to humans [@Teh2013].
 As coral reefs thrive in nutrient-poor waters, efficient cycling of elements is key to their characteristic high productivity [@Brandl2019science].
 Importantly, the integrity of coral reefs is threatened by a plethora of anthropogenic stressors, such as exploitation and climate change [@Hughes2017].
-Over the past decades, severe declines in coral reef habitat quality and fish biomass, and shifts in community structure have brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front].
-Yet, our capacity to quantitatively evaluate, monitor, and compare reef functioning primarily relies on static proxies of functions, such as relative live coral cover, standing stock biomass of reef fishes, or functional richness based on qualitative species traits [e.g. @Mora2011plos; @Cinner2020; @Mouillot2014].
+Over the past decades, severe declines in coral reef habitat quality and fish biomass as well as shifts in community structure have brought coral reef functioning and services to the forefront of scientific discourse [@Williams2019; @Bellwood2019; @Brandl2019front].
+Yet, our capacity to quantitatively evaluate, monitor, and compare reef functioning primarily relies on static proxies of functions, such as live coral cover, standing stock biomass of reef fishes, or functional richness based on qualitative species traits [e.g. @Mora2011plos; @Cinner2020; @Mouillot2014].
 Conversely, we know comparatively little about elemental fluxes and their drivers (but see [@Allgeier2016]), which currently limits effective management [@Brandl2019front].
 
 Here, we integrate biogeochemistry and community ecology to advance our understanding of the fluxes of elements that underpin reef fish functioning.
@@ -67,7 +67,7 @@ We apply these models to all individuals in 9,118 reef fish communities across 5
 
 Quantifying five key ecosystem functions performed by fishes across the world's reefs uncovers high functional variation (Fig. 1).
 Biomass is the most commonly employed indicator of coral reef functioning [@MacNeil2015, @Mora2011plos; @Cinner2020; @Brandl2019front], and as can be expected from the additive nature of community-level ecosystem functioning, we indeed observed a strong relationship between fish standing stock biomass and all five functions (Extended Data Fig. 1a-e, Extended Data Fig. 2).
-However, there is a remarkable variability within reef fish functions beyond the effect of biomass. Some communities with similar biomass perform functions with a difference of two orders of magnitude and a two-fold difference in biomass can yield similar levels for functions (i.e. production, Extended Data Fig. 1a-f).
+However, reef fish functions vary remarkably  beyond the effect of biomass. Some communities with similar biomass perform functions with a difference of two orders of magnitude and a two-fold difference in biomass can yield similar levels for functions (i.e. production, Extended Data Fig. 1a-f).
 Thus, using biomass as a single proxy for functioning can mask strong variation in community-level functions that may be driven by community structure and high-contributing species.
 Further, we reveal strong trade-offs among the different functions, independent of biomass (Fig.1, Extended Data Fig. 1g).
 For example, high herbivory rates or N excretion negatively correlate with rates of P excretion.
@@ -76,7 +76,7 @@ While many reefs may stand out as hotspots for one function, none maximize funct
 
 
 Disentangling predictors of reef fish functioning revealed important effects of both community structure and species-specific influences.
-First, we explored the relationship of each function on the community level with ecological predictors known to affect elemental fluxes [@Schiettekatte2020] (i.e. body size, trophic level, species richness, biomass, temperature, and age structure; Fig. 2).
+First, we explored the relationship of each function at the community level with ecological predictors known to affect elemental fluxes [@Schiettekatte2020] (i.e. body size, trophic level, species richness, biomass, temperature, and age structure; Fig. 2).
 We found that correlations between functions are mediated by contrasting aspects of community structure by fitting Bayesian regression models (Fig. 2; Extended Data Table 2; Extended Data Fig. 2).
 For example, P excretion is higher in communities with a high proportion of large-bodied, mature fishes that occupy high trophic levels, thus creating positive relationships between P excretion and piscivory (Extended Fig. 1g; See @Allgeier2014).
 In contrast, biomass production is highest in communities dominated by small and/or immature fishes at lower trophic levels, creating a strong trade-off between biomass production and P excretion.
@@ -120,8 +120,8 @@ While herbivores of all body sizes and functional groups are combined in our ass
 Thus, our results reflect the overall vulnerability of functions, yet this does not consider unique roles played by a small group of species, nested in a broad function such as herbivory.
 
 Conserving biomass, diversity, and ecosystem functioning are important objectives of contemporary conservation initiatives [@Cinner2020].
-Even though increased fish biomass enhances functions, the strong trade-offs we reveal between key ecosystem functions introduces a to date unrecognised challenge for coral reef conservation, where actions to enhance one function may negatively affect another.
-For example, marine protected areas, which are one of the primary used conservation approaches for coral reefs [@Graham2020], may provide benefits for herbivory but they often offer little insurance for diversity conservation in human-dominated regions [@Cinner2020] and do not protect reefs from the pervasive effects of climate change [@Graham2020], potentially affecting functions such as P excretion.
+Even though increased fish biomass enhances functions, the strong trade-offs we reveal between key ecosystem functions introduces an as yet unrecognised challenge for coral reef conservation, where actions to enhance one function may negatively affect another.
+For example, marine protected areas, which are one of the primary used conservation approaches for coral reefs [@Graham2020], may provide benefits for herbivory. However, marine protected areas do not protect reefs from the pervasive effects of climate change [@Graham2020], and community shifts towards domination of herbivores may affect functions such as P excretion.
 Thus, measuring conservation success with biomass or solely one function (e.g. herbivory) can mask the collapse of other essential functions.
 Therefore, it is necessary to gauge the state of reef ecosystems based on multiple, complementary, process-based functions [@Brandl2019front], which may lead to informed decisions to prioritize certain functions based on local needs and stressors.
 Finally, while there is a general consensus on the role of diversity in enhancing functioning [@Zavaleta2010; @Hooper2005], we highlight the overarching importance of community structure and the identity of dominant species identity at the local scale.
@@ -130,7 +130,8 @@ While, it seems clear that maintaining diversity of fishes appears critical for 
 
 Overall, our results demonstrate that managing coral reefs for ecosystem functioning is even more challenging than previously assumed.
 While enhancing fish biomass is important, the variability of reef fish communities in the rates of functions representing cycling of critical elements is striking.
-Conserving these elemental fluxes in the 21st century will require a more nuanced approach to coral reef management.
+Trying to enhance individual functions to conserve or restore the integrity of coral reefs will not be fruitful.
+Conserving ecosystem functioning in the 21st century will require a more nuanced approach to coral reef management.
 
 
 # Figures
