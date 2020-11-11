@@ -257,7 +257,7 @@ make_fig2 <- function(commodels){
   result <- result %>%
     dplyr::filter(!variable == "b_Intercept") %>%
     left_join(tot) %>% 
-    filter(diff == FALSE) %>%
+    #filter(diff == FALSE) %>%
     filter(!variable == "b_standardlogbiomass") %>%
     filter(!variable == "b_standardmean") %>%
     mutate(variable = fct_relevel(variable, 
@@ -1035,9 +1035,9 @@ make_rank_plots <- function(contributions, herb_pisc){
     mutate(Family = as_factor(as.character(Family)))
   
   rank_fam <- con %>%
+    ungroup() %>%    
     group_by(bioregion, Family) %>%
-    summarise_if(is.numeric, sum
-    ) %>%
+    summarise_if(is.numeric, sum) %>%
     ungroup() %>%
     pivot_longer(
       c(Fn_p_m, Fp_p_m, Gc_p_m, I_herb_p_m, I_pisc_p_m),
@@ -1054,7 +1054,15 @@ make_rank_plots <- function(contributions, herb_pisc){
     group_by(bioregion, name) %>%
     dplyr::mutate(value2 = value/max(value))  %>%
     ungroup() %>%
-    mutate(Family = as_factor(as.character(Family)))
+    mutate(Family = as_factor(as.character(Family))) %>%
+    # adjust tie 
+    mutate(rank = case_when(
+      Family == "Fistulariidae" &
+        bioregion == "w_atlantic" &
+        name == "I_pisc_p_m" ~ as.integer(3),
+      TRUE ~ rank
+    ))
+
   
  
   ggplot(rank) +
@@ -1065,7 +1073,7 @@ make_rank_plots <- function(contributions, herb_pisc){
                  name = c(Fn_p_m = "N excretion",
                           Fp_p_m = "P excretion",
                           Gc_p_m = "Production",
-                          I_herb_p_m = "Herbovory",
+                          I_herb_p_m = "Herbivory",
                           I_pisc_p_m = "Piscivory"),
                  bioregion = c(c_indopacific = "CIP",
                                c_pacific = "CP",
@@ -1211,13 +1219,13 @@ alt_diet <- function(tfish, cnpflux){
     geom_histogram(aes(x = (d_herb_gas), y = stat(count) / sum(count)), bins = 30) +
     scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
     scale_x_continuous(breaks = c(-5, - 2.5, 0, 2.5, 5), limits = c(-5, 5)) +
-    labs(y = "Percent of total", x = "Difference herbivory rate", title = "C) Comparison Gaspar") +
+    labs(y = "Percent of total", x = "Difference herbivory rate", title = "C) Comparison Mouillot") +
     theme_bw()
   b2 <- ggplot(tfs) +
     geom_histogram(aes(x = (d_pisc_gas), y = stat(count) / sum(count)), bins = 30) +
     scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
     scale_x_continuous(breaks = c(-1, - 0.5, 0, 0.5, 1), limits = c(-1, 1)) +
-    labs(y = "Percent of total", x = "Difference piscivory rate", title = "D) Comparison Gaspar") +
+    labs(y = "Percent of total", x = "Difference piscivory rate", title = "D) Comparison Mouillot") +
     theme_bw()
   c1 <- ggplot(tfs) +
     geom_histogram(aes(x = (d_herb_siq), y = stat(count) / sum(count)), bins = 30) +

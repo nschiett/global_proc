@@ -78,24 +78,28 @@ plan <- drake_plan(
   # Supplemental data figures
   SI_fig1 = make_annex_fig1(summary_transect_complete, residuals, bmmodels),
   SI_fig2 = make_annex_fig2(summary_transect_complete, residuals),
-  
-  # Supplemental information figures
+
   SI_rank_plots = make_rank_plots(contributions, herb_pisc),
-  SI_pp_plots = make_pp_plots(bmmodels, procmodels, commodels)
+  SI_pp_plots = make_pp_plots(bmmodels, procmodels, commodels),
   
-  
+  extra_diet_analysis = alt_diet(tfish, cnpflux),
   
   ##### TEXT #####
-  # main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"), 
-  #                                   output_format = "word_document", 
-  #                                   output_dir = "./output/text/",
-  #                                   output_file = "Schiettekatte_global_functions_main.docx"),
-  # methods_text_doc = rmarkdown::render(knitr_in("text/methods.Rmd"), 
-  #                                   output_format = "word_document", 
-  #                                   output_dir = "./output/text/",
-  #                                   output_file = "Schiettekatte_global_functions_methods.docx"),
-  # suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"), 
-  #                                   output_format = "word_document", 
-  #                                   output_dir = "./output/text/",
-  #                                   output_file = "Schiettekatte_global_functions_suppl_methods.docx")
+  main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"),
+                                    output_format = "word_document",
+                                    output_dir = "./output/text/",
+                                    output_file = "Schiettekatte_global_functions_main.docx"),
+  methods_text_doc = rmarkdown::render(knitr_in("text/methods.Rmd"),
+                                    output_format = "word_document",
+                                    output_dir = "./output/text/",
+                                    output_file = "Schiettekatte_global_functions_methods.docx"),
+  suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"),
+                                    output_format = "word_document",
+                                    output_dir = "./output/text/",
+                                    output_file = "Schiettekatte_global_functions_suppl_methods.docx"),
+  suppl_figs_doc = rmarkdown::render(knitr_in("text/suppl_tables_figures.Rmd"),
+                                             output_format = "word_document",
+                                             output_dir = "./output/text/",
+                                             output_file = "Schiettekatte_global_functions_suppl_tables_figures.docx")
+  
 )
