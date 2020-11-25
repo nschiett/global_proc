@@ -96,10 +96,10 @@ plan <- drake_plan(
   suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"),
                                     output_format = "word_document",
                                     output_dir = "./output/text/",
-                                    output_file = "Schiettekatte_global_functions_suppl_methods.docx"),
-  suppl_figs_doc = rmarkdown::render(knitr_in("text/suppl_tables_figures.Rmd"),
-                                             output_format = "word_document",
-                                             output_dir = "./output/text/",
-                                             output_file = "Schiettekatte_global_functions_suppl_tables_figures.docx")
-  
+                                    output_file = "Schiettekatte_global_functions_suppl_methods.docx")#,
+  # suppl_figs_doc = rmarkdown::render(knitr_in("text/suppl_tables_figures.Rmd"),
+  #                                            output_format = "word_document",
+  #                                            output_dir = "./output/text/",
+  #                                            output_file = "Schiettekatte_global_functions_suppl_tables_figures.docx")
+  # 
 )

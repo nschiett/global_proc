@@ -61,7 +61,7 @@ There is currently no streamlined method to make predictions for new species fro
 
 ### 2.2 Data analysis and extrapolation  
 
-\noindent The CNP\% content of organisms is known to be highly conserved within families (REF). We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
+\noindent The CNP\% content of organisms is known to be highly conserved within families [@Allgeier2020sci]. We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
 
 <!-- \begin{equation} -->
 $$\begin{bmatrix}Y_1 \\ Y_2 \\ Y_3\end{bmatrix} \sim MVNormal(\begin{bmatrix}mu1 \\ mu2 \\ mu3\end{bmatrix}, S),$$

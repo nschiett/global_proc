@@ -556,8 +556,7 @@ make_fig4 <- function(contributions, vulnerability, herb_pisc, residuals){
                                  "P excretion", 
                                  "Production",
                                  "Herbivory",
-                                 "Piscivory"),
-                      name = "Proportion communities with increased functional vulnerability") +
+                                 "Piscivory"), name = "") +
     theme_void() +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(), legend.position = c(0.5, 0.95), 
