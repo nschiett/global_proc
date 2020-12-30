@@ -16,38 +16,38 @@ loadd(fig3)
 loadd(fig4)
 ```
 
-# Global drivers and vulnerabilities of coral reef fish functions
+# **Title:** Global drivers and vulnerabilities of coral reef fish functions
 
-Nina M. D. Schiettekatte^1,2^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas A. J. Graham^4^, Diego R. Barneche^5,6^, Deron E. Burkepile^7,8^, Jacob E. Allgeier^9^, Jesús E. Arias-Gonzaléz^10^, Graham J. Edgar^11^, Carlos E. L. Ferreira^12^, Sergio R. Floeter^13^, Alan M. Friedlander^14^, Alison L. Green^15^, Michel Kulbicki^2,16^, Yves Letourneur^2,17^, Osmar J. Luiz^18^, Alexandre Mercière^1,2^, Fabien Morat^1,2^, Katrina S. Munsterman^9^, Enrico L. Rezende^19^, Fabian A. Rodríguez‐Zaragoza^20^, Rick D. Stuart-Smith^11^, Laurent Vigliola^2,16^, Sébastien Villéger^21^, Valeriano Parravicini^1,2^
+**Authors:** Nina M. D. Schiettekatte^1,2,*^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas A. J. Graham^4^, Diego R. Barneche^5,6^, Deron E. Burkepile^7,8^, Jacob E. Allgeier^9^, Jesús E. Arias-Gonzaléz^10^, Graham J. Edgar^11^, Carlos E. L. Ferreira^12^, Sergio R. Floeter^13^, Alan M. Friedlander^14^, Alison L. Green^15^, Michel Kulbicki^2,16^, Yves Letourneur^2,17^, Osmar J. Luiz^18^, Alexandre Mercière^1,2^, Fabien Morat^1,2^, Katrina S. Munsterman^9^, Enrico L. Rezende^19^, Fabian A. Rodríguez‐Zaragoza^20^, Rick D. Stuart-Smith^11^, Laurent Vigliola^2,16^, Sébastien Villéger^21^, Valeriano Parravicini^1,2^
 
 
 
-^1^PSL Université Paris: EPHE-UPVD-CNRS, USR 3278 CRIOBE, Université de Perpignan, Perpignan, France;
-^2^Laboratoire d'Excellence “CORAIL”, Perpignan, France;
-^3^The University of Texas at Austin, Marine Science Institute, Port Aransas, TX 78373, USA;
-^4^Lancaster Environment Centre, Lancaster University, Lancaster, LA1 4YQ, UK;
-^5^Australian Institute of Marine Science, Crawley, WA, Australia;
-^6^Oceans Institute, The University of Western Australia, Crawley, WA, Australia;
-^7^Department of Ecology, Evolution, and Marine Biology, University of California, Santa Barbara, CA, USA;
-^8^Marine Science Institute, University of California, Santa Barbara, CA, USA;
-^9^Department of Ecology and Evolutionary Biology, University of Michigan, Ann Arbor, MI, USA;
-^10^Laboratorio Ecología de Ecosistemas de Arrecifes Coralinos, Departamento Recursos del Mar, CINVESTAV Unidad Mérida, AP73 Cordemex, CP97310, Mérida, Yucatán, Mexico;
-^11^Institute for Marine and Antarctic Studies, University of Tasmania, Hobart, TAS, Australia;
-^12^Departamento de Biologia Marinha, Universidade Federal Fluminense (UFF), Niterói,  the state of Rio de Janeiro (RJ), Brazil;
-^13^Marine Macroecology and Biogeography Lab, Depto. de Ecologia e Zoologia, CCB, Universidade Federal de Santa Catarina, Florianopolis, Santa Catarina, Brazil;
-^14^Department of Biology, University of Hawaii, Honolulu, HI, USA;
+^1^PSL Université Paris: EPHE-UPVD-CNRS, USR 3278 CRIOBE, Université de Perpignan, Perpignan, France;    
+^2^Laboratoire d'Excellence “CORAIL”, Perpignan, France;     
+^3^The University of Texas at Austin, Marine Science Institute, Port Aransas, TX 78373, USA;      
+^4^Lancaster Environment Centre, Lancaster University, Lancaster, LA1 4YQ, UK;      
+^5^Australian Institute of Marine Science, Crawley, WA, Australia;      
+^6^Oceans Institute, The University of Western Australia, Crawley, WA, Australia;      
+^7^Department of Ecology, Evolution, and Marine Biology, University of California, Santa Barbara, CA, USA;      
+^8^Marine Science Institute, University of California, Santa Barbara, CA, USA;      
+^9^Department of Ecology and Evolutionary Biology, University of Michigan, Ann Arbor, MI, USA;      
+^10^Laboratorio Ecología de Ecosistemas de Arrecifes Coralinos, Departamento Recursos del Mar, CINVESTAV Unidad Mérida, AP73 Cordemex, CP97310, Mérida, Yucatán, Mexico;      
+^11^Institute for Marine and Antarctic Studies, University of Tasmania, Hobart, TAS, Australia;      
+^12^Departamento de Biologia Marinha, Universidade Federal Fluminense (UFF), Niterói,  the state of Rio de Janeiro (RJ), Brazil;     
+^13^Marine Macroecology and Biogeography Lab, Depto. de Ecologia e Zoologia, CCB, Universidade Federal de Santa Catarina, Florianopolis, Santa Catarina, Brazil;      
+^14^Department of Biology, University of Hawaii, Honolulu, HI, USA;      
 ^15^Red Sea Research Center, King Abdullah University of Science and Technology, Thuwal 23955-6900, Saudi Arabia;
-^16^Institut de Recherche pour le Développement, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;
-^17^Université de la Nouvelle-Calédonie, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;
-^18^Research Institute for the Environment and Livelihoods, Charles Darwin University, Darwin, Australia;
-^19^Departamento de Ecología, Center of Applied Ecology and Sustainability (CAPES), Facultad de Ciencias Biológicas, Pontificia Universidad Católica de Chile, Santiago 6513677, Chile;
-^20^Laboratorio de Ecosistemas Marinos y Acuicultura (LEMA), Departamento de 12 Ecología, CUCBA, Universidad de Guadalajara. México. Carr. Guadalajara-Nogales 13 km. 15.5, Las Agujas Nextipac, Zapopan, C.P. 45110, Jalisco, 14, Mexico;
-^21^MARBEC, Université de Montpellier, CNRS, IFREMER, IRD, Montpellier, France    
-
-
-
-## Abstract   
-
+^16^Institut de Recherche pour le Développement, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;     
+^17^Université de la Nouvelle-Calédonie, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;     
+^18^Research Institute for the Environment and Livelihoods, Charles Darwin University, Darwin, Australia;     
+^19^Departamento de Ecología, Center of Applied Ecology and Sustainability (CAPES), Facultad de Ciencias Biológicas, Pontificia Universidad Católica de Chile, Santiago 6513677, Chile;      
+^20^Laboratorio de Ecosistemas Marinos y Acuicultura (LEMA), Departamento de 12 Ecología, CUCBA, Universidad de Guadalajara. México. Carr. Guadalajara-Nogales 13 km. 15.5, Las Agujas Nextipac, Zapopan, C.P. 45110, Jalisco, 14, Mexico;     
+^21^MARBEC, Université de Montpellier, CNRS, IFREMER, IRD, Montpellier, France     
+^*^Correspondance to NMDS (nina.schiettekatte@gmail.com).    
+                 
+**One Sentence Summary:** A global assessment of multiple ecosystem functions reveals critical trade-offs among functions in coral reefs.
+           
+**Abstract:** 
 Preserving the integrity of coral reefs – their functioning – is a critical challenge of the 21st century. 
 However, a quantitative assessment of multiple functions is needed to guide conservation efforts. 
 Through the integration of empirically-parametrized bioenergetic models and global community surveys, we quantify five key functions mediated by fishes. 
@@ -55,8 +55,7 @@ We show that functions exhibit critical trade-offs driven by diverging community
 Further, functions are locally dominated by few species, but worldwide, the identity of dominant species varies a lot - 70% of the 1110 species in our dataset are locally dominant. 
 Our quantitative assessment reveals a challenge in global coral reef conservation: no reef fish community can simultaneously sustain high values across all functions and there are no global keystone species to target. 
 
-## Main Text
-
+**Main Text:** 
 The flow of elements through biological communities fuels all life on Earth [@Welti2017]. Preserving these fluxes, often termed ecosystem functions, is critical for the integrity of ecosystems [@Welti2017].
 For millennia, resources have been managed with an economic mindset to maximize desirable functions such as the production of plant or animal biomass [@Weisser2017].
 Sustaining multiple functions likely requires both high species richness and a variety of species assemblages across a landscape [@Zavaleta2010].
