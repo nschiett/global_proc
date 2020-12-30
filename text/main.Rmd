@@ -2,9 +2,9 @@
 output:
   word_document:
     fig_caption: yes
-    reference_docx: ../text/word_template.docx
+    reference_docx: ../text/word_template_science.docx
 bibliography: ../text/global_proc.bib
-csl: nature.csl
+csl: science.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -46,7 +46,16 @@ Nina M. D. Schiettekatte^1,2^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas 
 
 
 
-**Preserving the integrity of ecosystems – their functioning – is a critical challenge of the 21st century. The world’s coral reefs are highly diverse, productive, and valuable to millions of people [@Teh2013], and protecting their ecosystem functioning under the escalating pressures of fishing [@Graham2017; @Ceccarelli2016: @Stuart-Smith2018] and climate change [@Hughes2017] underpins most of today’s coral reef conservation efforts. However, a quantitative assessment of multiple, process-based functions on reefs is lacking. Here, we show that five key functions mediated by fishes —nitrogen and phosphorus cycling, biomass production, herbivory, and piscivory— exhibit critical trade-offs that are driven by diverging community structures and species dominance. Contrary to the concept of maximizing functioning as a single currency, no reef fish community worldwide can simultaneously sustain high values across all functions. Furthermore, functions are locally dominated by few species, but worldwide, 70% of the 1110 species in our dataset contribute disproportionally to functioning in at least one local community. This leads to disparate vulnerabilities of functions to anthropogenic stressors. Our findings reveal a profound challenge in coral reef conservation: there is no clear objective for protecting coral reef functioning and there are no global keystone species to target. Instead, quantitative assessments of multiple functions are necessary to design informed conservation strategies.**
+## Abstract   
+
+Preserving the integrity of coral reefs – their functioning – is a critical challenge of the 21st century. 
+However, a quantitative assessment of multiple functions is needed to guide conservation efforts. 
+Through the integration of empirically-parametrized bioenergetic models and global community surveys, we quantify five key functions mediated by fishes. 
+We show that functions exhibit critical trade-offs driven by diverging community structures. 
+Further, functions are locally dominated by few species, but worldwide, the identity of dominant species varies a lot - 70% of the 1110 species in our dataset are locally dominant. 
+Our quantitative assessment reveals a challenge in global coral reef conservation: no reef fish community can simultaneously sustain high values across all functions and there are no global keystone species to target. 
+
+## Main Text
 
 The flow of elements through biological communities fuels all life on Earth [@Welti2017]. Preserving these fluxes, often termed ecosystem functions, is critical for the integrity of ecosystems [@Welti2017].
 For millennia, resources have been managed with an economic mindset to maximize desirable functions such as the production of plant or animal biomass [@Weisser2017].
