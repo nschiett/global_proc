@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Supplementary methods
 
-To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N), and phosphorus (P), a number of parameters are required [see @Schiettekatte2020]. Here, we describe how these parameters were quantified for all 1110 species in our database, with a combination of literature, empirical measures, and Bayesian models. All analyzes were carried out in R v.3.6.3 and Bayesian modes were run using Stan [@Carpenter2017] and the R package brms [@Burkner2017]. 
+To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N), and phosphorus (P), a number of parameters are required [see @Schiettekatte2020]. Here, we describe how these parameters were quantified for all 1110 species in our database, with a combination of literature, empirical measures, and Bayesian models. All protocols related to the capture and handling of fish complied to the ethical standards of CRIOBE and EPHE, and the University of California Santa Barbara’s Institutional Animal Care and Use Committee (IACUC #915 2016-2019). Extraction and transport of samples were approved by the government of French Polynesia. All analyzes were carried out in R v.3.6.3 and Bayesian modes were run using Stan [@Carpenter2017] and the R package brms [@Burkner2017]. 
 
 ## 1. Growth parameters
 

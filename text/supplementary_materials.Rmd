@@ -1,0 +1,352 @@
+---
+output:
+  word_document:
+    fig_caption: yes
+    reference_docx: ../text/word_template_science_supp.docx
+bibliography: ../text/global_proc.bib
+csl: science.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, error = FALSE)
+library(tidyverse)
+library(flextable)
+library(officer)
+library(drake)
+library(broom)
+library(brms)
+library(broom.mixed)
+
+loadd(SI_fig1)
+loadd(SI_fig2)
+loadd(SI_pp_plots)
+loadd(SI_rank_plots)
+```
+
+# Supplementary Materials for
+     
+Global drivers and vulnerabilities of coral reef fish functions
+     
+Nina M. D. Schiettekatte^1,2,*^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas A. J. Graham^4^, Diego R. Barneche^5,6^, Deron E. Burkepile^7,8^, Jacob E. Allgeier^9^, Jesús E. Arias-Gonzaléz^10^, Graham J. Edgar^11^, Carlos E. L. Ferreira^12^, Sergio R. Floeter^13^, Alan M. Friedlander^14^, Alison L. Green^15^, Michel Kulbicki^2,16^, Yves Letourneur^2,17^, Osmar J. Luiz^18^, Alexandre Mercière^1,2^, Fabien Morat^1,2^, Katrina S. Munsterman^9^, Enrico L. Rezende^19^, Fabian A. Rodríguez‐Zaragoza^20^, Rick D. Stuart-Smith^11^, Laurent Vigliola^2,16^, Sébastien Villéger^21^, Valeriano Parravicini^1,2^
+     
+Correspondence to: nina.schiettekatte@gmail.com
+         
+This PDF file includes:
+
+Materials and Methods       
+Figs. S1 to S5      
+Table S1 to S2       
+Supplementary methods
+\newpage
+
+# Materials and Methods
+
+## 1. Underwater visual census database
+\noindent We used a published global database of reef fish abundance and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, Western Atlantic. The database only includes sites at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize the bias related to the identification of small individuals, and finally we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species that belong to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
+
+## 2. Bioenergetic modeling
+\noindent Here, we focused on 5 key processes mediated by fish: N excretion rate (gN/day/m^2^), P excretion rate (gP/day/m^2^), production of body mass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^). These 5 processes were estimated in each transect using individual-based bioenergetic models that predicts elemental fluxes, including ingestion rate, excretion rates of N and P, and growth rate.
+The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We ran the model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each process in each transect and the cumulated estimates for the fish community per surface area. Each process is thus expressed in dry mass per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild [@Parravicini2020]. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
+
+## 3. Relationship between functions and biomass
+
+The standing stock biomass of communities is inevitably related to all functions because of the additive nature of the quantification and general metabolic theory. Furthermore, because of the known relationship between temperature and parameters related to growth and respiration, all functions are also positively correlated with temperature. To model the effect of biomass and sea surface temperature (sst), independent of other factors, we performed a Bayesian mixed effect regression of each log-transformed function for community-level observations ($y_j$):
+<!-- \begin{equation} -->
+	$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
+<!-- 	\label{modbiom1} -->
+<!-- \end{equation}      -->
+
+<!-- \begin{equation} -->
+$$\mu_{\textrm{j}} = \beta_0 +{\beta_1} {x_{log(biomass),j}} + {\beta_2} {x_{sst,j}}$$
+<!-- 	\label{modbiom2} -->
+<!-- \end{equation} -->
+
+\noindent We then assessed the covariation between functions, independent of biomass and sst. To do so, we first extracted the median residuals for each function per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. We then quantified the correlations that exist among the different functions using these median residuals. Finally, for the purpose of visualizing the residual variation of functions per locality on a world map, we ran a supplemental model, similar to the model described above but including random effects both per site and locality. We then extracted and plotted the location effects, which can be interpreted as the average variation per locality.  
+
+## 4. Effect of community structure on ecosystem functions 
+\noindent To investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, we quantified a set of variables that characterize the community. These variables describe the size, age, and trophic distribution of the community, as these may all affect functions [@Schiettekatte2020]. Specifically, we calculated the 2.5%, 50% and 97.5% quantiles of the total length, immaturity, and trophic level of all individuals per transect. The total length is based on the visual estimation by divers. The immaturity is quantified using the following formula: 
+<!-- \begin{equation} -->
+	$$\textrm{immaturity}_\textrm{i} = \kappa (\textrm{l}_{\infty} - \textrm{l}_\textrm{i}),$$
+<!-- 	\label{imm} -->
+<!-- \end{equation} -->
+where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018]. Additionally, we quantified the transect-level species richness. 
+For each log-transformed function we then fitted a Bayesian mixed-effect model with all 12 above-mentioned variables, after verifying that there are no strong correlations between variables (the highest correlation coefficient was 0.5, and 50% of the variable pair correlations varied between -0.1 and 0.2). 
+
+<!-- \begin{equation} -->
+$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
+<!-- 	\label{modcom1} -->
+<!-- \end{equation}      -->
+       
+<!-- \begin{equation} -->
+$\begin{array}{c} \mu_{j} = \beta_0 + \beta_1 x_{log(biomass),j} + \beta_2 x_{sst,j}  + \beta_3 x_{richness,j}  + \beta_4 x_{size_m,j}  + \beta_5 x_{size_{2.5\%},j} +  \beta_6 x_{size_{97.5\%},j} + \\ \beta_7 x_{troph_m,j}  + \beta_8 x_{troph_{2.5\%},j} +  \beta_9 x_{troph_{97.5\%},j} + \beta_{10} x_{imm_m,j}  + \beta_{11} x_{imm_{2.5\%},j} +  \beta_{12} x_{imm_{97.5\%},j} \end{array}$     
+<!-- 	\label{modcom2} -->
+<!-- \end{equation} -->
+
+To compare effects across functions and assess the relative importance of each variable, we standardized all variables prior to model fitting. We fitted all 5 models by using 4 cores, that each had 2000 iterations with a warm-up of 1000 iterations, and used weakly-informative priors [@Burkner2017]. 
+
+## 5. Species dominance and contributions to functions
+We quantified the relative contribution of each species to each function for all transects as followed:
+<!-- \begin{equation} -->
+$$	\textrm{contribution}_{f,i,j} = \frac{\sum F_{f,i,j}}{\sum F_{f,j}},$$
+<!-- 	\label{con} -->
+<!-- \end{equation} -->
+where i is a certain species, j is a transect, F is the value of function f. 
+
+Then, we quantified the degree of species dominance per function for each transect. 
+We did this by first ranking species according to their contribution to function, followed by quantifying the cumulative contributions of species to functions. Then, we used the area under the species accumulation curve as a measure for the degree of dominance.
+Specifically, the degree of dominance (DD) was calculated as followed:
+<!-- \begin{equation} -->
+$$	\textrm{DD} = \frac{A - A_{min}}{A_{max} - A_{min}},$$
+<!-- 	\label{dd} -->
+<!-- \end{equation} -->
+where $A$ is the area under the curve, $A_{min}$ is the theoretical area under the curve where each species has an equal contribution to a certain function, $A_max$ is the theoretical area under the curve where one species performs the entire function. They are quantified as:
+<!-- \begin{equation} -->
+$$	\textrm{A}_{min} = \frac{R^2 - 1}{2 R},$$
+<!-- 	\label{Amin} -->
+<!-- \end{equation} -->
+
+<!-- \begin{equation} -->
+$$	\textrm{A}_{max} = R - 1,$$
+<!-- 	\label{Amax} -->
+<!-- \end{equation} -->
+
+<!-- \begin{equation} -->
+$$	\textrm{A} = \sum_{i = 2}^R \frac{C_i + C_{i-1}}{2},$$
+<!-- 	\label{A} -->
+<!-- \end{equation} -->
+
+where $C_i$ is the contribution of a certain species and R is the number of species contributing to a certain function. The degree of dominance thus ranges between 0 and 1, where 0 means that each species contributes equally and 1 means that a single species performs the entire function. In the case of N excretion, P excretion, and production, R equals the species richness, while for herbivory and piscivory R represents the number of herbivores and piscivores, respectively.
+
+Finally, to know how often species are contributing more than average for a certain function, we quantified the frequency of dominance, i.e. the number of times a species is dominant divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function. 
+
+## 6. Vulnerability to fishing and climate change
+For each species, we quantified two measures of vulnerability: vulnerability to climate change and vulnerability to fishing pressure [@Graham2011]. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change induced coral loss is related to diet specialization, habitat specialization for live coral and body size [@Graham2011]. Graham et al. (2011) [@Graham2011] developed a score for climate change vulnerability for 134 species. We used these scores to fit a Bayesian mixed effect predictive model that relates the vulnerability with the log-transformed maximum size of fish (extracted from Fishbase @Froese2018), the dependence on coral for food (3 categories: not dependent, facultative corallivore, and obligate corallivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent) [@Coker2014; @Cole2008]. We also included a random effect for family. To verify the fit of the model we inspected the posterior predictive plot, which indicated a good fit. Further, the model had a Bayesian R2 of 0.97. We thus used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. For species' vulnerability to fishing, we extracted the index from Cheung et al. (2005) [@Cheung2005].
+Next, we calculated vulnerability scores per function on the community level by averaging the species-level scores weighted by the contributions to function of species. We also calculated community-level vulnerability scores based on biomass contributions as a comparison. Finally, we calculated the proportions of communities that had a higher vulnerability score of functions, compared to the vulnerability score based on biomass alone. In other words, we quantified the proportions of communities that have an increased functional vulnerability. 
+
+## Figures
+
+![Fig. S1: a-e) Relationship between biomass and the five functions. Lines and shaded areas show the average and 95% credible interval of the predicted functions respectively, for a constant sea surface temperature of 26°C (the average across all sites). Vertical lines show the range of the estimated functions across fish communities per biomass class of 100g/m2. f) Fold variation of each function per biomass class of 100g/m2 across fish communities. g) Correlation matrix of the residuals of the five functions after regression with biomass and sea surface temperature. Standard deviations of correlation coefficients did not exceed 0.01.](../output/plots/annex_fig1.png)
+
+\newpage
+
+
+![Fig. S2: Posterior predictive checks of the five models relating functions  with biomass and sea surface temperature only (a) N excretion, b) P excretion, c) Production, d) Herbivory, e) Piscivory), and the five models relating functions with community variables (f) N excretion, g) P excretion, h) Production, i) Herbivory, j) Piscivory)](../output/plots/pp_plots.png)
+
+\newpage
+
+![Fig. S3: Average relative contribution of fish families to all five functions per biogeographical ocean basin. CIP = Central-Indo-Pacific, CP = Central Pacific, EA = Eastern Atlantic, WA = Western Atlantic, WI = Western Indian](../output/plots/con_family_rank.png)
+
+\newpage
+
+![Fig. S4: Average relative contribution of the top ten most contributing species to all five functions per biogeographical ocean basin. CIP = Central-Indo-Pacific, CP = Central Pacific, EA = Eastern Atlantic, WA = Western Atlantic, WI = Western Indian](../output/plots/con_species_rank.png)
+
+\newpage
+
+![Fig. S5: Comparison herbivory and piscivory rates when using alternative diet classifications from Mouillot et al. (2014) and Siqueira et al. 2020](../output/plots/Supplemental_herbivory_piscivory_alternative_classification.png)
+
+
+\newpage
+
+## Tables
+
+```{r, echo = FALSE}
+data <- drake::readd(summary_transect_complete) %>%
+  dplyr::group_by(bioregion, locality) %>%
+  dplyr::summarize(n_sites = length(unique(sites)),
+            n_transects = n()) 
+
+  flextable::flextable(data) %>%
+    flextable::fontsize(size = 8) %>%
+    flextable::fontsize(size = 10, part = "header") %>%
+    flextable::set_caption("Table S1: Overview of localities of UVC transects, used in this study, including number of sites and number of transects") %>%
+    flextable::autofit()
+```
+\newpage
+
+```{r, echo = FALSE, eval=FALSE}
+  list <- drake::readd(commodels_real)
+  table <- rbind(
+    tidy(list[[1]], par_type = "non-varying") %>%
+    dplyr::mutate_if(is.numeric, round, 4) %>%
+    dplyr::mutate(term = c("intercept",
+                    "sst",
+                    "log(biomass)",
+                    "richness",
+                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
+                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
+                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
+                    )) %>%
+    dplyr::mutate(response = "log(N excretion)"),
+    broom.mixed::tidy(list[[2]], par_type = "non-varying") %>%
+    dplyr::mutate_if(is.numeric, round, 4) %>%
+    dplyr::mutate(term = c("intercept",
+                    "sst",
+                    "log(biomass)",
+                    "richness",
+                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
+                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
+                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
+                    )) %>%
+    dplyr::mutate(response = "log(P excretion)"),
+    broom.mixed::tidy(list[[3]], par_type = "non-varying") %>%
+    dplyr::mutate_if(is.numeric, round, 4) %>%
+    dplyr::mutate(term = c("intercept",
+                    "sst",
+                    "log(biomass)",
+                    "richness",
+                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
+                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
+                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
+                    )) %>%
+    dplyr::mutate(response = "log(Production)"),
+    broom.mixed::tidy(list[[4]], par_type = "non-varying") %>%
+    dplyr::mutate_if(is.numeric, round, 4) %>%
+    dplyr::mutate(term = c("intercept",
+                    "sst",
+                    "log(biomass)",
+                    "richness",
+                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
+                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
+                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
+                    )) %>%
+    dplyr::mutate(response = "log(Herbivory)"),
+    broom.mixed::tidy(list[[5]], par_type = "non-varying") %>%
+    dplyr::mutate_if(is.numeric, round, 4) %>%
+    dplyr::mutate(term = c("intercept",
+                    "sst",
+                    "log(biomass)",
+                    "richness",
+                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
+                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
+                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
+                    )) %>%
+    dplyr::mutate(response = "log(Piscivory)")) %>%
+    dplyr::select(response, term, estimate, std.error, lower, upper)
+  
+  flextable::flextable(table) %>%
+    flextable::fontsize(size = 8) %>%
+    flextable::fontsize(size = 10, part = "header") %>%
+    flextable::merge_v(j = 1) %>% 
+    flextable::border_inner_h(border = fp_border(color = "black", style = "solid", width = 1)) %>%
+    flextable::set_caption("Table S2: Overview of parameters of the regressions relating the five functions to the community structure variables") %>%
+    flextable::autofit()
+```
+
+  
+\newpage
+
+
+
+# Supplementary methods
+
+To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N), and phosphorus (P), a number of parameters are required [see @Schiettekatte2020]. Here, we describe how these parameters were quantified for all 1110 species in our database, with a combination of literature, empirical measures, and Bayesian models. All protocols related to the capture and handling of fish complied to the ethical standards of CRIOBE and EPHE, and the University of California Santa Barbara’s Institutional Animal Care and Use Committee (IACUC #915 2016-2019). Extraction and transport of samples were approved by the government of French Polynesia. All analyzes were carried out in R v.3.6.3 and Bayesian modes were run using Stan [@Carpenter2017] and the R package brms [@Burkner2017]. 
+
+## 1. Growth parameters
+
+### 1.1 Data compilation
+We first compiled maximum lengths for all species with Fishbase [@Froese2018] and used these lengths for the $l_{\infty}$ . For $\kappa$, we used a standardized coefficient that describes the potential growth trajectory of an individual if $l_{\infty}$ were to be equal to its maximum length [i.e. $k_{max}$, @Morais2018]. $t0$ was kept constant at 0 for all species. 
+
+We extracted the data for $k_{max}$ from Morais et al. (2018) [@Morais2018] and filtered out only the species of our species list. As the Lenth-Frequency method consistently overestimates kmax, we omitted the $k_{max}$ estimates coming from this method. In total, this selection process resulted in 439 observations of kmax for different species and temperatures. 
+
+Further, we collected additional otolith data, including measurements of fishes from five Polynesian islands. 
+We collected data across four archipelagos, including six distinct islands: Mo'orea and Manuae (Society Islands), Hao and Mataiva (Tuamotus), Mangareva (Gambiers), and Nuku Hiva (Marquesas) between 2014 and 2018. All fishes were collected in the lagoon and/or outer slope, depending on the accessibility of the respective habitats. 
+        
+For each species, otoliths were cut transversely, using a diamond disc saw (Presi Mecatome T210) to obtain a section of 500 μm. Sections were then fixed on a glass side with thermoplastic glue (Crystalbond TM). Small otoliths were directly embedded in the thermoplastic glue and polished until obtaining a transversal section. Otoliths were sanded with abrasive discs of decreasing grain size (2,400 and 1,200 grains cm- 130 2) and polished with a 0.25 μm diamond suspension in order to be closest to the nucleus. All sections were photographed under a Leica DM750 light microscope with a Leica ICC50 HD microscope camera and LAS software (Leica Microsystems).
+
+A standardized transect across the otoliths (from the nucleus to the edge) was chosen for each species, and distances between annual growth increments were measured using the software ImageJ. This procedure was performed twice by two independent researchers to prevent biases induced by a single observer. When the coefficient of variation between the two observers was greater than 5%, a common reading was reached by averaging the measurements for each section. 
+
+We then used the Modified Fry back-calculation model (MF) [@Vigliola2000] to estimate fish length at previous ages, modified to also investigate the uncertainty around the obtained length estimates using a Bayesian approach (fishgrowbot, ref).
+
+Finally, we fitted the Von Bertalanffy growth models to all species at each location for which there were at least 3 individuals. We fitted the models using Bayesian hierarchical regression models provided by the R package fishgrowbot (ref). 
+
+After combining the two data sources, we obtained 496 estimates of $k_{max}$ for 181 species. 
+
+### 1.2 Data analysis and extrapolation
+
+\noindent Aside from phylogeny, $k_{max}$ is mostly determined by body size and temperature [@Morais2018]. 
+
+We applied a Bayesian hierarchical model to predict the growth rate of fishes as a function of body size, temperature and phylogeny:  
+
+<!-- \begin{equation} -->
+$$\textrm{ln}kmax = (\beta_{\textrm{0}} + \gamma_{\textrm{0phy}}) +  \beta_{\textrm{1}} \textrm{ln}sizemax +  \beta_{\textrm{2}} sst + \epsilon,$$
+<!-- \label{kmax} -->
+<!-- \end{equation} -->
+
+\noindent where $\textrm{ln}kmax$ represents the natural log-transformed kmax value, $\beta_\textrm{0}$ is the fixed-effect intercept, $\gamma_\textrm{0phy}$ is the vector of random-effect coefficients that account for the residual intercept variation, based on the relatedness as described by the phylogeny, $\beta_\textrm{1}$ is the slope for the natural transformed maximum body size, $\beta_\textrm{2}$ is the slope for the average ambient sea surface temperature, $\epsilon$ is the residual variation.
+\noindent We used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains. 
+\noindent The model fit confirmed a negative relationship of $\textrm{ln}kmax$ with $\textrm{ln}size$, and a positive relationship with sea surface temperature. The Bayesian R2 of the model was 0.738 (95\%CI: 0.702-0.769). 
+\noindent The phylogenetic heritability (equivalent to Pagel’$\lambda$) was estimated as the proportion of total variance, conditioned on the effects, attributable to the phylogeny(i.e. $\lambda = \frac{{\textrm{sd}(\gamma_{\textrm{0phy}})}^2} {{\textrm{sd}(\gamma_\textrm{0phy})}^2 + \epsilon^2}$). This calculation resulted in a phylogenetic signal of 0.74 (95\% CI: 0.70 - 0.77). 
+
+\noindent We extrapolated $kmax$ for all species across the full temperature range in which those species occur in the database, with temperature rounded to the °C, which results in 4712 unique temperature and species combinations.  
+There is currently no streamlined method to make predictions for new species from a phylogenetic regression model. We circumvented the issue by extracting draws of the phylogenetic effect, $\gamma_\textrm{0phy}$ for each species included in the model. We subsequently predicted these phylogenetic effects for missing species with the help of the function phyEstimate in the picante package for R [@Kembel2010]. This function uses phylogenetic ancestral state estimation to infer trait values for new species on a phylogenetic tree by rerooting the tree to the parent edge for the node to be predicted [@Kembel2012]. We repeated this for all 100 trees and 1000 draws. Per draw, we averaged the extrapolated values per species for the hundred trees. Then, by combining the predicted phylogenetic effects with the global intercept and slopes for body size and temperatures for each draw, we predicted $\kappa$ for each species. We only use one chain in order to keep computational time reasonable. Finally, we summarised all $\kappa$ predictions per sst per species by taking the mean and standard deviation across the 1000 draws. 
+
+## 2 Body stoichiometry    
+### 2.1 Data collection    
+\noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Mo'orea, the Caribbean, and Palmyra. Their gut contents were removed, and the whole body was freeze-dried and ground to powder with a Precellys homogenizer. $Q_\textrm{k}$ (\%) were then measured in the lab using standard methods. Ground samples were analysed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500) for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis [@Allen1974]. Elemental content was calculated based on dry mass. 
+
+### 2.2 Data analysis and extrapolation  
+
+\noindent The CNP\% content of organisms is known to be highly conserved within families [@Allgeier2020sci]. We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
+
+<!-- \begin{equation} -->
+$$\begin{bmatrix}Y_1 \\ Y_2 \\ Y_3\end{bmatrix} \sim MVNormal(\begin{bmatrix}mu1 \\ mu2 \\ mu3\end{bmatrix}, S),$$
+<!-- 	\label{cnp} -->
+<!-- \end{equation} -->
+
+$$mu_{\textrm{n}\times\textrm{k}} = \beta_\textrm{0 k} + \gamma_{\textrm{0phy}\times\textrm{k}} + \gamma_{\textrm{0sp}\times\textrm{k}},$$
+<!-- 	\label{cnp2} -->
+<!-- \end{equation} -->
+
+\noindent where $Y_1$, $Y_2$ and $Y_3$ are the \% content of $\textrm{C}$, $\textrm{N}$, and $\textrm{P}$ respectively, $mu_{\textrm{n}\times\textrm{k}}$ represents the average \% content of element $k$ ($\textrm{C}$, $\textrm{N}$, and $\textrm{P}$) per species, $\beta_\textrm{0 k}$ is the fixed-effect intercept for each element $k$, $\gamma_{\textrm{0phy}\times\textrm{k}}$ is the matrix of random-effect coefficients that account for the intercept variation, based on the relatedness as described by the phylogeny per element k, $\gamma_{\textrm{0sp}\times\textrm{k}}$ is the matrix of random-effect coefficients that account for the residual species-level intercept variation per element k.
+
+\noindent We used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains. 
+\noindent The Bayesian R2 of the model was 0.39 (95\%CI: 0.36-0.42), 0.50 (95\%CI: 0.48-0.53), and 0.43 (95\%CI: 0.40-0.46) for C, N and P respectively. 
+\noindent The phylogenetic heritability was 0.41 (95\%CI: 0.28-0.55), 0.58 (95\%CI: 0.4-0.66), and 0.57 (95\%CI: 0.46-0.69) for C, N, and P respectively.
+                
+\noindent As before, we used 1000 fitted draws for each species, and 100 phylogenetic trees to extrapolate to all species with unknown body stoichiometry. Specifically, we used the phylopars function from the Rphylopars package [@Bruggeman2009]. This function uses ancectral state reconstruction and brownian motion, and takes the correlation between C, N and P into account.      
+
+## 3 Diet     
+### 3.1 Data collection 
+\noindent We collected 571 adult individuals of 51 species between 2018 and 2019 in Mo'orea and Tetiaroa, and Mangareva, three Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab for CNP content analysis using similar methods as for the fish body stoichiometry. 
+
+### 3.2 Data analysis and extrapolation  
+\noindent We used trophic guilds defined by @Parravicini2020. We fitted a multivariate Bayesian regression model to summarize CNP\% content data per trophic guild with random effects at the species level. This model had a median Bayesian R2 of 0.62, 0.62, and 0.48 for C, N and P respectively.           
+Next, we extracted 1000 draws of the predicted the CNP\% per trophic guild. Parravicini et al. 2020 [@Parravicini2020] provides the probability of reef fish species to be assigned to each of the eight defined trophic guilds(i.e. sessile invertivores; herbivores, microvores, and detrivores; corallivores; piscivores; microinvertivores; macroinvertivores; crustacivores; planktivores). By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. We then took the average and standard deviation across all 1000 draws. While we recognize the bias of using diet CNP\% estimates of a dataset in one region, we argue that variability between food categories e.g. animal material and primary producers is likely to be higher than regional differences within trophic categorizations. Further, as the used trophic guild classification includes probabilities to belong to each group, variation is included when the trophic categorization is not well known. For example, if a species has a 50% probability to be a herbivore and a 50% probability to be a sessile invertivore this uncertainty will be reflected the estimation of the diet CNP\%.
+
+## 4 Metabolic parameters    
+### 4.1 Data collection    
+In the period between 2018 and 2019, we collected 1393 individuals of 61 species and 18 families with a minimum of 3 replicates per species. Individuals were collected using handnets and clove oil by scuba divers. 
+
+### 4.2 Metabolic rate
+To quantify standard metabolic rate (SMR) and maximum metabolic rate (MMR), we conducted intermittent-closed respirometry experiments at 28°C [@Steffensen1989; @Clark2013]. After an acclimatization and fasting period of 48 h in aquaria, the fish were individually transferred to a water-filled tub at 28°C and manually chased by the experimenter until exhausted [@Norin2011; @Clark2012]. Then, they were placed in respirometry chambers submersed in an ambient and temperature-controlled tank, where they were left for ~23 h. The intermittent respirometry cycles started immediately after a fish was placed in its respirometry chamber. The cycles consisted of a measurement (sealed) period followed by a flush period during which the respirometry chambers were flushed with fully aerated water from the ambient tank. Because fish were exhausted right before entering the respirometry chambers, it is possible to measure the approximate MMR. Depending on fish size, 8 respirometry chambers ranging in volume (including tubes and pumps) from 0.4 to 4.4 L were run in parallel, and measurement and flush periods lasted between 3 to 15 min and 3 to 5 min, respectively. SMR was calculated as the average of the 10 % lowest  values measured during the entire period, after the removal of outliers [@Chabot2016]. MMR was calculated from the slope of the first measurement period.
+
+### 4.3 Data analysis and extrapolation
+To retrieve the parameters $f_\textrm{0}$ (Metabolic normalisation constant independent of body mass; $\textrm{g C} \textrm{g}^{-\alpha} \textrm{d}^{-1}$) and $\alpha$ (mass-scaling exponent), and $\theta$ (factorial activity scope), we fitted a Bayesian mixed effect model predicting the log10-transformed metabolic rate with the log10-transformed biomass including random effects of family, species, and mr type (SMR or MMR) on both the intercept and the species. We ran the model for 4000 iterations, with a warm-up of 2000 iterations. Further, we used an informative prior for the slope ($\alpha \sim normal(0.8, 0.5)$. The model had a Bayesian R2 of 0.973 (95\%CI: 0.972-0.974).
+We then extracted the family-level $\alpha$ by summing the slope of the model with the effects of the family on the slope of the SMR. We did this for 1000 iterations and then took the mean and standard deviation. In a similar way we extracted the family-level intercept for SMR, and then quantified mean and standard deviation of $f_\textrm{0}$ after the back-transformation of 1000 iterations of the intercept. 
+Finally, $\theta$ was quantified as followed, based on the assumption that fishes rest 12h a day and they on average spend the remaining 12 hours at a metabolic rate that is the average of their SMR and MMR: 
+<!-- \begin{equation} -->
+$$\theta = \frac{3\textrm{SMR} + \textrm{MMR}}{4\textrm{SMR}},$$
+<!-- 	\label{theta} -->
+<!-- \end{equation} -->
+where 1000 iterations of the back-transformed family-level intercepts were used for SMR and MMR. We then summarized these predictions by taking the mean and standard deviation. 
+We used the family-level estimates for these three parameters for all species in our database. For families that were not represented in our respirometry dataset, we used an average across all families. 
+
+## 5. Additional parameters  
+We retrieved the parameters $lw_a$, $lw_b$, $h$, and $r$ from fishbase [@Froese2018]. For the mass-specific turnover rates for N and P($F_\textrm{0Nz}$; $F_\textrm{0Pz}$), we used the estimates provided in Schiettekatte et al. (2020) [@Schiettekatte2020]. 
+
+
+
+## References and Notes
+
+
+
+
+
+
+
+
+
