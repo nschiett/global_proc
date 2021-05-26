@@ -8,5 +8,6 @@ output
 figures
 text/outline.Rmd
 text/summary.Rmd
+test
 
 README.Rmd
