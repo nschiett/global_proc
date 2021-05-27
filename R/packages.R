@@ -22,5 +22,8 @@ library(Rcpp)
 library(broom)
 library(flextable)
 library(officer)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(cmdstanr)
 
 Sys.setlocale("LC_MESSAGES", "en_US.utf8")

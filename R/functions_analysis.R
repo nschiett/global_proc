@@ -387,5 +387,172 @@ get_spi_vuln <- function(sp_importance, vulnerability){
   
 }
 
+############# multivariate ################
+stand <- function(x){
+  max <- max(x, na.rm = TRUE)
+  st <- sapply(x, FUN = function(i){
+    st <- (i )/max
+    return(st)
+  })
+}
 
+geomean <- function(x, ...) {
+  prod(x, ...)^(1/length(x))
+}
+
+
+
+##### functions for imputation #####
+
+impute <- function(summary_transect_complete){
+  fitimp1 <- brm(log(I_herb) ~ standard(mean) + standard(log(biomass_tot)) +
+                   standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                   standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
+                   standard(imm_q3) + standard(troph_q1) + standard(size_q1) +
+                   standard(Gc) + standard(Fp) + standard(Fn) +
+                   (1|s|sites) + (1|p|locality),
+                 data = summary_transect_complete[summary_transect_complete$I_herb>0,],
+                 cores = 4,
+                 backend = "cmdstanr",
+                 threads = threading(20))
+  
+  imp1 <- fitted(fitimp1,
+                 newdata = summary_transect_complete[summary_transect_complete$I_herb==0,],
+                 allow_new_levels = TRUE)
+  
+  
+  #### imputation ####
+  fitimp2 <- brm(log(I_pisc) ~ standard(mean) + standard(log(biomass_tot)) +
+                   standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+                   standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
+                   standard(imm_q3) + standard(troph_q1) + standard(size_q1) +
+                   standard(Gc) + standard(Fp) + standard(Fn) +
+                   (1|s|sites) + (1|p|locality),
+                 data = summary_transect_complete[summary_transect_complete$I_pisc>0,],
+                 cores = 4,
+                 backend = "cmdstanr",
+                 threads = threading(20))
+  
+  imp2 <- fitted(fitimp2,
+                 newdata = summary_transect_complete[summary_transect_complete$I_pisc==0,],
+                 allow_new_levels = TRUE)
+  
+  # replace
+  flux <- summary_transect_complete
+  flux[flux$I_herb == 0, "I_herb"] <- exp(imp1[,1])
+  flux[flux$I_pisc == 0, "I_pisc"] <- exp(imp2[,1])
+  
+  # get multifunction
+  
+  result <- flux %>%
+    mutate(Fn_st = stand(Fn),
+           Fp_st = stand(Fp),
+           Gc_st = stand(Gc),
+           I_herb_st = stand(I_herb),
+           I_pisc_st = stand(I_pisc)) %>%
+    rowwise() %>%
+    mutate(multi = geomean(Fn_st, Fp_st, Gc_st, I_herb_st, I_pisc_st)) %>%
+    ungroup() %>%
+    mutate(multi = stand(multi))
+  
+  return(list(summary_transect_imp = flux, 
+              models = list(fitimp1, fitimp2)))
+}
+
+
+validate_model <- function(fit, save_plots = TRUE, name = "Title", pars = NULL){
+  
+  p1 <- 
+    brms::pp_check(fit)  +
+    labs(title = paste0(name))
+  
+  p2 <- 
+    mcmc_plot(fit, type = "trace", pars = pars) +
+    labs(title = paste0(name))
+  
+  p3 <- 
+    mcmc_plot(fit, type = "rhat_hist", pars = pars) +
+    labs(title = paste0(name))
+  
+  if (save_plots == TRUE) {
+    ggsave(plot = p1, 
+           filename = paste0("output/plots/__modeval_", name, "_ppcheck.pdf"), 
+           width = 8, height = 6)
+    ggsave(plot = p2, 
+           filename = paste0("output/plots/__modeval_", name, "_trace.pdf"), 
+           width = 8, height = 6)
+    ggsave(plot = p3, 
+           filename = paste0("output/plots/__modeval_", name, "_Rhat.pdf"), 
+           width = 8, height = 6)
+  }
+  
+  R2 <- bayes_R2(fit)
+  return(list(pp_plot = p1, par_plot = p2, R2 = R2))
+}
+
+
+##### Models #####
+##### 1) only site and location 
+fit_mvfun_siteloc <- function(data){
+  brm(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc)) ~ 
+        (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+  
+}
+fit_mf_siteloc <- function(data){
+  brm(log(multi) ~ (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
+
+
+##### 2) add biomass and sst
+fit_mvfun_bm <- function(data){
+  brm(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc)) ~ 
+        log(biomass_tot) + mean + (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
+
+fit_mvfun_com <- function(data){
+  data <- data %>%
+    dplyr::mutate(Fn_st = standard(log(Fn)),
+                  Fp_st = standard(log(Fp)),
+                  Gc_st = standard(log(Gc)),
+                  I_herb_st = standard(log(I_herb)),
+                  I_pisc_st = standard(log(I_pisc)),
+                  multi_st = standard(log(multi)))
+  
+  brm(mvbind(Fn_st, Fp_st, Gc_st, I_herb_st, I_pisc_st) ~ 
+        standard(mean) + standard(log(biomass_tot)) +
+        standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+        standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
+        standard(imm_q3) + standard(troph_q1) + standard(size_q1) + 
+        (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
+fit_mf_com <- function(data){
+  data <- data %>%
+    dplyr::mutate(Fn_st = standard(log(Fn)),
+                  Fp_st = standard(log(Fp)),
+                  Gc_st = standard(log(Gc)),
+                  I_herb_st = standard(log(I_herb)),
+                  I_pisc_st = standard(log(I_pisc)),
+                  multi_st = standard(log(multi)))
+  brm(multi_st ~ 
+        standard(mean) + standard(log(biomass_tot)) +
+        standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
+        standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
+        standard(imm_q3) + standard(troph_q1) + standard(size_q1) + 
+        (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
 

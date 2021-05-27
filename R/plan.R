@@ -45,18 +45,33 @@ plan <- drake_plan(
   # combine summary data, sst 
   summary_transect_complete = combine_summary(summary_transect, herb_pisc),
   
+  # imputation 
+  imp = impute(summary_transect_complete),
+  summary_transect_imp = imp,
+  
   ##### models #####
   # run models only with biomass ans sst
-  bmmodels = run_bmmodels(summary_transect_complete),
-  residuals = get_residuals(summary_transect_complete, procmodels),
+  # bmmodels = run_bmmodels(summary_transect_complete),
+  # residuals = get_residuals(summary_transect_complete, procmodels),
   
   # run models proc ~ biomass et al
-  procmodels = run_procmodels(summary_transect_complete),
-  location_effect = get_location_effect(procmodels, summary_transect),
+  # procmodels = run_procmodels(summary_transect_complete),
+  # location_effect = get_location_effect(procmodels, summary_transect),
   
   # run models proc ~ community vars
-  commodels = run_commodels(summary_transect_complete),
-  commodels_real = run_commodels_abs(summary_transect_complete),
+  # commodels = run_commodels(summary_transect_complete),
+  # commodels_real = run_commodels_abs(summary_transect_complete),
+  
+  # site loc
+  mod_mv_siteloc = fit_mvfun_siteloc(summary_tranect_imp),
+  mod_mf_siteloc = fit_mf_siteloc(summary_transect_imp),
+  
+  # add biomass sst
+  mod_mvfun_bm = fit_mvfun_bm(summary_transect_imp),
+  
+  # community analysis
+  mod_mvfun_bm = fit_mvfun_com(summary_transect_imp),
+  mod_mf_com = fit_mf_com(summary_transect_imp),
   
   ##### contribution analysis #####
   contr_family = get_cf(contributions, herb_pisc),
