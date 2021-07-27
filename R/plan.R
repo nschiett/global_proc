@@ -45,9 +45,12 @@ plan <- drake_plan(
   # combine summary data, sst 
   summary_transect_complete = combine_summary(summary_transect, herb_pisc),
   
+  # subset 
+  summary_transect_sub = dplyr::filter(summary_transect_complete, I_herb > 0, I_pisc > 0),
+  
   # imputation 
   imp = impute(summary_transect_complete),
-  summary_transect_imp = imp,
+  summary_transect_imp = imp[[1]],
   
   ##### models #####
   # run models only with biomass ans sst
@@ -63,58 +66,72 @@ plan <- drake_plan(
   # commodels_real = run_commodels_abs(summary_transect_complete),
   
   # site loc
-  mod_mv_siteloc = fit_mvfun_siteloc(summary_tranect_imp),
+  mod_mv_siteloc = fit_mvfun_siteloc(summary_transect_imp),
   mod_mf_siteloc = fit_mf_siteloc(summary_transect_imp),
   
   # add biomass sst
   mod_mvfun_bm = fit_mvfun_bm(summary_transect_imp),
+  mod_mf_bm = fit_mf_bm(summary_transect_imp),
   
   # community analysis
-  mod_mvfun_bm = fit_mvfun_com(summary_transect_imp),
-  mod_mf_com = fit_mf_com(summary_transect_imp),
+  mod_mvfun_com = fit_mvfun_com(summary_transect_imp),
+  mod_mvfun_com2 = fit_mvfun_com2(summary_transect_imp), #get absolute slopes
+  mod_mf_com = fit_mf_com(summary_transect_imp), 
+  
+  # Same model with data subset
+  mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
+  
+  # output tables 
+  tab_mod_mv_siteloc = make_table_mod_mv_siteloc(mod_mv_siteloc),
+  tab_mod_mf_siteloc = make_table_mod_mf_siteloc(mod_mf_siteloc), 
+  tab_mod_mvfun_bm = make_table_mod_mvfun_bm(mod_mvfun_bm),
+  tab_mod_mvfun_com = make_table_mod_mvfun_com(mod_mvfun_com),
+  tab_mod_mf_com = make_table_mod_mf_com(mod_mf_com),
+  tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
+  tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
   
   ##### contribution analysis #####
   contr_family = get_cf(contributions, herb_pisc),
   degree_dominance = get_dd(contributions, herb_pisc),
   sp_importance = get_importance(contributions, herb_pisc),
   freq_dominance = get_fd(sp_importance),
-  
+
   ##### Species vulnerability #####
   vulnerability = get_vuln(sptl),
-  spi_vuln = get_spi_vuln(sp_importance, vulnerability),
-  
-  ##### FIGURES #####
-  # main
-  fig1 = make_fig1(location_effect),
-  fig2 = make_fig2(commodels),
-  fig3 = make_fig3(contributions, herb_pisc, degree_dominance, freq_dominance),
-  fig4 = make_fig4(contributions, vulnerability, herb_pisc, residuals),
-  
-  # Supplemental data figures
-  SI_fig1 = make_annex_fig1(summary_transect_complete, residuals, bmmodels),
-  SI_fig2 = make_annex_fig2(summary_transect_complete, residuals),
-
-  SI_rank_plots = make_rank_plots(contributions, herb_pisc),
-  SI_pp_plots = make_pp_plots(bmmodels, procmodels, commodels),
-  
-  extra_diet_analysis = alt_diet(tfish, cnpflux),
-  
-  ##### TEXT #####
-  main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"),
-                                    output_format = "word_document",
-                                    output_dir = "./output/text/",
-                                    output_file = "Schiettekatte_global_functions_main.docx"),
-  # methods_text_doc = rmarkdown::render(knitr_in("text/methods.Rmd"),
+  spi_vuln = get_spi_vuln(sp_importance, vulnerability)#,
+  # 
+  # ##### FIGURES #####
+  # # main
+  # fig1 = make_fig1(location_effect),
+  # fig2 = make_fig2(commodels),
+  # fig3 = make_fig3(contributions, herb_pisc, degree_dominance, freq_dominance),
+  # fig4 = make_fig4(contributions, vulnerability, herb_pisc, residuals),
+  # 
+  # # Supplemental data figures
+  # SI_fig1 = make_annex_fig1(summary_transect_complete, residuals, bmmodels),
+  # SI_fig2 = make_annex_fig2(summary_transect_complete, residuals),
+  # 
+  # SI_rank_plots = make_rank_plots(contributions, herb_pisc),
+  # SI_pp_plots = make_pp_plots(bmmodels, procmodels, commodels),
+  # 
+  # extra_diet_analysis = alt_diet(tfish, cnpflux),
+  # 
+  # ##### TEXT #####
+  # main_text_doc = rmarkdown::render(knitr_in("text/main.Rmd"),
   #                                   output_format = "word_document",
   #                                   output_dir = "./output/text/",
-  #                                   output_file = "Schiettekatte_global_functions_methods.docx"),
-  # suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"),
-  #                                   output_format = "word_document",
-  #                                   output_dir = "./output/text/",
-  #                                   output_file = "Schiettekatte_global_functions_suppl_methods.docx"),
-  suppl_mat_doc = rmarkdown::render(knitr_in("text/supplementary_materials.Rmd"),
-                                              output_format = "word_document",
-                                              output_dir = "./output/text/",
-                                              output_file = "Schiettekatte_global_functions_suppl_materials.docx")
-   
+  #                                   output_file = "Schiettekatte_global_functions_main.docx"),
+  # # methods_text_doc = rmarkdown::render(knitr_in("text/methods.Rmd"),
+  # #                                   output_format = "word_document",
+  # #                                   output_dir = "./output/text/",
+  # #                                   output_file = "Schiettekatte_global_functions_methods.docx"),
+  # # suppl_methods_text_doc = rmarkdown::render(knitr_in("text/suppl_methods.Rmd"),
+  # #                                   output_format = "word_document",
+  # #                                   output_dir = "./output/text/",
+  # #                                   output_file = "Schiettekatte_global_functions_suppl_methods.docx"),
+  # suppl_mat_doc = rmarkdown::render(knitr_in("text/supplementary_materials.Rmd"),
+  #                                             output_format = "word_document",
+  #                                             output_dir = "./output/text/",
+  #                                             output_file = "Schiettekatte_global_functions_suppl_materials.docx")
+  #  
 )

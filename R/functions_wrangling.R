@@ -8,7 +8,7 @@ load("data/fishtree_glob.RData")
 get_sptl <- function(x){
   sptl <- read.csv("data/species_list_tl.csv")
   sptl$Species <- gsub("_", " ", sptl$species)
-  tax <- rfishbase::load_taxa()
+  tax <- dplyr::collect(rfishbase::load_taxa())
   sptl <- right_join(dplyr::select(tax, Species, Family), sptl)
   sptl[sptl$species == "Rhinesomus_triqueter", "Family"] <- "Ostraciidae"
   sptl[sptl$species == "Abudefduf_luridus", "Family"] <- "Pomacentridae"
@@ -108,33 +108,9 @@ get_kmax <- function(){
   return(kmax)
 }
 
-##### find lw #####
+##### get lw #####
 get_lw <- function(sptl){
-lwl <- map(as.list(sptl$Species), possibly(fishflux::find_lw, otherwise =  NA_real_))
-lwl2 <- lapply(lwl, function(x){
-   if (is.na(x)){
-     res <- data.frame(
-       species = NA, lwa_m = NA, lwa_sd = NA, lwb_m = NA, lwb_sd = NA
-     )
-     return(res)
-   } else{
-     return(x)
-   }
- }) 
-
- lwd <- plyr::ldply(lwl2) %>% drop_na()
- lwd$species <- gsub(" ", "_", lwd$species)
- traits <-left_join(select(sptl, species), lwd) %>% dplyr::select( species, lwa_m, lwb_m, lwa_sd, lwb_sd) %>% ungroup()
- treesp <- 
-   data.frame(species = fishtree[[1]]$tip.label)
- traits <- dplyr::left_join(treesp, traits)
- 
- test <- phylopars(traits, fishtree[[1]])
- recon <- test$anc_recon %>% as.data.frame()
- recon$species <- rownames(recon)
- recon <- recon[1:1110,]
- lw_glob <- recon
- return(lw_glob)
+  readr::read_csv("data/length_weight_fishbase.csv")
 }
 
 ##### ar and troph #####

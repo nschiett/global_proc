@@ -39,9 +39,14 @@ data <- drake::readd(summary_transect_complete) %>%
 ```
 
 ```{r, echo = FALSE}
-  list <- readd(commodels_real)
-  table <- rbind(
-    tidy(list[[1]], par_type = "non-varying") %>%
+  tab <- tidy(readd(mod_mvfun_com))
+test <- summary(tab)$summary %>% 
+  as.data.frame() %>%
+  tibble::rownames_to_column("name") %>%
+  tidyr::separate(name, into = c("dep", "var", "extra"), sep = "_") %>%
+  dplyr::mutate(var = paste0(var, extra)) %>%
+  table <- 
+    tidy(tab) %>%
     mutate_if(is.numeric, round, 4) %>%
     mutate(term = c("intercept",
                     "sst",
@@ -51,53 +56,7 @@ data <- drake::readd(summary_transect_complete) %>%
                     "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
                     "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
                     )) %>%
-    mutate(response = "log(N excretion)"),
-    tidy(list[[2]], par_type = "non-varying") %>%
-    mutate_if(is.numeric, round, 4) %>%
-    mutate(term = c("intercept",
-                    "sst",
-                    "log(biomass)",
-                    "richness",
-                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
-                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
-                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
-                    )) %>%
-    mutate(response = "log(P excretion)"),
-    tidy(list[[3]], par_type = "non-varying") %>%
-    mutate_if(is.numeric, round, 4) %>%
-    mutate(term = c("intercept",
-                    "sst",
-                    "log(biomass)",
-                    "richness",
-                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
-                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
-                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
-                    )) %>%
-    mutate(response = "log(Production)"),
-    tidy(list[[4]], par_type = "non-varying") %>%
-    mutate_if(is.numeric, round, 4) %>%
-    mutate(term = c("intercept",
-                    "sst",
-                    "log(biomass)",
-                    "richness",
-                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
-                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
-                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
-                    )) %>%
-    mutate(response = "log(Herbivory)"),
-    tidy(list[[5]], par_type = "non-varying") %>%
-    mutate_if(is.numeric, round, 4) %>%
-    mutate(term = c("intercept",
-                    "sst",
-                    "log(biomass)",
-                    "richness",
-                    "size (mean)", "trophic level (mean)", "immaturity (mean)",
-                    "size (97.5)", "trophic level (97.5%)", "immaturity (2.5%)",
-                    "immaturity (97.5%)", "trophic level (2.5%)", "size (2.5%)"
-                    )) %>%
-    mutate(response = "log(Piscivory)")) %>%
-    select(response, term, estimate, std.error, lower, upper)
-  
+    mutate(response = "log(N excretion)")
   flextable(table) %>%
     fontsize(size = 8) %>%
     fontsize(size = 10, part = "header") %>%

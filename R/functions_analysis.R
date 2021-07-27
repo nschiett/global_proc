@@ -96,14 +96,10 @@ get_residuals <- function(summary_transect_complete, procmodels){
   return(res)
 }
 
-get_location_effect <- function(procmodels, summary_transect){
-  result <- lapply(procmodels, function(x){
-      x %>%
-      spread_draws(r_locality[locality, Intercept]) %>%
-      median_qi() %>%
-      select(locality, effect = r_locality)
-  }) %>% purrr::reduce(dplyr::left_join, by = "locality")
-  
+get_location_effect <- function(model, summary_transect){
+  result <- ranef(model)$locality[,1,] %>% as.data.frame() %>%
+    rownames_to_column("locality")
+
   colnames(result) <- c("locality", "r_loc_Fn", "r_loc_Fp", "r_loc_Gc", 
                         "r_loc_I_herb", "r_loc_I_pisc")
   
@@ -119,7 +115,24 @@ get_location_effect <- function(procmodels, summary_transect){
     
 }
 
-
+get_location_effect2 <- function(model, summary_transect){
+  result <- ranef(model)$locality %>% as.data.frame() %>%
+    rownames_to_column("locality") %>%
+    select(1:2)
+  
+  colnames(result) <- c("locality", "r_loc_multi")
+  
+  # add coordinates
+  coord <- select(summary_transect, bioregion, locality, lat, lon) %>%
+    unique() %>%
+    group_by(bioregion, locality) %>%
+    summarize_all(mean)
+  
+  result <- coord %>% left_join(result) %>% ungroup()
+  
+  return(result)
+  
+}
 
 ####### community models ######
 run_commodels <- function(summary_transect_complete){
@@ -414,7 +427,7 @@ impute <- function(summary_transect_complete){
                  data = summary_transect_complete[summary_transect_complete$I_herb>0,],
                  cores = 4,
                  backend = "cmdstanr",
-                 threads = threading(20))
+                 threads = threading(10))
   
   imp1 <- fitted(fitimp1,
                  newdata = summary_transect_complete[summary_transect_complete$I_herb==0,],
@@ -431,7 +444,7 @@ impute <- function(summary_transect_complete){
                  data = summary_transect_complete[summary_transect_complete$I_pisc>0,],
                  cores = 4,
                  backend = "cmdstanr",
-                 threads = threading(20))
+                 threads = threading(10))
   
   imp2 <- fitted(fitimp2,
                  newdata = summary_transect_complete[summary_transect_complete$I_pisc==0,],
@@ -455,7 +468,7 @@ impute <- function(summary_transect_complete){
     ungroup() %>%
     mutate(multi = stand(multi))
   
-  return(list(summary_transect_imp = flux, 
+  return(list(summary_transect_imp = result, 
               models = list(fitimp1, fitimp2)))
 }
 
@@ -508,6 +521,13 @@ fit_mf_siteloc <- function(data){
       threads = threading(10))
 }
 
+fit_mf_bm <- function(data){
+  brm(log(multi) ~ log(biomass_tot) + mean + (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
+
 
 ##### 2) add biomass and sst
 fit_mvfun_bm <- function(data){
@@ -537,6 +557,23 @@ fit_mvfun_com <- function(data){
       backend = "cmdstanr",
       threads = threading(10))
 }
+
+
+fit_mvfun_com2 <- function(data){
+
+  brm(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc))  ~ 
+        (mean) + (log(biomass_tot)) +
+        (nspec) + (size_m) + (troph_m) + (imm_m) +
+        (size_q3) + (troph_q3) + (imm_q1) +
+        (imm_q3) + (troph_q1) + (size_q1) + 
+        (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10))
+}
+
+
+
 fit_mf_com <- function(data){
   data <- data %>%
     dplyr::mutate(Fn_st = standard(log(Fn)),
