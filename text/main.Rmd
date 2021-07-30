@@ -21,36 +21,36 @@ loadd(fig4)
 **Authors:** Nina M. D. Schiettekatte^1,2,\*^, Simon J. Brandl^3^, Jordan M. Casey^3^, Nicholas A. J. Graham^4^, Diego R. Barneche^5,6^, Deron E. Burkepile^7,8^, Jacob E. Allgeier^9^, Jesús E. Arias-Gonzaléz^10^, Graham J. Edgar^11^, Carlos E. L. Ferreira^12^, Sergio R. Floeter^13^, Alan M. Friedlander^14^, Alison L. Green^15^, Michel Kulbicki^2,16^, Yves Letourneur^2,17^, Osmar J. Luiz^18^, Alexandre Mercière^1,2^, Fabien Morat^1,2^, Katrina S. Munsterman^9^, Enrico L. Rezende^19^, Fabian A. Rodríguez‐Zaragoza^20^, Rick D. Stuart-Smith^11^, Laurent Vigliola^2,16^, Sébastien Villéger^21^, Valeriano Parravicini^1,2^
 
 
-**Affiliations:**      
-^1^PSL Université Paris: EPHE-UPVD-CNRS, USR 3278 CRIOBE, Université de Perpignan, Perpignan, France;    
-^2^Laboratoire d'Excellence “CORAIL”, Perpignan, France;     
-^3^Department of Marine Science, The University of Texas at Austin, Marine Science Institute, Port Aransas, TX 78373, USA;      
-^4^Lancaster Environment Centre, Lancaster University, Lancaster, LA1 4YQ, UK;      
-^5^Australian Institute of Marine Science, Crawley, WA, Australia;      
-^6^Oceans Institute, The University of Western Australia, Crawley, WA, Australia;      
-^7^Department of Ecology, Evolution, and Marine Biology, University of California, Santa Barbara, CA, USA;      
-^8^Marine Science Institute, University of California, Santa Barbara, CA, USA;      
-^9^Department of Ecology and Evolutionary Biology, University of Michigan, Ann Arbor, MI, USA;      
-^10^Laboratorio Ecología de Ecosistemas de Arrecifes Coralinos, Departamento Recursos del Mar, CINVESTAV Unidad Mérida, AP73 Cordemex, CP97310, Mérida, Yucatán, Mexico;      
-^11^Institute for Marine and Antarctic Studies, University of Tasmania, Hobart, TAS, Australia;      
-^12^Departamento de Biologia Marinha, Universidade Federal Fluminense (UFF), Niterói,  the state of Rio de Janeiro (RJ), Brazil;     
-^13^Marine Macroecology and Biogeography Lab, Depto. de Ecologia e Zoologia, CCB, Universidade Federal de Santa Catarina, Florianopolis, Santa Catarina, Brazil;      
-^14^Department of Biology, University of Hawaii, Honolulu, HI, USA;      
+**Affiliations:**
+^1^PSL Université Paris: EPHE-UPVD-CNRS, USR 3278 CRIOBE, Université de Perpignan, Perpignan, France;
+^2^Laboratoire d'Excellence “CORAIL”, Perpignan, France;
+^3^Department of Marine Science, The University of Texas at Austin, Marine Science Institute, Port Aransas, TX 78373, USA;
+^4^Lancaster Environment Centre, Lancaster University, Lancaster, LA1 4YQ, UK;
+^5^Australian Institute of Marine Science, Crawley, WA, Australia;
+^6^Oceans Institute, The University of Western Australia, Crawley, WA, Australia;
+^7^Department of Ecology, Evolution, and Marine Biology, University of California, Santa Barbara, CA, USA;
+^8^Marine Science Institute, University of California, Santa Barbara, CA, USA;
+^9^Department of Ecology and Evolutionary Biology, University of Michigan, Ann Arbor, MI, USA;
+^10^Laboratorio Ecología de Ecosistemas de Arrecifes Coralinos, Departamento Recursos del Mar, CINVESTAV Unidad Mérida, AP73 Cordemex, CP97310, Mérida, Yucatán, Mexico;
+^11^Institute for Marine and Antarctic Studies, University of Tasmania, Hobart, TAS, Australia;
+^12^Departamento de Biologia Marinha, Universidade Federal Fluminense (UFF), Niterói,  the state of Rio de Janeiro (RJ), Brazil;
+^13^Marine Macroecology and Biogeography Lab, Depto. de Ecologia e Zoologia, CCB, Universidade Federal de Santa Catarina, Florianopolis, Santa Catarina, Brazil;
+^14^Department of Biology, University of Hawaii, Honolulu, HI, USA;
 ^15^Red Sea Research Center, King Abdullah University of Science and Technology, Thuwal 23955-6900, Saudi Arabia;
-^16^Institut de Recherche pour le Développement, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;     
-^17^Université de la Nouvelle-Calédonie, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;     
-^18^Research Institute for the Environment and Livelihoods, Charles Darwin University, Darwin, Australia;     
-^19^Departamento de Ecología, Center of Applied Ecology and Sustainability (CAPES), Facultad de Ciencias Biológicas, Pontificia Universidad Católica de Chile, Santiago 6513677, Chile;      
-^20^Laboratorio de Ecosistemas Marinos y Acuicultura (LEMA), Departamento de 12 Ecología, CUCBA, Universidad de Guadalajara. México. Carr. Guadalajara-Nogales 13 km. 15.5, Las Agujas Nextipac, Zapopan, C.P. 45110, Jalisco, 14, Mexico;     
-^21^MARBEC, Université de Montpellier, CNRS, IFREMER, IRD, Montpellier, France     
-^\*^Correspondance to NMDS (nina.schiettekatte@gmail.com).    
+^16^Institut de Recherche pour le Développement, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;
+^17^Université de la Nouvelle-Calédonie, UMR UR-IRD-CNRS-IFREMER-UNC ENTROPIE, Nouméa, New Caledonia, France;
+^18^Research Institute for the Environment and Livelihoods, Charles Darwin University, Darwin, Australia;
+^19^Departamento de Ecología, Center of Applied Ecology and Sustainability (CAPES), Facultad de Ciencias Biológicas, Pontificia Universidad Católica de Chile, Santiago 6513677, Chile;
+^20^Laboratorio de Ecosistemas Marinos y Acuicultura (LEMA), Departamento de 12 Ecología, CUCBA, Universidad de Guadalajara. México. Carr. Guadalajara-Nogales 13 km. 15.5, Las Agujas Nextipac, Zapopan, C.P. 45110, Jalisco, 14, Mexico;
+^21^MARBEC, Université de Montpellier, CNRS, IFREMER, IRD, Montpellier, France
+^\*^Correspondance to NMDS (nina.schiettekatte@gmail.com).
 
 **One Sentence Summary:** A global assessment reveals critical trade-offs among multiple ecosystem functions performed by coral reef fishes.
 
 \newpage
 
 **Abstract:**
-Preserving the functioning of coral reefs is a critical challenge of the 21st century. However, a lack of quantitative assessments of multiple functions across large spatial scales has hindered local and regional conservation efforts. We integrate empirically-parametrized bioenergetic models and global community surveys to quantify five key functions mediated by coral reef fishes. We show that functions exhibit critical trade-offs driven by diverging community structures, such that no reef can holistically maximize functioning. Further, functions are locally dominated by few species, but worldwide, the identity of dominant species greatly varies; 70% of the 1,110 species in our dataset are functionally dominant. Our results underline the need for a nuanced approach to coral reef conservation that considers multiple functions beyond the effect of standing stock biomass.
+Preserving the functioning of coral reefs is a critical challenge of the 21st century. However, a lack of quantitative assessments of multiple functions across large spatial scales has hindered local and regional conservation efforts. We integrate empirically-parametrized bioenergetic models and global community surveys to quantify five key functions mediated by coral reef fishes. We show that functions exhibit critical trade-offs driven by varying community structures, such that no reef can holistically maximize functioning. Further, functions are locally dominated by few species, but worldwide, the identity of dominant species greatly varies; 70% of the 1,110 species in our dataset are functionally dominant. Our results underline the need for a nuanced approach to coral reef conservation that considers multiple functions beyond the effect of standing stock biomass.
 
 **Main Text:**
 The flow of elements through biological communities fuels all life on Earth [@Welti2017]. Preserving these fluxes, often termed ecosystem functions, is critical for the integrity of ecosystems [@Welti2017].
@@ -64,7 +64,7 @@ Coral reefs are among the most diverse and productive ecosystems on Earth and pr
 Yet, their integrity is threatened by a plethora of anthropogenic stressors [@Hughes2017].
 Severe declines in habitat quality and fish biomass have brought coral reef functioning to the forefront of scientific discourse [@Bellwood2019; @Brandl2019front].
 However, our capacity to evaluate reef functioning typically relies on static proxies of functions, such as live coral cover, standing stock biomass of reef fishes, or the diversity of qualitative traits [e.g. @Cinner2020].
-Conversely, we know comparatively little about actual functions - fluxes of elements and energy - and their drivers (but see [@Allgeier2016]), which constitutes a severe limitation to mefficient anagement [@Brandl2019front].
+Conversely, we know comparatively little about actual functions - fluxes of elements and energy - and their drivers (but see [@Allgeier2016]), which constitutes a severe limitation to efficient management [@Brandl2019front].
 
 Here, we integrate biogeochemistry and community ecology to advance our understanding of the elemental fluxes that underpin reef fish functioning.
 Using empirically-collected species-specific data on basic organismal processes and Bayesian phylogenetic models, we parameterize individual-level bioenergetic models to estimate five key ecosystem functions: nitrogen (N) excretion, phosphorus (P) excretion, biomass production, herbivory, and piscivory.
@@ -74,7 +74,7 @@ We apply these bioenergetic models to 9,118 reef fish communities across 585 sit
 (3) gauge the vulnerability of reef fish functioning in the Anthropocene.
 
 
-The five key ecosystem functions performed by fishes across the world's reefs exhibit high variability (Fig. 1).
+The five key ecosystem functions performed by fishes across the world's coral reefs exhibit high variability (Fig. 1).
 Biomass is the most commonly employed indicator of coral reef functioning [@Cinner2020; @Brandl2019front], and we observed a predictably strong relationship between fish biomass and all five functions (Fig. S1a-e, Fig. S2).
 However, our analyses demonstrate striking variability after accounting for biomass: in communities with similar biomass, functions may differ by two orders of magnitude or more (Fig. S1a-f).
 Thus, using biomass as a proxy for functioning masks fundamental differences in critical community-level functions.
@@ -86,7 +86,7 @@ While many reefs may stand out as hotspots for one function, none can holistical
 
 Community structure and species-specific traits clearly impact rates of functioning.
 First, using community-level ecological predictors known to affect elemental fluxes (body size, trophic level, species richness, biomass, temperature, and age structure [@Schiettekatte2020]; Fig. 2), we show that correlations between functions are mediated by contrasting aspects of community structure (Fig. 2; Table S2; Fig. S2).
-For example, phosphorus excretion and piscivory are higher in communities that include large-bodied fishes or occupy high trophic levels (Fig. 2; @Allgeier2014).  
+For example, phosphorus excretion and piscivory are higher in communities that include large-bodied fishes or occupy high trophic levels (Fig. 2; @Allgeier2014).
 In contrast, biomass production is highest in communities dominated by small and/or immature fishes at low trophic levels, creating a trade-off between biomass production and phosphorus excretion.
 Metabolic theory predicts that small-bodied individuals have higher mass-specific metabolic rates, leading to elevated consumption rates and disproportionate contributions to functions that rely on rapid energetic turnover [@Barneche2018; @Morais2020glob; @Brandl2019science].
 Conversely, fishes in early life stages or with a nutrient-poor diet are often limited by phosphorus [@Schiettekatte2020], resulting in low contributions to phosphorus excretion.
@@ -126,7 +126,7 @@ For example, the establishment of marine protected areas, which are one of the p
 Thus, measuring conservation success with biomass or solely one function (e.g. herbivory) can mask the collapse of other essential functions.
 It is necessary to gauge the state of reef ecosystems based on multiple, complementary, process-based functions [@Brandl2019front], as well as making informed decisions on local needs and stressors.
 While there is a general consensus on the role of diversity in enhancing functioning [@Zavaleta2010], we highlight the importance of community structure and the identity of dominant species at the local scale.
-Maintaining the diversity of fishes is critical, yet, at local scales, species richness has a minor impact on individual functions. Importantly, dissimilarity between local communities may be critical to maintain functioning across seascapes since no species consistently provides high contributions for all functions or across its range [@Zavaleta2010].    
+Maintaining the diversity of fishes is critical, yet, at local scales, species richness has a minor impact on individual functions. Importantly, dissimilarity between local communities may be critical to maintain functioning across seascapes since no species consistently provides high contributions for all functions or across its range [@Zavaleta2010].
 
 
 Overall, we demonstrate that the variability in processes that govern the elemental cycling presents an unrecognized challenge for protecting ecosystem functioning. Management strategies that call for the enhancement of coral reef functioning via an economic mindset (i.e. where higher functioning is better) are not feasible. Instead, conserving coral reef ecosystem functioning will require a more nuanced approach that considers processes that vary beyond the effect of standing stock biomass and are subject to variable, local trade-offs, drivers, and anthropogenic threats.
@@ -148,27 +148,24 @@ Overall, we demonstrate that the variability in processes that govern the elemen
 
 <br>
 
-**References and Notes:**         
+**References and Notes:**
 <div id="refs"></div>
-               
-              
-**Acknowledgements:** 
+
+
+**Acknowledgements:**
 We thank the staff at CRIOBE, Moorea for field support. We would also like to thank Jérémy Carlot, Beverly French, Titouan Roncin, Yann Lacube, Camille Gache, Gabrielle Martineau, Kailey Bissell, Benoit Espiau, Calvin Quigley, Kaitlyn Landfield and Tommy Norin for their help in the field, Sophie Schiettekatte for proof-reading the manuscript, and Guillemette de Sinéty and Jérémy Wicquart for their contribution to otolith analyis.
-**Funding:** 
+**Funding:**
 This research was funded by the BNP Paribas Foundation (Reef Services Project) and the French National Agency for Scientific Research (ANR; REEFLUX Project; ANR‐17‐CE32‐0006). This research is product of the SCORE-REEF group funded by the Centre de Synthèse et d’Analyse sur la Biodiversité (CESAB) of the Foundation pour la Recherche sur la Biodiversité (FRB) and the Agence Nationale de la Biodiversité (AFB). VP was supported by the Institut Universitaire de France (IUF) and JMC was supported by a Make Our Planet Great Again Postdoctoral Grant (mopga‐pdf‐0000000144).
-**Author contributions:** 
+**Author contributions:**
 NMDS and VP conceived the idea and NMDS, VP, SJB, and JMC designed methodology; NMDS, JMC, SJB, AM, FM, VP, KSM, JEA and DEB collected the data; All authors shared existing data. NMDS analyzed the data and led the writing of the manuscript. All authors contributed significantly to the drafts and approved the final version for publication.
 **Competing interests:** None declared.
-**Data and materials availability:** 
-All data and code to reproduce figures are available online through GitHub (https://github.com/nschiett/global_proc) and figshare (https://figshare.com/s/f789aec2c20492c4f0f9). All data on individual fish traits are available from the corresponding author on reasonable request. 
-                
+**Data and materials availability:**
+All data and code to reproduce figures are available online through GitHub (https://github.com/nschiett/global_proc) and figshare (https://figshare.com/s/f789aec2c20492c4f0f9). All data on individual fish traits are available from the corresponding author on reasonable request.
+
 
 **Supplementary Materials:**
-Materials and Methods     
-Figures S1-S5     
-Table S1     
-Supplementary methods     
-References (##-##)     
-
-
-
+Materials and Methods
+Figures S1-S5
+Table S1
+Supplementary methods
+References (##-##)
