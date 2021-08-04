@@ -79,7 +79,7 @@ plan <- drake_plan(
   mod_mf_com = fit_mf_com(summary_transect_imp), 
   
   # Same model with data subset
-  mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
+  #mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
   
   # output tables 
   tab_mod_mv_siteloc = make_table_mod_mv_siteloc(mod_mv_siteloc),
@@ -87,7 +87,7 @@ plan <- drake_plan(
   tab_mod_mvfun_bm = make_table_mod_mvfun_bm(mod_mvfun_bm),
   tab_mod_mvfun_com = make_table_mod_mvfun_com(mod_mvfun_com),
   tab_mod_mf_com = make_table_mod_mf_com(mod_mf_com),
-  tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
+  #tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
   tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
   
   ##### contribution analysis #####
@@ -97,10 +97,11 @@ plan <- drake_plan(
   freq_dominance = get_fd(sp_importance),
 
   ##### Species vulnerability #####
-  vulnerability = get_vuln(sptl),
-  spi_vuln = get_spi_vuln(sp_importance, vulnerability)#,
+  #vulnerability = get_vuln(sptl),
+  #spi_vuln = get_spi_vuln(sp_importance, vulnerability)#,
   # 
   # ##### FIGURES #####
+  coords = get_coords_siteloc(summary_transect_imp)
   # # main
   # fig1 = make_fig1(location_effect),
   # fig2 = make_fig2(commodels),

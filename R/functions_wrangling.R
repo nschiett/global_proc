@@ -471,5 +471,13 @@ combine_summary <- function(summary_transect, herb_pisc){
   
 }
 
-
+##### coordinates per location and site #####
+get_coords_siteloc <- function(data) {
+  data %>%
+    group_by(bioregion, locality, sites) %>%
+    summarize_at(vars(lat, lon, mean), median) %>%
+    group_by(locality) %>%
+    mutate(lon_loc = median(lon), lat_loc = median(lat)) 
+    
+}
 

@@ -521,22 +521,44 @@ fit_mf_siteloc <- function(data){
       threads = threading(10))
 }
 
-fit_mf_bm <- function(data){
-  brm(log(multi) ~ log(biomass_tot) + mean + (1|s|sites) + (1|p|locality),
-      data = data, cores = 4,
-      backend = "cmdstanr",
-      threads = threading(10))
-}
 
 
 ##### 2) add biomass and sst
 fit_mvfun_bm <- function(data){
-  brm(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc)) ~ 
-        log(biomass_tot) + mean + (1|s|sites) + (1|p|locality),
+  prior <- 
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", resp = "logFn") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean", resp = "logFn") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", resp = "logFp") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean", resp = "logFp") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", resp = "logGc") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean", resp = "logGc") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", resp = "logIherb") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean", resp = "logIherb") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", resp = "logIpisc") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean", resp = "logIpisc") 
+  
+  brm(bf(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc)) ~ 
+        log(biomass_tot) + mean + (1|s|sites) + (1|p|locality)) + 
+        set_rescor(rescor = TRUE),
       data = data, cores = 4,
       backend = "cmdstanr",
-      threads = threading(10))
+      threads = threading(10),
+      prior = prior)
 }
+
+fit_mf_bm <- function(data){
+  
+  prior <- 
+    set_prior(prior = "normal(1,1)", class = "b", coef = "logbiomass_tot", ) +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "mean")
+  
+  brm(log(multi) ~ log(biomass_tot) + mean + (1|s|sites) + (1|p|locality),
+      data = data, cores = 4,
+      backend = "cmdstanr",
+      threads = threading(10),
+      prior = prior)
+}
+
 
 fit_mvfun_com <- function(data){
   data <- data %>%
@@ -547,15 +569,85 @@ fit_mvfun_com <- function(data){
                   I_pisc_st = standard(log(I_pisc)),
                   multi_st = standard(log(multi)))
   
-  brm(mvbind(Fn_st, Fp_st, Gc_st, I_herb_st, I_pisc_st) ~ 
+  prior <- 
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardlogbiomass_tot", resp = "Fnst") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "standardmean", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardlogbiomass_tot", resp = "Fpst") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "standardmean", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardlogbiomass_tot", resp = "Gcst") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "standardmean", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardlogbiomass_tot", resp = "Iherbst") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "standardmean", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardlogbiomass_tot", resp = "Ipiscst") +
+    set_prior(prior = "normal(0,1)", class = "b", coef = "standardmean", resp = "Ipiscst") +
+    
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_m", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q1", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q3", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardnspec", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_m", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q1", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q3", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_m", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q1", resp = "Fnst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q3", resp = "Fnst") +
+    
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_m", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q1", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q3", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardnspec", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_m", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q1", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q3", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_m", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q1", resp = "Fpst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q3", resp = "Fpst") +
+    
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_m", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q1", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q3", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardnspec", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_m", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q1", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q3", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_m", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q1", resp = "Gcst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q3", resp = "Gcst") +
+    
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_m", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q1", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q3", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardnspec", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_m", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q1", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q3", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_m", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q1", resp = "Iherbst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q3", resp = "Iherbst") +
+    
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_m", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q1", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardimm_q3", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardnspec", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_m", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q1", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardsize_q3", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_m", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q1", resp = "Ipiscst") +
+    set_prior(prior = "normal(1,1)", class = "b", coef = "standardtroph_q3", resp = "Ipiscst") 
+    
+  
+  brm(bf(mvbind(Fn_st, Fp_st, Gc_st, I_herb_st, I_pisc_st) ~ 
         standard(mean) + standard(log(biomass_tot)) +
         standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
         standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
         standard(imm_q3) + standard(troph_q1) + standard(size_q1) + 
-        (1|s|sites) + (1|p|locality),
+        (1|s|sites) + (1|p|locality)) + 
+        set_rescor(rescor = TRUE),
       data = data, cores = 4,
       backend = "cmdstanr",
-      threads = threading(10))
+      threads = threading(10),
+      prior = prior)
 }
 
 

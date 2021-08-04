@@ -14,34 +14,59 @@ knitr::opts_chunk$set(echo = TRUE)
 # Methods 
 
 ## 1. Underwater visual census database
-\noindent We used a published global database of reef fish abundance and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, Western Atlantic. The database only includes sites at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize the bias related to the identification of small individuals, and finally we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species that belong to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
+\noindent We used a published global database of reef fish abundance and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (within 98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, and Western Atlantic. Sites are defined as small islands or stretches of continuous reefs in larger coastlines and localities encompass sites that belong to the same biogeographic sub-provinces [see @Barneche2019]. The database only includes transects at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize the bias related to the identification of small individuals, and finally we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species that belong to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
+Sea surface temperature (SST) for each site was obtained from daily time‐series data from the National Oceanicand Atmospheric Administration of the USA (NOAA) covering a 5‐year period (°C; 0.25° resolution) (@Reynolds2007; available from https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.highres.html). Further, for each transect (fish community), we calculated the species richness and estimated the total standing stock biomass of fishes by using Bayesian length-weight relationships available from Fishbase [@Froese2013]. 
 
-## 2. Bioenergetic modeling
-\noindent Here, we focused on 5 key processes mediated by fish: N excretion rate (gN/day/m^2^), P excretion rate (gP/day/m^2^), production of body mass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^). These 5 processes were estimated in each transect using individual-based bioenergetic models that predicts elemental fluxes, including ingestion rate, excretion rates of N and P, and growth rate.
-The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We ran the model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each process in each transect and the cumulated estimates for the fish community per surface area. Each process is thus expressed in dry mass per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild [@Parravicini2020]. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
+## 2. Quantification of functions
+\noindent For each transect, we estimated five key process-based functions mediated by fishes: N excretion rate (gN/day/m^2^), P excretion rate (gP/day/m^2^), production of body mass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^) [@Brandl2019front]. These five functions were estimated in each transect using individual-based bioenergetic models that predict elemental fluxes, including ingestion rate, excretion rates of N and P, and growth rate.
+The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We ran an individual bioenergetic model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each process in each transect and the summed estimates on the fish community level per surface area (m^2^). Each function is thus expressed in dry mass (of C, N, or P) per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild [@Parravicini2020]. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
+Finally, we estimated multifunction, i.e. one measure that combines all five functions by taking the geometric average. 
 
-## 3. Relationship between functions and biomass
-
-The standing stock biomass of communities is inevitably related to all functions because of the additive nature of the quantification and general metabolic theory. Furthermore, because of the known relationship between temperature and parameters related to growth and respiration, all functions are also positively correlated with temperature. To model the effect of biomass and sea surface temperature (sst), independent of other factors, we performed a Bayesian mixed effect regression of each log-transformed function for community-level observations ($y_j$):
-<!-- \begin{equation} -->
-	$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
-<!-- 	\label{modbiom1} -->
-<!-- \end{equation}      -->
-
-<!-- \begin{equation} -->
-$$\mu_{\textrm{j}} = \beta_0 +{\beta_1} {x_{log(biomass),j}} + {\beta_2} {x_{sst,j}}$$
-<!-- 	\label{modbiom2} -->
-<!-- \end{equation} -->
-
-\noindent We then assessed the covariation between functions, independent of biomass and sst. To do so, we first extracted the median residuals for each function per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. We then quantified the correlations that exist among the different functions using these median residuals. Finally, for the purpose of visualizing the residual variation of functions per locality on a world map, we ran a supplemental model, similar to the model described above but including random effects both per site and locality. We then extracted and plotted the location effects, which can be interpreted as the average variation per locality.  
-
-## 4. Effect of community structure on ecosystem functions 
-\noindent To investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, we quantified a set of variables that characterize the community. These variables describe the size, age, and trophic distribution of the community, as these may all affect functions [@Schiettekatte2020]. Specifically, we calculated the 2.5%, 50% and 97.5% quantiles of the total length, immaturity, and trophic level of all individuals per transect. The total length is based on the visual estimation by divers. The immaturity is quantified using the following formula: 
+## 3. Community structure variables
+We quantified a set of variables that characterize the fish community structure. These variables describe the size, age, and trophic distribution of the community, as these may all affect functions [@Schiettekatte2020]. Specifically, we calculated the 2.5%, 50% and 97.5% quantiles of the total length, immaturity, and trophic level of all individuals per transect. The total length is based on the visual estimation by divers. The immaturity is quantified using the following formula: 
 <!-- \begin{equation} -->
 	$$\textrm{immaturity}_\textrm{i} = \kappa (\textrm{l}_{\infty} - \textrm{l}_\textrm{i}),$$
 <!-- 	\label{imm} -->
 <!-- \end{equation} -->
-where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018]. Additionally, we quantified the transect-level species richness. 
+where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018]. 
+
+## 5. Imputation of herbivory and piscivory
+
+## 4. Regression models
+The standing stock biomass of communities is inevitably positively related to all functions because of the additive nature of the quantification and general metabolic theory. Furthermore, because of the known relationship between temperature and parameters related to growth and respiration, functions are expected to be positively correlated with temperature. To model the effect of biomass and sea surface temperature (sst), while simultaneously investigating the correlations between the the five functions, we performed a multivariate Bayesian mixed effect regression the log-transformed functions for transect-level observations ($i$) including site and location effects:
+
+
+$$\begin{bmatrix}Y_{ExN,i} \\ Y_{ExP,i} \\ Y_{Prod,i} \\ Y_{Herb,i} \\ Y_{Pisc,i} \end{bmatrix} \sim MVNormal\left(\begin{bmatrix} \mu_{ExN,i} \\ \mu_{ExP,i} \\ \mu_{Prod,i} \\ \mu_{Herb,i} \\ \mu_{Pisc,i}\end{bmatrix}, S \right),$$
+$$S = \begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\ 
+0 & \sigma_{ExP} & 0 & 0 & 0 \\ 
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\ 
+0 & 0 & 0 & \sigma_{Herb} & 0\\ 
+0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix} 
+R 
+\begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\ 
+0 & \sigma_{ExP} & 0 & 0 & 0 \\ 
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\ 
+0 & 0 & 0 & \sigma_{Herb} & 0\\ 
+0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix}$$
+
+           
+$$\mu_{\textrm{ExN,i}} = (\beta0_{ExN} +  \delta_{ExN, loc} +  \delta_{ExN, site}) +{\beta1_{ExN}} {x_{log(biomass),i}} + {\beta2_{ExN}} {x_{sst,i}} $$
+$$\beta0_{ExN} \sim  student( 3, -3.9, 2.5)\\
+\beta0_{ExP} \sim  student( 3, -6.6, 2.5)\\
+\beta0_{Prod} \sim  student( 3, -4.3, 2.5)\\
+\beta0_{Herb} \sim  student( 3, -2.4, 2.5)\\
+\beta0_{Pisc} \sim  student( 3, -4.6, 2.5)\\
+R \sim lkj\_corr(1)
+$$
+
+\noindent We used non-centered parametrisation for site and location effects and all standard deviations had the following prior: $\sigma \sim student(3, 0, 2.5)$. To further optimize convergence of the model, we sampled from the cholesky decomposed triangular matrix L such that $R = LL^T$. We used flat priors for the model slopes $\beta1, \beta2$.
+
+The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples  were used to estimate posterior distributions. We used Bayesian R2 to estimate the amount of explained variation of each model. Posterior predictive checks for are provided in Supporting Informationxxxxx.
+
+\noindent The multivariate  and mixed structure of the above-mentioned model allowed us to extract the correlations between the five functions on the location, site, and  We then assessed the covariation between functions, independent of biomass and sst. To do so, we first extracted the median residuals for each function per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. We then quantified the correlations that exist among the different functions using these median residuals. Finally, for the purpose of visualizing the residual variation of functions per locality on a world map, we ran a supplemental model, similar to the model described above but including random effects both per site and locality. We then extracted and plotted the location effects, which can be interpreted as the average variation per locality.  
+
+## 4. Effect of community structure on ecosystem functions 
+\noindent To investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, Additionally, we quantified the transect-level species richness. 
 For each log-transformed function we then fitted a Bayesian mixed-effect model with all 12 above-mentioned variables, after verifying that there are no strong correlations between variables (the highest correlation coefficient was 0.5, and 50% of the variable pair correlations varied between -0.1 and 0.2). 
 
 <!-- \begin{equation} -->

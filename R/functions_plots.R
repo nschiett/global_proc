@@ -1,5 +1,47 @@
 
-make_fig1 <- function(location_effect){
+make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, coords){
+  
+  re <- ranef(mod_mvfun_bm)
+  re_loc <- re$locality[,1,] %>%
+    as.data.frame()
+  colnames(re_loc) <- c("r_loc_Fn", "r_loc_Fp", "r_loc_Gc", "r_loc_Iherb", "r_loc_Ipisc")
+  
+  re1 <- ranef(mod_mv_siteloc)
+  re_loc1 <- re1$locality[,1,] %>%
+    as.data.frame()
+  colnames(re_loc1) <- c("r1_loc_Fn", "r1_loc_Fp", "r1_loc_Gc", "r1_loc_Iherb", "r1_loc_Ipisc")
+  re_loc1 <- re_loc1 %>%
+    rownames_to_column("locality") 
+  
+  re2 <- ranef(mod_mf_siteloc)
+  re_loc2 <- re2$locality[,1,1] %>%
+    as.data.frame()
+  colnames(re_loc2) <- c("r1_loc_mf")
+  re_loc2 <- re_loc2 %>%
+    rownames_to_column("locality") 
+  
+  re3 <- ranef(mod_mf_bm)
+  re_loc3 <- re3$locality[,1,1] %>%
+    as.data.frame()
+  colnames(re_loc3) <- c("r_loc_mf")
+  re_loc3 <- re_loc3 %>%
+    rownames_to_column("locality") 
+
+  
+  coords <- coords %>%
+    select(- sites, -lat, -lon, -mean) %>%
+    unique()
+  
+  data <- re_loc %>%
+    rownames_to_column("locality") %>%
+    left_join(coords) %>%
+    left_join(re_loc1) %>%
+    unique()
+  
+  
+  data2 <- left_join(re_loc2, re_loc3) %>%
+    left_join(coords) %>%
+    unique()
   
   library("rnaturalearth")
   library("rnaturalearthdata")
@@ -11,7 +53,7 @@ make_fig1 <- function(location_effect){
   
   
   theme_worldmap <- function(){
-    theme_bw()+
+    theme_bw() +
       theme(legend.position = "none", 
             panel.grid = element_blank(),
             panel.border = element_rect(fill = NA, color = "grey", size = 1),
@@ -27,7 +69,7 @@ make_fig1 <- function(location_effect){
   col <- fish(n = 5, option = "Callanthias_australis")
   
   get_scale <- function(f){
-    quant <- quantile(f, c(0,0.25,0.75,1), na.rm = TRUE)
+    quant <- quantile(f, c(0,0.1,0.9,1), na.rm = TRUE)
     quant[1] <- quant[1] - 0.5   # adjust lower bound
     factor(cut(f, breaks = quant), labels = c( "low", "medium", "high"))
   }
@@ -50,19 +92,19 @@ make_fig1 <- function(location_effect){
   
   
   a <-
-    ggplot(location_effect) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_Fn), 
-                   size = get_scores(r_loc_Fn)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Fn), 
+                   size = get_scores(r1_loc_Fn)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(location_effect, r_loc_Fn > quantile(location_effect$r_loc_Fn, 0.95, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Fn > quantile(data$r1_loc_Fn, 0.9, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "N excretion (g N/m²day)"), size = 3, hjust = 0) +
-    guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
-    scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+    guides(color = guide_legend(override.aes = list(size = 3, alpha = 1))) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
     theme(legend.position = "none", 
           axis.text.x = element_blank(), 
@@ -80,19 +122,19 @@ make_fig1 <- function(location_effect){
   
   
   b <-
-    ggplot(location_effect) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_Fp), 
-                   size = get_scores(r_loc_Fp)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Fp), 
+                   size = get_scores(r1_loc_Fp)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(location_effect, r_loc_Fp > quantile(location_effect$r_loc_Fp, 0.95, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Fp > quantile(data$r1_loc_Fp, 0.9, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "P excretion (g P/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
-    scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
     theme(legend.position = "none", 
           axis.text.x = element_blank(), 
@@ -110,19 +152,19 @@ make_fig1 <- function(location_effect){
   pal <- c("black", "grey50", col[3])
   
   c <-
-    ggplot(location_effect) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_Gc), 
-                   size = get_scores(r_loc_Gc)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Gc), 
+                   size = get_scores(r1_loc_Gc)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(location_effect, r_loc_Gc > quantile(location_effect$r_loc_Gc, 0.95, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Gc > quantile(data$r1_loc_Gc, 0.9, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Production (g C/m²day)"), size = 3, hjust = 0) +
-    guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
-    scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+    guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.9))) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
     theme(legend.position = "none", 
           axis.text.x = element_blank(), 
@@ -145,19 +187,19 @@ make_fig1 <- function(location_effect){
   
   
   d <-
-    ggplot(location_effect) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_I_herb), 
-                   size = get_scores(r_loc_I_herb)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Iherb), 
+                   size = get_scores(r1_loc_Iherb)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(location_effect, r_loc_I_herb > quantile(location_effect$r_loc_I_herb, 0.95, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Iherb > quantile(data$r1_loc_Iherb, 0.9, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Herbivory (g C/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
-    scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
     theme(legend.position = "none", 
           axis.text.x = element_blank(), 
@@ -177,33 +219,60 @@ make_fig1 <- function(location_effect){
   pal <- c("black", "grey50", col[5])
   
   e <-
-    ggplot(location_effect) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_I_pisc), 
-                   size = get_scores(r_loc_I_pisc)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Ipisc), 
+                   size = get_scores(r1_loc_Ipisc)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(location_effect, r_loc_I_pisc > quantile(location_effect$r_loc_I_pisc, 0.95, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Ipisc > quantile(data$r1_loc_Ipisc, 0.9, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Piscivory (g C/m²day)"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
-    scale_size_continuous(range = c(0.5, 3), guide = FALSE) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap()+ 
     theme(legend.position = "none", 
           plot.title = element_text(vjust = -8, hjust = 0.005),
           plot.margin = unit(c(0.0,0.00,0.00,0.00), units = , "cm"))
   e
   
+
+  
+  pal <- c("black", "grey50", "deepskyblue1")
+  
+  f <-
+    ggplot(data2) + 
+    geom_sf(data = world, color = NA, fill = "lightgrey") +
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_mf), 
+                   size = get_scores(r1_loc_mf)),  alpha = 0.9,
+               position = position_jitter(0,0), shape = 16) +
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
+               shape = 1, size = 4,
+               data = filter(data2, r1_loc_mf > quantile(data2$r1_loc_mf, 0.9, na.rm = TRUE))) +
+    scale_color_manual(values = pal, name = "",
+                       drop = TRUE, na.translate = F) +
+    coord_sf(ylim = c(-35, 35), expand = FALSE) +
+    geom_text(aes(x = -175, y = 30, label = "Multifunction"), size = 3, hjust = 0) +
+    guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
+    scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
+    theme_worldmap()+ 
+    theme(legend.position = "none", 
+          plot.title = element_text(vjust = -8, hjust = 0.005),
+          plot.margin = unit(c(0.0,0.00,0.00,0.00), units = , "cm"))
+  f
+  
+  
   
   multimap <-
-    a + b + c + d + e +
+    a + b + c + d + e + f +
     plot_layout(ncol = 1)
   
   #multimap
-  ggsave("output/plots/fig1_multimap.png", multimap, width = 8, height = 8)
+  ggsave("output/plots/fig1_multimap.png", multimap, width = 8, height = 10)
+  ggsave("output/plots/fig1_multimap.pdf", multimap, width = 8, height = 10)
 }
 
 
@@ -1249,7 +1318,22 @@ alt_diet <- function(tfish, cnpflux){
 
 
 ###### absolute functions map 
-make_maps_supp <- function(location_effect){
+make_maps_supp <- function(mod_mvfun_bm, coords){
+  
+  
+  re <- ranef(mod_mv_siteloc)
+  re_loc <- re$locality[,1,] %>%
+    as.data.frame()
+  colnames(re_loc) <- c("r_loc_Fn", "r_loc_Fp", "r_loc_Gc", "r_loc_Iherb", "r_loc_Ipisc")
+  
+  
+  coords <- coords %>%
+    select(- sites, -lat, -lon) %>%
+    unique()
+  
+  data <- re_loc %>%
+    rownames_to_column("locality") %>%
+    left_join(coords)
   
   library("rnaturalearth")
   library("rnaturalearthdata")
@@ -1456,8 +1540,23 @@ make_maps_supp <- function(location_effect){
   ggsave("output/plots/multimap_supp.png", multimap, width = 8, height = 8)
 }
 
-make_map_multi_supp <- function(data){
+make_map_multi_supp <- function(model, coords){
+
+  nd <- model$data %>%
+    select(locality) %>%
+    mutate(sites = NA) %>%
+    unique()
   
+  pred <- fitted(model, nd)
+  
+  coords <- coords %>%
+    select(- sites, -lat, -lon) %>%
+    unique()
+  
+  pred <- cbind(nd, pred) %>%
+    dplyr::left_join(coords)
+  
+
   library("rnaturalearth")
   library("rnaturalearthdata")
   library(rgeos)
@@ -1499,17 +1598,17 @@ make_map_multi_supp <- function(data){
  
   pal <- c("black", "grey50", "red")
   
-  
+
   
   a <-
-    ggplot(data) + 
+    ggplot(pred) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon, y = lat, color = get_scale(r_loc_multi), 
-                   size = get_scores(r_loc_multi)),  alpha = 0.8,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(Estimate), 
+                   size = get_scores(Estimate)),  alpha = 0.8,
                position = position_jitter(0,0), shape = 16) +
-    geom_point(aes(x = lon, y = lat),  alpha = 0.7,
+    geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(data, r_loc_multi > quantile(data$r_loc_multi, 0.95, na.rm = TRUE))) +
+               data = filter(pred, Estimate > quantile(pred$Estimate, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Multifunction"), size = 3, hjust = 0) +
@@ -1521,9 +1620,10 @@ make_map_multi_supp <- function(data){
           axis.ticks.x = element_blank(),
           plot.title = element_text(vjust = -8, hjust = 0.005),
           plot.margin = unit(c(0.000,0.000,0.000,0.000), units = , "cm"))
+  
   a
   
-  #multimap
+  #map
   ggsave("output/plots/map_multi_supp.png", a, width = 8, height = 2)
 }
 
