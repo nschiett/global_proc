@@ -422,7 +422,6 @@ impute <- function(summary_transect_complete){
                    standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
                    standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
                    standard(imm_q3) + standard(troph_q1) + standard(size_q1) +
-                   standard(Gc) + standard(Fp) + standard(Fn) +
                    (1|s|sites) + (1|p|locality),
                  data = summary_transect_complete[summary_transect_complete$I_herb>0,],
                  cores = 4,
@@ -439,7 +438,6 @@ impute <- function(summary_transect_complete){
                    standard(nspec) + standard(size_m) + standard(troph_m) + standard(imm_m) +
                    standard(size_q3) + standard(troph_q3) + standard(imm_q1) +
                    standard(imm_q3) + standard(troph_q1) + standard(size_q1) +
-                   standard(Gc) + standard(Fp) + standard(Fn) +
                    (1|s|sites) + (1|p|locality),
                  data = summary_transect_complete[summary_transect_complete$I_pisc>0,],
                  cores = 4,
@@ -470,6 +468,21 @@ impute <- function(summary_transect_complete){
   
   return(list(summary_transect_imp = result, 
               models = list(fitimp1, fitimp2)))
+}
+
+subset_data <- function(data) {
+  data %>%
+    dplyr::filter(I_herb > 0, I_pisc > 0) %>%
+    mutate(Fn_st = stand(Fn),
+           Fp_st = stand(Fp),
+           Gc_st = stand(Gc),
+           I_herb_st = stand(I_herb),
+           I_pisc_st = stand(I_pisc)) %>%
+    rowwise() %>%
+    mutate(multi = geomean(Fn_st, Fp_st, Gc_st, I_herb_st, I_pisc_st)) %>%
+    ungroup() %>%
+    mutate(multi = stand(multi))
+  
 }
 
 

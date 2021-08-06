@@ -46,7 +46,7 @@ plan <- drake_plan(
   summary_transect_complete = combine_summary(summary_transect, herb_pisc),
   
   # subset 
-  summary_transect_sub = dplyr::filter(summary_transect_complete, I_herb > 0, I_pisc > 0),
+  summary_transect_sub = subset_data(summary_transect_complete),
   
   # imputation 
   imp = impute(summary_transect_complete),
@@ -78,8 +78,13 @@ plan <- drake_plan(
   mod_mvfun_com2 = fit_mvfun_com2(summary_transect_imp), #get absolute slopes
   mod_mf_com = fit_mf_com(summary_transect_imp), 
   
-  # Same model with data subset
-  #mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
+  # Same models with data subset
+  mod_mv_siteloc_sub = fit_mvfun_siteloc(summary_transect_sub),
+  mod_mf_siteloc_sub = fit_mf_siteloc(summary_transect_sub),
+  mod_mvfun_bm_sub = fit_mvfun_bm(summary_transect_sub),
+  mod_mf_bm_sub = fit_mf_bm(summary_transect_sub),
+  mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
+  mod_mf_com_sub = fit_mf_com(summary_transect_sub), 
   
   # output tables 
   tab_mod_mv_siteloc = make_table_mod_mv_siteloc(mod_mv_siteloc),
@@ -87,8 +92,8 @@ plan <- drake_plan(
   tab_mod_mvfun_bm = make_table_mod_mvfun_bm(mod_mvfun_bm),
   tab_mod_mvfun_com = make_table_mod_mvfun_com(mod_mvfun_com),
   tab_mod_mf_com = make_table_mod_mf_com(mod_mf_com),
-  #tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
-  tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
+  tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
+  #tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
   
   ##### contribution analysis #####
   contr_family = get_cf(contributions, herb_pisc),

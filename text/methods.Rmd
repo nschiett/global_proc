@@ -30,9 +30,14 @@ We quantified a set of variables that characterize the fish community structure.
 <!-- \end{equation} -->
 where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018]. 
 
-## 5. Imputation of herbivory and piscivory
 
 ## 4. Regression models
+
+### 4.1 Imputation of herbivory and piscivory
+In the underwater visual transect database, xx transects contained no herbivores and xx transects contained no piscivores yielding false zeros for herbivory and piscivory, respectively. We considered these zeros as missing values because the absence of the observation of a herbivore or piscivore does not prove the actual absence of herbivores and piscivores. In fact, it is highly unlikely that a coral reef fish community contains no herbivores and piscivores at all. To avoid removing all transects with missing values for herbivory or piscivory (n = xx) from our database, we imputed the missing values by fitting two models using the observed herbivory and piscivory rates and then imputing the missing values by taking the means of posterior predictions. In other words, we used the predictor values corresponding to missing responses to predict herbivory and piscivory rates. As predictor variables, we used all community structure variables described above and sea surface temperature. Additionally, we used .
+
+Specifically, we fitted a Bayesian regression 
+
 The standing stock biomass of communities is inevitably positively related to all functions because of the additive nature of the quantification and general metabolic theory. Furthermore, because of the known relationship between temperature and parameters related to growth and respiration, functions are expected to be positively correlated with temperature. To model the effect of biomass and sea surface temperature (sst), while simultaneously investigating the correlations between the the five functions, we performed a multivariate Bayesian mixed effect regression the log-transformed functions for transect-level observations ($i$) including site and location effects:
 
 
