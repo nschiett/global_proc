@@ -1,14 +1,22 @@
 
-make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, coords){
+make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
   
-  re <- ranef(mod_mvfun_bm)
-  re_loc <- re$locality[,1,] %>%
-    as.data.frame()
-  colnames(re_loc) <- c("r_loc_Fn", "r_loc_Fp", "r_loc_Gc", "r_loc_Iherb", "r_loc_Ipisc")
+  nsiteloc <- summary_transect %>%
+    group_by(locality) %>%
+    mutate(nsite = length(unique(sites))) %>%
+    select(locality, sites, nsite) %>%
+    unique() 
+  
+  ls1 <- nsiteloc[nsiteloc$nsite==1, ]$locality
+  ls2 <- nsiteloc[nsiteloc$nsite==1, ]$sites
   
   re1 <- ranef(mod_mv_siteloc)
   re_loc1 <- re1$locality[,1,] %>%
     as.data.frame()
+  re_site1 <- re1$sites[,1,] %>%
+    as.data.frame()
+  re_loc1[ls1,] <- re_loc1[ls1,] + re_site1[ls2,]
+  
   colnames(re_loc1) <- c("r1_loc_Fn", "r1_loc_Fp", "r1_loc_Gc", "r1_loc_Iherb", "r1_loc_Ipisc")
   re_loc1 <- re_loc1 %>%
     rownames_to_column("locality") 
@@ -16,30 +24,25 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   re2 <- ranef(mod_mf_siteloc)
   re_loc2 <- re2$locality[,1,1] %>%
     as.data.frame()
+  re_site2 <- re1$sites[,1,1] %>%
+    as.data.frame()
+  re_loc2[ls1,] <- re_loc2[ls1,] + re_site2[ls2,]
   colnames(re_loc2) <- c("r1_loc_mf")
   re_loc2 <- re_loc2 %>%
     rownames_to_column("locality") 
-  
-  re3 <- ranef(mod_mf_bm)
-  re_loc3 <- re3$locality[,1,1] %>%
-    as.data.frame()
-  colnames(re_loc3) <- c("r_loc_mf")
-  re_loc3 <- re_loc3 %>%
-    rownames_to_column("locality") 
+ 
 
   
   coords <- coords %>%
     select(- sites, -lat, -lon, -mean) %>%
     unique()
   
-  data <- re_loc %>%
-    rownames_to_column("locality") %>%
+  data <- re_loc1 %>%
     left_join(coords) %>%
-    left_join(re_loc1) %>%
     unique()
   
   
-  data2 <- left_join(re_loc2, re_loc3) %>%
+  data2 <- (re_loc2) %>%
     left_join(coords) %>%
     unique()
   
@@ -69,7 +72,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   col <- fish(n = 5, option = "Callanthias_australis")
   
   get_scale <- function(f){
-    quant <- quantile(f, c(0,0.1,0.9,1), na.rm = TRUE)
+    quant <- quantile(f, c(0,0.25,0.75,1), na.rm = TRUE)
     quant[1] <- quant[1] - 0.5   # adjust lower bound
     factor(cut(f, breaks = quant), labels = c( "low", "medium", "high"))
   }
@@ -87,19 +90,19 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   getcol <- colorRampPalette(c("black","white"))
   pal1 <- getcol(n = 3)
   pal <- c(pal1[1], pal2[2:3])
-  pal <- c("black", "grey50", col[1])
+  pal <- c("black", "grey60", col[1])
   
   
   
   a <-
     ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Fn), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_Fn), 
                    size = get_scores(r1_loc_Fn)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(data, r1_loc_Fn > quantile(data$r1_loc_Fn, 0.9, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Fn > quantile(data$r1_loc_Fn, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "N excretion (g N/m²day)"), size = 3, hjust = 0) +
@@ -118,18 +121,18 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   pal2 <- getcol(n = 3)
   getcol <- colorRampPalette(c("black","white"))
   pal1 <- getcol(n = 3)
-  pal <- c("black", "grey50", col[2])
+  pal <- c("black", "grey60", col[2])
   
   
   b <-
     ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Fp), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_Fp), 
                    size = get_scores(r1_loc_Fp)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(data, r1_loc_Fp > quantile(data$r1_loc_Fp, 0.9, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Fp > quantile(data$r1_loc_Fp, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "P excretion (g P/m²day)"), size = 3, hjust = 0) +
@@ -149,17 +152,17 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   pal2 <- getcol(n = 3)
   getcol <- colorRampPalette(c("black","white"))
   pal1 <- getcol(n = 3)
-  pal <- c("black", "grey50", col[3])
+  pal <- c("black", "grey60", col[3])
   
   c <-
     ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Gc), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_Gc), 
                    size = get_scores(r1_loc_Gc)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.7,
                shape = 1, size = 4,
-               data = filter(data, r1_loc_Gc > quantile(data$r1_loc_Gc, 0.9, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Gc > quantile(data$r1_loc_Gc, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Production (g C/m²day)"), size = 3, hjust = 0) +
@@ -183,18 +186,18 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   getcol <- colorRampPalette(c("black","lightgrey"))
   pal1 <- getcol(n = 3)
   pal <- c(pal1[1:2], pal2[2:3])
-  pal <- c("black", "grey50", col[4])
+  pal <- c("black", "grey60", col[4])
   
   
   d <-
     ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Iherb), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_Iherb), 
                    size = get_scores(r1_loc_Iherb)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(data, r1_loc_Iherb > quantile(data$r1_loc_Iherb, 0.9, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Iherb > quantile(data$r1_loc_Iherb, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "") +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = "Herbivory (g C/m²day)"), size = 3, hjust = 0) +
@@ -216,17 +219,17 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
   pal1 <- getcol(n = 3)
   pal <- c(pal1[1:2], pal2[2:3])
   
-  pal <- c("black", "grey50", col[5])
+  pal <- c("black", "grey60", col[5])
   
   e <-
     ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_Ipisc), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_Ipisc), 
                    size = get_scores(r1_loc_Ipisc)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(data, r1_loc_Ipisc > quantile(data$r1_loc_Ipisc, 0.9, na.rm = TRUE))) +
+               data = filter(data, r1_loc_Ipisc > quantile(data$r1_loc_Ipisc, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
@@ -235,23 +238,25 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap()+ 
     theme(legend.position = "none", 
+          axis.text.x = element_blank(), 
+          axis.ticks.x = element_blank(),
           plot.title = element_text(vjust = -8, hjust = 0.005),
           plot.margin = unit(c(0.0,0.00,0.00,0.00), units = , "cm"))
   e
   
 
   
-  pal <- c("black", "grey50", "deepskyblue1")
+  pal <- c("black", "grey60", "deepskyblue1")
   
   f <-
     ggplot(data2) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_loc_mf), 
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_mf), 
                    size = get_scores(r1_loc_mf)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(data2, r1_loc_mf > quantile(data2$r1_loc_mf, 0.9, na.rm = TRUE))) +
+               data = filter(data2, r1_loc_mf > quantile(data2$r1_loc_mf, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
@@ -264,218 +269,309 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mf_siteloc, mod_mf_bm, c
           plot.margin = unit(c(0.0,0.00,0.00,0.00), units = , "cm"))
   f
   
+  #### relationship with biomass 
+  
+  
+  nd <- data.frame(biomass_tot = seq(50, 500, 5),
+                   mean = 27,
+                   locality = NA,
+                   sites = NA)
+  
+  pred <- predict(mod_mvfun_bm, newdata = nd)
+  pred2 <- predict(mod_mf_bm, newdata = nd)
+  
+  a1 <- 
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred[,3,1]), ymax = exp(pred[,4,1])), 
+                alpha = 0.5, fill = col[1]) +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred[,1,1])), alpha = 0.5, color = col[1]) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "N excretion (gN/m2/day)") +
+    theme(axis.ticks.x = element_blank(), axis.title = element_blank(), axis.text.x = element_blank())
+  b1 <-
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred[,3,2]), ymax = exp(pred[,4,2])), 
+                alpha = 0.5, fill = col[2]) +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred[,1,2])), alpha = 0.5, color = col[2]) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "P excretion (gP/m2/day)") +
+    theme(axis.ticks.x = element_blank(), axis.title = element_blank(), axis.text.x = element_blank())
+  c1 <- 
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred[,3,3]), ymax = exp(pred[,4,3])), 
+                alpha = 0.5, fill = col[3]) +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred[,1,3])), alpha = 0.5, color = col[3]) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "Production (gC/m2/day)") +
+    theme(axis.ticks.x = element_blank(), axis.title = element_blank(), axis.text.x = element_blank())
+  d1 <- 
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred[,3,4]), ymax = exp(pred[,4,4])), 
+                alpha = 0.5, fill = col[4]) +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred[,1,4])), alpha = 0.5, color = col[4]) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "Herbivory (gC/m2/day)") +
+    theme(axis.ticks.x = element_blank(), axis.title = element_blank(), axis.text.x = element_blank())
+  e1 <- 
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred[,3,5]), ymax = exp(pred[,4,5])), 
+                alpha = 0.5, fill = col[5]) +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred[,1,5])), alpha = 0.5, color = col[5]) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "Piscivory (gC/m2/day)") +
+    theme(axis.ticks.x = element_blank(), axis.title = element_blank(), axis.text.x = element_blank())
+  
+  f1 <- 
+    ggplot() +
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred2[,3]), ymax = exp(pred2[,4])), 
+                alpha = 0.5, fill = "deepskyblue1") +
+    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred2[,1])), alpha = 0.5, color = "deepskyblue1") +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Biomass (g/m2)", y = "Multifunction") +
+    theme(axis.title.y = element_blank() )
+  
   
   
   multimap <-
-    a + b + c + d + e + f +
-    plot_layout(ncol = 1)
+    a + a1 + b + b1 + c + c1 + d + d1 + e + e1 + f + f1 +
+    plot_layout(ncol = 2, widths = c(4,1))# + plot_annotation(tag_levels = "a")
   
   #multimap
-  ggsave("output/plots/fig1_multimap.png", multimap, width = 8, height = 10)
-  ggsave("output/plots/fig1_multimap.pdf", multimap, width = 8, height = 10)
+  ggsave("output/plots/fig1_multimap.png", multimap, width = 10, height = 10)
+  ggsave("output/plots/fig1_multimap.pdf", multimap, width = 10, height = 10)
 }
+
 
 
 make_fig2 <- function(commodels){
   
-  standard <- function(x){
-    m <- mean(x, na.rm = TRUE)
-    sd <- sd(x, na.rm = TRUE)
-    st <- sapply(x, FUN = function(i){
-      st <- (i - m)/sd
-      return(st)
-    })
-    return(st)
-  }
+  fe <- brms::fixef(mod_mvfun_com) %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("name") %>%
+    tidyr::separate(name, into = c("dep", "var", "extra"), sep = "_") %>%
+    dplyr::mutate(var = paste0(var, extra)) %>%
+    dplyr::filter(!var == "InterceptNA") %>%
+    filter(!var == "standardlogbiomasstot") %>%
+    filter(!var == "standardmeanNA") %>%
+    mutate(var = fct_relevel(var,
+                             "standardimmq1",
+                             "standardimmm",
+                             "standardimmq3",
+                             "standardsizeq1",
+                             "standardsizem",
+                             "standardsizeq3",
+                             "standardtrophq1",
+                             "standardtrophm",
+                             "standardtrophq3",
+                             "standardnspecNA"
+    ))
   
+  unique(fe$var)
+  plot <-
+    ggplot(fe) +
+    geom_hline(yintercept = 0) +
+    geom_linerange(aes(x = var, ymin = Q2.5, ymax = Q97.5, color = dep),
+                   position = position_dodge(.7), size = 1, linetype = 1) +
+    geom_point(aes(x = var, y = Estimate, color = dep), position = position_dodge(.7), size = 3) +
+    coord_flip() +
+    theme_bw() +
+    labs(x = "", color = "") +
+    theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
+          axis.title = element_text(size = 12), legend.text = element_text(size = 12),
+          axis.line.x = element_line(), axis.ticks.x = element_line(),
+          panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()
+    )  
   
-  
-  ## function to extract slope
-  
-  extract_b <- function(x, name){
-    draws <- extract_draws(x)$dpars$mu$fe$b
-    means <- apply(draws, 2, mean)
-    lq <- apply(draws, 2, quantile, 0.025)
-    uq <- apply(draws, 2, quantile, 0.975)
-    result <- 
-      data.frame(
-        model = name,
-        variable = names(means),
-        mean = means,
-        lq = lq,
-        uq = uq
-      )
-  }
-  
-  # extract all slopes for each model
-  result <- bind_rows(
-    extract_b(commodels[[1]], "Fn"),
-    extract_b(commodels[[2]], "Fp"),
-    extract_b(commodels[[3]], "Gc"),
-    extract_b(commodels[[4]], "I_herb"),
-    extract_b(commodels[[5]], "I_pisc")) 
-  
-  # Indicate which ones overlap with 0
-  result <- mutate(result, diff = (uq > 0 & lq < 0)) 
-  
-  # Specify importance of variables per slope values
-  tot <- group_by(result, model) %>%
-    summarise(tot = sum(abs(mean))) 
-  
-  # filter out variables that we don't need 
-  result <- result %>%
-    dplyr::filter(!variable == "b_Intercept") %>%
-    left_join(tot) %>% 
-    #filter(diff == FALSE) %>%
-    filter(!variable == "b_standardlogbiomass") %>%
-    filter(!variable == "b_standardmean") %>%
-    mutate(variable = fct_relevel(variable, 
-                                  "b_standardimm_q1",
-                                  "b_standardimm_m",
-                                  "b_standardimm_q3",
-                                  "b_standardsize_q1",
-                                  "b_standardsize_m",
-                                  "b_standardsize_q3",
-                                  "b_standardtroph_q1",
-                                  "b_standardtroph_m",
-                                  "b_standardtroph_q3",
-                                  "b_standardnspec"
-                                  ))
-    
-  
-  # plot
   slopes <-
-    ggplot(result) +
+    ggplot(fe) +
     geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey",
                size = 0.5, linetype = 1, alpha = 0.7) +
     geom_hline(yintercept = 0, size = 1, color = "black") +
-    geom_linerange(aes(x = variable, ymin = lq, ymax = uq, color = model),
-                   position = position_dodge(.7), size = 1, linetype = 1) + 
-    geom_point(aes(x = variable, y = mean, color = model), position = position_dodge(.7), size = 3) +
+    geom_linerange(aes(x = var, ymin = Q2.5, ymax = Q97.5, color = dep),
+                   position = position_dodge(.7), size = 1, linetype = 1) +
+    geom_point(aes(x = var, y = Estimate, color = dep), position = position_dodge(.7), size = 3) +
     coord_flip() +
+    scale_y_continuous(lim = c(-0.22, 0.22)) +
     theme_minimal() +
-    scale_color_fish_d(option = "Callanthias_australis", 
+    scale_color_fish_d(option = "Callanthias_australis",
                        labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
-                       name = "")  + 
-    labs(y = "Effect size", x = "") +
+                       name = "")  +
+    labs(y = "Effect", x = "") +
     scale_x_discrete(
-      labels = rev(c( "Richness", "Trophic level (97.5%)", "Trophic level (median)", "Trophic level (2.5%)",
-                  "Size (97.5%)", "Size (median)", "Size (2.5%)",
-                  "Immaturity (97.5%)", "Immaturity (median)", "Immaturity (2.5%)"
-                   ))
-      ) +
-   
+      labels = rev(c( "Richness", "Trophic level (upper)", "Trophic level (median)", "Trophic level (lower)",
+                      "Size (upper)", "Size (median)", "Size (lower)",
+                      "Immaturity (upper)", "Immaturity (median)", "Immaturity (lower)"
+      ))
+    ) +
+    
     theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
-          axis.title = element_text(size = 12), legend.text = element_text(size = 12), 
+          axis.title = element_text(size = 12), legend.text = element_text(size = 12),
           axis.line.x = element_line(), axis.ticks.x = element_line(),
           panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
           panel.grid.major.y = element_blank()
-    )   
+    )  
   slopes
   ggsave("output/plots/fig2_com_slopes.png", slopes, width = 8, height = 9)
+  
+  
+  fe2 <-
+    brms::fixef(mod_mf_com) %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("name") %>%
+    dplyr::filter(!name == "Intercept") %>%
+    filter(!name == "standardlogbiomass_tot") %>%
+    filter(!name == "standardmean") %>%
+    mutate(name = fct_relevel(name,
+                              "standardimm_q1",
+                              "standardimm_m",
+                              "standardimm_q3",
+                              "standardsize_q1",
+                              "standardsize_m",
+                              "standardsize_q3",
+                              "standardtroph_q1",
+                              "standardtroph_m",
+                              "standardtroph_q3",
+                              "standardnspec"
+    ))
+  
+  slopes2 <-
+    ggplot(fe2) +
+    geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey",
+               size = 0.5, linetype = 1, alpha = 0.7) +
+    geom_hline(yintercept = 0, size = 1, color = "black") +
+    geom_linerange(aes(x = name, ymin = Q2.5, ymax = Q97.5),
+                   position = position_dodge(.7), size = 1, linetype = 1) +
+    geom_point(aes(x = name, y = Estimate), position = position_dodge(.7), size = 3) +
+    coord_flip() +
+    theme_minimal() +
+    labs(y = "Effect size", x = "") +
+    scale_y_continuous(lim = c(-0.22, 0.22)) +
+    scale_x_discrete(
+      labels = rev(c( "Richness", "Trophic level (upper)", "Trophic level (median)", "Trophic level (lower)",
+                      "Size (upper)", "Size (median)", "Size (lower)",
+                      "Immaturity (upper)", "Immaturity (median)", "Immaturity (lower)"
+      ))
+    ) +
+    
+    theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
+          axis.title = element_text(size = 12), legend.text = element_text(size = 12),
+          axis.line.x = element_line(), axis.ticks.x = element_line(),
+          panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+          panel.grid.major.y = element_blank()
+    )  
+
+  slopes + slopes2
+  
   
 }
 
 make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance){
   
   # a
-  con_fam <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
-    filter(!is.na(Family)) %>%
-    mutate(I_herb_p = case_when(I_herb_p == 0 ~ NA_real_,
-                                TRUE ~ I_herb_p),
-           I_pisc_p = case_when(I_pisc_p == 0 ~ NA_real_,
-                                TRUE ~ I_pisc_p)) %>%
-    mutate(Fn_p = Fn_p - biomass_p,
-           Fp_p = Fp_p - biomass_p,
-           Gc_p = Gc_p - biomass_p,
-           I_herb_p = I_herb_p - biomass_herb_p,
-           I_pisc_p = I_pisc_p - biomass_pisc_p) %>%
-    group_by(bioregion, locality, sites, transect_id, Family) %>%
-    summarize_at(.vars = vars(ends_with("_p")), sum, na.rm = TRUE)  %>%
-    group_by(bioregion, locality, sites, Family) %>%
-    summarize_at(.vars = vars(ends_with("_p")), median, na.rm = TRUE)  %>%
-    group_by(bioregion, locality, Family) %>%
-    summarize_at(.vars = vars(ends_with("_p")), mean, na.rm = TRUE)  %>%
-    ungroup() %>%
-    pivot_longer(c(Fn_p, Fp_p, Gc_p, I_herb_p, I_pisc_p)) %>%
-    mutate(value = case_when(value == 0 ~ NA_real_,
-                             TRUE ~ value)) %>%
-    group_by(name, Family) %>%
-    summarize(biomass_p = median(biomass_p),
-              value_m = median(value, na.rm = TRUE), 
-              value_lq = quantile(value, 0.25, na.rm = TRUE),
-              value_uq = quantile(value, 0.75, na.rm = TRUE)) %>%
-    arrange(-biomass_p) %>%
-    filter(biomass_p > 0.025) 
-  
-  con_fam <- con_fam %>%
-    arrange(biomass_p) %>%
-    filter(biomass_p > 0.025) %>%
-    filter(!Family == "Fistulariidae") %>%
-    mutate(Family = factor(Family, unique(Family)))
-
-  
-  a <- 
-    ggplot(con_fam) +
-    geom_point(aes(xmin = value_lq, xmax = value_uq, x = value_m, 
-                   y = Family, color = name),
-               position = ggstance::position_dodgev(height = -0.7)) +
-    geom_hline(yintercept = seq(1, 12 ,1) + .5, color = "lightgrey", 
-               size = 0.5, linetype = 1, alpha = 0.7) +
-    geom_vline(xintercept = 0) +
-    geom_errorbarh(aes(xmin = value_lq, xmax = value_uq, x = value_m, 
-                       y = Family, color = name),
-                   position = ggstance::position_dodgev(height = -0.7), height = 0) +
-
-    scale_color_fish_d(option = "Callanthias_australis",
-                       labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
-                       name = "") +
-    
-    add_fishape(family = "Acanthuridae", option = NA, alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 11.75, ymax = 12.25) +
-    add_fishape(family = "Labridae", option = NA, alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 10.75, ymax = 11.25) +
-    add_fishape(family = "Pomacentridae", option = NA,  alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 9.75, ymax = 10.25) +
-    add_fishape(family = "Haemulidae", option = NA,  alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 8.75, ymax = 9.25) +
-    add_fishape(family = "Lutjanidae", option = NA,  alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 7.75, ymax = 8.25) +
-    add_fishape(family = "Serranidae", option = "Cephalopholis_argus",  alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 6.75, ymax = 7.25) +
-    add_fishape(family = "Balistidae", option = NA,  alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 5.75, ymax = 6.25) +
-    add_fishape(family = "Mullidae", option = NA,  alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 4.75, ymax = 5.25) +
-    add_fishape(family = "Kyphosidae", option = NA,  alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 3.75, ymax = 4.25) +
-    add_fishape(family = "Holocentridae", option = NA,  alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 2.75, ymax = 3.25) +
-    add_fishape(family = "Chaetodontidae", option = NA,  alpha = 0.7,
-                xmin = -0.075, xmax = -0.11, ymin = 1.75, ymax = 2.25) +
-    add_fishape(family = "Lethrinidae", option = NA,  alpha = 0.7,
-                xmax = -0.075, xmin = -0.11, ymin = 0.75, ymax = 1.25) +
-    
-    xlim(c(-0.11, 0.11)) +
-
-    labs(x = "contribution function - contribution biomass", y = "") +
-    theme_bw() +
-    theme(panel.grid.major.x = element_blank(),
-          panel.grid.minor.x = element_blank(), panel.border = element_blank(), 
-          legend.position = "right",
-          panel.grid.major.y = element_blank(),
-          axis.line.x = element_line(), axis.ticks.x = element_line(),
-          axis.ticks.y = element_blank(), axis.text = element_text(color = "black"))
-  
-  # b
+  # con_fam <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+  #   filter(!is.na(Family)) %>%
+  #   mutate(I_herb_p = case_when(I_herb_p == 0 ~ NA_real_,
+  #                               TRUE ~ I_herb_p),
+  #          I_pisc_p = case_when(I_pisc_p == 0 ~ NA_real_,
+  #                               TRUE ~ I_pisc_p)) %>%
+  #   mutate(Fn_p = Fn_p - biomass_p,
+  #          Fp_p = Fp_p - biomass_p,
+  #          Gc_p = Gc_p - biomass_p,
+  #          I_herb_p = I_herb_p - biomass_herb_p,
+  #          I_pisc_p = I_pisc_p - biomass_pisc_p) %>%
+  #   group_by(bioregion, locality, sites, transect_id, Family) %>%
+  #   summarize_at(.vars = vars(ends_with("_p")), sum, na.rm = TRUE)  %>%
+  #   group_by(bioregion, locality, sites, Family) %>%
+  #   summarize_at(.vars = vars(ends_with("_p")), median, na.rm = TRUE)  %>%
+  #   group_by(bioregion, locality, Family) %>%
+  #   summarize_at(.vars = vars(ends_with("_p")), mean, na.rm = TRUE)  %>%
+  #   ungroup() %>%
+  #   pivot_longer(c(Fn_p, Fp_p, Gc_p, I_herb_p, I_pisc_p)) %>%
+  #   mutate(value = case_when(value == 0 ~ NA_real_,
+  #                            TRUE ~ value)) %>%
+  #   group_by(name, Family) %>%
+  #   summarize(biomass_p = median(biomass_p),
+  #             value_m = median(value, na.rm = TRUE), 
+  #             value_lq = quantile(value, 0.25, na.rm = TRUE),
+  #             value_uq = quantile(value, 0.75, na.rm = TRUE)) %>%
+  #   arrange(-biomass_p) %>%
+  #   filter(biomass_p > 0.025) 
+  # 
+  # con_fam <- con_fam %>%
+  #   arrange(biomass_p) %>%
+  #   filter(biomass_p > 0.025) %>%
+  #   filter(!Family == "Fistulariidae") %>%
+  #   mutate(Family = factor(Family, unique(Family)))
+  # 
+  # 
+  # a <- 
+  #   ggplot(con_fam) +
+  #   geom_point(aes(xmin = value_lq, xmax = value_uq, x = value_m, 
+  #                  y = Family, color = name),
+  #              position = ggstance::position_dodgev(height = -0.7)) +
+  #   geom_hline(yintercept = seq(1, 12 ,1) + .5, color = "lightgrey", 
+  #              size = 0.5, linetype = 1, alpha = 0.7) +
+  #   geom_vline(xintercept = 0) +
+  #   geom_errorbarh(aes(xmin = value_lq, xmax = value_uq, x = value_m, 
+  #                      y = Family, color = name),
+  #                  position = ggstance::position_dodgev(height = -0.7), height = 0) +
+  # 
+  #   scale_color_fish_d(option = "Callanthias_australis",
+  #                      labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
+  #                      name = "") +
+  #   
+  #   add_fishape(family = "Acanthuridae", option = NA, alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 11.75, ymax = 12.25) +
+  #   add_fishape(family = "Labridae", option = NA, alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 10.75, ymax = 11.25) +
+  #   add_fishape(family = "Pomacentridae", option = NA,  alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 9.75, ymax = 10.25) +
+  #   add_fishape(family = "Haemulidae", option = NA,  alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 8.75, ymax = 9.25) +
+  #   add_fishape(family = "Lutjanidae", option = NA,  alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 7.75, ymax = 8.25) +
+  #   add_fishape(family = "Serranidae", option = "Cephalopholis_argus",  alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 6.75, ymax = 7.25) +
+  #   add_fishape(family = "Balistidae", option = NA,  alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 5.75, ymax = 6.25) +
+  #   add_fishape(family = "Mullidae", option = NA,  alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 4.75, ymax = 5.25) +
+  #   add_fishape(family = "Kyphosidae", option = NA,  alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 3.75, ymax = 4.25) +
+  #   add_fishape(family = "Holocentridae", option = NA,  alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 2.75, ymax = 3.25) +
+  #   add_fishape(family = "Chaetodontidae", option = NA,  alpha = 0.7,
+  #               xmin = -0.075, xmax = -0.11, ymin = 1.75, ymax = 2.25) +
+  #   add_fishape(family = "Lethrinidae", option = NA,  alpha = 0.7,
+  #               xmax = -0.075, xmin = -0.11, ymin = 0.75, ymax = 1.25) +
+  #   
+  #   xlim(c(-0.11, 0.11)) +
+  # 
+  #   labs(x = "contribution function - contribution biomass", y = "") +
+  #   theme_bw() +
+  #   theme(panel.grid.major.x = element_blank(),
+  #         panel.grid.minor.x = element_blank(), panel.border = element_blank(), 
+  #         legend.position = "right",
+  #         panel.grid.major.y = element_blank(),
+  #         axis.line.x = element_line(), axis.ticks.x = element_line(),
+  #         axis.ticks.y = element_blank(), axis.text = element_text(color = "black"))
+  # 
+  # # b
   
   dd_long <- degree_dominance %>%
-    pivot_longer(c(dd_Fn, dd_Fp, dd_Gc, dd_I_herb, dd_I_pisc))
+    pivot_longer(c(dd_Fn, dd_Fp, dd_Gc, dd_I_herb, dd_I_pisc)) %>%
+    drop_na()
   
   b <- 
-    ggplot(dd_long, alpha = 0.8) +
+    ggplot(dd_long, alpha = 0.9) +
     geom_eyeh(aes(x = value, y = reorder(name, desc(name)), fill = name),
-              alpha = 0.5, size = 3, .width = c(0.25,0.5,0.75)) +
+              alpha = 0.5, size = 3, .width = c(0.5,0.75)) +
     scale_fill_fish_d(option = "Callanthias_australis",
                       labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
                       name = "Function") +
@@ -495,12 +591,14 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
   
   # c
   spi_sp_long <- freq_dominance %>%
-    pivot_longer(c(Fn_i, Fp_i, Gc_i, I_herb_i, I_pisc_i))
+    pivot_longer(c(Fn_i, Fp_i, Gc_i, I_herb_i, I_pisc_i)) %>%
+    drop_na() %>%
+    filter(value>0)
   
   c <-
-    ggplot(spi_sp_long, alpha = 0.8) +
+    ggplot(spi_sp_long, alpha = 0.9) +
     geom_eyeh(aes(x = value, y = reorder(name, desc(name)), fill = name),
-              alpha = 0.5, size = 3, .width = c(0.25,0.5,0.75)) +
+              alpha = 0.5, size = 3, .width = c(0.5,0.75)) +
     scale_fill_fish_d(option = "Callanthias_australis",
                       labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
                       name = "Function") +
@@ -508,7 +606,7 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
     labs(x = "Frequency of dominance (species)") +
     theme_bw() +
     theme(plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"),
-          legend.position = "none", 
+          legend.position = "top", 
           panel.border = element_blank(), 
           axis.text.y = element_blank(), 
           axis.title.y = element_blank(),
@@ -531,7 +629,14 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
     plot_annotation(tag_levels = 'a', tag_suffix = ")") #& 
     #theme(plot.tag = element_text(size = 12)) 
   
-  ggsave("output/plots/fig3_contributions.png", plot,  width = 9, height = 6)
+  plot <- 
+    b + c  +
+    plot_layout(nrow = 1, guides = "collect") +
+    plot_annotation(tag_levels = 'A') & 
+   theme(plot.tag = element_text(size = 12), legend.position = "bottom") 
+  
+  
+  ggsave("output/plots/fig3_contributions.png", plot,  width = 6, height = 6)
   
 }
 
@@ -1626,5 +1731,106 @@ make_map_multi_supp <- function(model, coords){
   #map
   ggsave("output/plots/map_multi_supp.png", a, width = 8, height = 2)
 }
+
+
+
+##### correlations #####
+
+make_corplot <- function(mod_mvfun_bm){
+  sum <- summary(mod_mvfun_bm)
+  rescor <- sum$rescor_pars
+  loc <- sum$random$locality[-c(1:5),]
+  site <- sum$random$sites[-c(1:5),]
+  
+  col <- fish(n = 3, option = "Ostracion_whitleyi", begin = 0.2, end = 0.8)
+  
+  nd <- data.frame(biomass_tot = 100, mean = 27, locality = NA, sites = NA)
+  
+  pred <- fitted(mod_mvfun_bm, newdata = nd, summary = FALSE, nsamples = 1000)
+
+  pl1 <-
+  ggplot() +
+    geom_point(aes(y = exp(pred[,1,3]), x = exp(pred[,1,2])),
+               color = col[1], alpha = 0.7) +
+    theme_bw() +
+    labs(x = "P excretion (gP/m2/day)", y = "Production (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank())
+  pl2 <-
+  ggplot() +
+    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,2])),
+               color = col[1], alpha = 0.7)  +
+    theme_bw() +
+    labs(x = "P excretion (gP/m2/day)", y = "Herbivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank())
+  pl3 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,3])),
+               color = col[1], alpha = 0.7)  +
+    theme_bw() +
+    labs(x = "Production (gC/m2/day)", y = "Herbivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank())
+  
+  
+  
+  
+  corplot <- function(j, name){
+    ggplot() +
+      geom_vline(aes(xintercept = 0), linetype = 2) +
+      geom_pointrange(aes(x = rescor[j,1], y = "sigma", xmin =  rescor[j,3], xmax = rescor[j,4]),
+                      color = col[1], size = 2, fatten = 2) +
+      geom_pointrange(aes(x = loc[j,1], y = "loc", xmin =  loc[j,3], xmax = loc[j,4]),
+                      color = col[2], size = 2, fatten = 2) +
+      geom_pointrange(aes(x = site[j,1], y = "asite", xmin =  site[j,3], xmax = site[j,4]),
+                      color = col[3], size = 2, fatten = 2) +
+      scale_x_continuous(limits = c(-0.9,0.9), expand = c(0, 0)) +
+      labs(x = "", title = name) +
+      theme_bw() +
+      theme(axis.title= element_blank(), axis.ticks.y = element_blank(), 
+            axis.text.y = element_blank(), panel.grid = element_blank(),
+            axis.text.x = element_text(size = 14, color = "black"))
+  }
+  
+  p1 <- corplot(1, "cor(N excretion, P excretion)")
+  p2 <- corplot(2, "cor(N excretion, Production)")
+  p3 <- corplot(3, "cor(P excretion, Production)")
+  p4 <- corplot(4, "cor(N excretion, Herbivory)")
+  p5 <- corplot(5, "cor(P excretion, Herbivory)")
+  p6 <- corplot(6, "cor(Production,  Herbivory)")
+  p7 <- corplot(7, "cor(N excretion, Piscivory)")
+  p8 <- corplot(8, "cor(P excretion, Piscivory)")
+  p9 <- corplot(9, "cor(Production, Piscivory)")
+  p10 <- corplot(10, "cor(Herbivory, Piscivory)")
+  
+  plot <- p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 +
+    plot_layout(nrow = 2) + plot_annotation(tag_levels = "a")
+  
+
+  plot1 <- pl1 + pl2 + pl3 + plot_annotation(tag_levels = "a")
+  
+  
+  detach("package:cowplot", unload = TRUE)
+  library(cowplot)
+  plot2 <- plot_grid(plot, plot1, nrow = 2, ncol = 1)
+  
+  ggsave("output/plots/corplot.png", plot2, width = 13, height = 8)
+  ggsave("output/plots/corplot.pdf", plot2, width = 13, height = 8)
+}
+
+
+
+test <- summary_transect_imp %>%
+  mutate(Fn_t = Fn> quantile(Fn, 0.75),
+         Fp_t = Fp > quantile(Fp, 0.75),
+         Gc_t = Gc > quantile(Gc, 0.75),
+         Iherb_t = I_herb > quantile(I_herb, 0.75),
+         Ipisc_t = I_pisc > quantile(I_pisc, 0.75)) %>%
+  mutate(MF50 = Fn_t + Fp_t + Gc_t + Iherb_t + Ipisc_t)
+
+summary(test$MF50)
+hist(test$MF50)
+sum(test$MF50==5)/nrow(test)
+ggplot(test) +
+  geom_point(aes(x = log(Fp), y = log(multi)))
+
 
 
