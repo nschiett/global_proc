@@ -520,7 +520,7 @@ validate_model <- function(fit, save_plots = TRUE, name = "Title", pars = NULL){
 ##### Models #####
 ##### 1) only site and location 
 fit_mvfun_siteloc <- function(data){
-  brm(mf(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc))|mi() ~ 
+  brm(bf(mvbind(log(Fn), log(Fp), log(Gc), log(I_herb), log(I_pisc))|mi() ~ 
         (1|s|sites) + (1|p|locality)) + 
         set_rescor(rescor = TRUE),
       data = data, cores = 4,
