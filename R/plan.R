@@ -46,11 +46,11 @@ plan <- drake_plan(
   summary_transect_complete = combine_summary(summary_transect, herb_pisc),
   
   # subset 
-  summary_transect_sub = subset_data(summary_transect_complete),
+  #summary_transect_sub = subset_data(summary_transect_complete),
   
   # imputation 
-  imp = impute(summary_transect_complete),
-  summary_transect_imp = imp[[1]],
+  #imp = impute(summary_transect_complete),
+  #summary_transect_imp = imp[[1]],
   
   ##### models #####
   # run models only with biomass ans sst
@@ -66,33 +66,33 @@ plan <- drake_plan(
   # commodels_real = run_commodels_abs(summary_transect_complete),
   
   # site loc
-  mod_mv_siteloc = fit_mvfun_siteloc(summary_transect_imp),
-  mod_mf_siteloc = fit_mf_siteloc(summary_transect_imp),
+  mod_mv_siteloc = fit_mvfun_siteloc(summary_transect_complete),
+  #mod_mf_siteloc = fit_mf_siteloc(summary_transect_imp),
   
   # add biomass sst
-  mod_mvfun_bm = fit_mvfun_bm(summary_transect_imp),
-  mod_mf_bm = fit_mf_bm(summary_transect_imp),
+  mod_mvfun_bm = fit_mvfun_bm(summary_transect_complete),
+  #mod_mf_bm = fit_mf_bm(summary_transect_imp),
   
   # community analysis
-  mod_mvfun_com = fit_mvfun_com(summary_transect_imp),
-  mod_mvfun_com2 = fit_mvfun_com2(summary_transect_imp), #get absolute slopes
-  mod_mf_com = fit_mf_com(summary_transect_imp), 
+  mod_mvfun_com = fit_mvfun_com(summary_transect_complete),
+  mod_mvfun_com2 = fit_mvfun_com2(summary_transect_complete), #get absolute slopes
+  #mod_mf_com = fit_mf_com(summary_transect_imp), 
   
   # Same models with data subset
-  mod_mv_siteloc_sub = fit_mvfun_siteloc(summary_transect_sub),
-  mod_mf_siteloc_sub = fit_mf_siteloc(summary_transect_sub),
-  mod_mvfun_bm_sub = fit_mvfun_bm(summary_transect_sub),
-  mod_mf_bm_sub = fit_mf_bm(summary_transect_sub),
-  mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
-  mod_mf_com_sub = fit_mf_com(summary_transect_sub), 
+  # mod_mv_siteloc_sub = fit_mvfun_siteloc(summary_transect_sub),
+  # mod_mf_siteloc_sub = fit_mf_siteloc(summary_transect_sub),
+  # mod_mvfun_bm_sub = fit_mvfun_bm(summary_transect_sub),
+  # mod_mf_bm_sub = fit_mf_bm(summary_transect_sub),
+  # mod_mvfun_com_sub = fit_mvfun_com(summary_transect_sub),
+  #mod_mf_com_sub = fit_mf_com(summary_transect_sub), 
   
   # output tables 
   tab_mod_mv_siteloc = make_table_mod_mv_siteloc(mod_mv_siteloc),
-  tab_mod_mf_siteloc = make_table_mod_mf_siteloc(mod_mf_siteloc), 
+  #tab_mod_mf_siteloc = make_table_mod_mf_siteloc(mod_mf_siteloc), 
   tab_mod_mvfun_bm = make_table_mod_mvfun_bm(mod_mvfun_bm),
   tab_mod_mvfun_com = make_table_mod_mvfun_com(mod_mvfun_com),
-  tab_mod_mf_com = make_table_mod_mf_com(mod_mf_com),
-  tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
+  #tab_mod_mf_com = make_table_mod_mf_com(mod_mf_com),
+  #tab_mod_mvfun_com_sub = make_table_mod_mvfun_com(mod_mvfun_com_sub),
   #tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
   
   ##### contribution analysis #####
@@ -106,7 +106,7 @@ plan <- drake_plan(
   #spi_vuln = get_spi_vuln(sp_importance, vulnerability)#,
   # 
   # ##### FIGURES #####
-  coords = get_coords_siteloc(summary_transect_imp)
+  coords = get_coords_siteloc(summary_transect_complete)
   # # main
   # fig1 = make_fig1(location_effect),
   # fig2 = make_fig2(commodels),

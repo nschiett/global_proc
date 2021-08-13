@@ -21,15 +21,25 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
   re_loc1 <- re_loc1 %>%
     rownames_to_column("locality") 
   
-  re2 <- ranef(mod_mf_siteloc)
-  re_loc2 <- re2$locality[,1,1] %>%
-    as.data.frame()
-  re_site2 <- re1$sites[,1,1] %>%
-    as.data.frame()
-  re_loc2[ls1,] <- re_loc2[ls1,] + re_site2[ls2,]
-  colnames(re_loc2) <- c("r1_loc_mf")
-  re_loc2 <- re_loc2 %>%
-    rownames_to_column("locality") 
+  re_loc1 <- re_loc1 %>%
+    group_by() %>%
+    mutate(r1 = normalize(r1_loc_Fn),
+           r2 = normalize(r1_loc_Fp),
+           r3 = normalize(r1_loc_Gc),
+           r4 = normalize(r1_loc_Iherb),
+           r5 = normalize(r1_loc_Ipisc)) %>%
+    rowwise() %>%
+    mutate(r_multi = geomean(r1, r2, r3, r4, r5))
+  
+  # re2 <- ranef(mod_mf_siteloc)
+  # re_loc2 <- re2$locality[,1,1] %>%
+  #   as.data.frame()
+  # re_site2 <- re1$sites[,1,1] %>%
+  #   as.data.frame()
+  # re_loc2[ls1,] <- re_loc2[ls1,] + re_site2[ls2,]
+  # colnames(re_loc2) <- c("r1_loc_mf")
+  # re_loc2 <- re_loc2 %>%
+  #   rownames_to_column("locality") 
  
 
   
@@ -41,10 +51,10 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
     left_join(coords) %>%
     unique()
   
-  
-  data2 <- (re_loc2) %>%
-    left_join(coords) %>%
-    unique()
+  # 
+  # data2 <- (re_loc2) %>%
+  #   left_join(coords) %>%
+  #   unique()
   
   library("rnaturalearth")
   library("rnaturalearthdata")
@@ -249,14 +259,14 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
   pal <- c("black", "grey60", "deepskyblue1")
   
   f <-
-    ggplot(data2) + 
+    ggplot(data) + 
     geom_sf(data = world, color = NA, fill = "lightgrey") +
-    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r1_loc_mf), 
-                   size = get_scores(r1_loc_mf)),  alpha = 0.9,
+    geom_point(aes(x = lon_loc, y = lat_loc, color = get_scale(r_multi), 
+                   size = get_scores(r_multi)),  alpha = 0.9,
                position = position_jitter(0,0), shape = 16) +
     geom_point(aes(x = lon_loc, y = lat_loc),  alpha = 0.9,
                shape = 1, size = 4,
-               data = filter(data2, r1_loc_mf > quantile(data2$r1_loc_mf, 0.95, na.rm = TRUE))) +
+               data = filter(data, r_multi > quantile(data$r_multi, 0.95, na.rm = TRUE))) +
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
@@ -278,7 +288,22 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
                    sites = NA)
   
   pred <- predict(mod_mvfun_bm, newdata = nd)
-  pred2 <- predict(mod_mf_bm, newdata = nd)
+  
+  ef <- predict(mod_mvfun_bm, newdata = nd, summary = F, nsamples = 1000)
+
+  ef[,,1] <- normalize(exp(ef[,,1]))
+  ef[,,2] <- normalize(exp(ef[,,2])) 
+  ef[,,3] <- normalize(exp(ef[,,3])) 
+  ef[,,4] <- normalize(exp(ef[,,4])) 
+  ef[,,5] <- normalize(exp(ef[,,5])) 
+  
+  mf <- apply(ef, 1:2, geomean)
+
+  mf_m <- apply(mf, 2, mean) 
+  mf_lb <- apply(mf, 2, quantile, 0.025) 
+  mf_ub <- apply(mf, 2, quantile, 0.975) 
+  
+
   
   a1 <- 
     ggplot() +
@@ -328,9 +353,9 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
   
   f1 <- 
     ggplot() +
-    geom_ribbon(aes(x = nd$biomass_tot, ymin = exp(pred2[,3]), ymax = exp(pred2[,4])), 
+    geom_ribbon(aes(x = nd$biomass_tot, ymin = mf_lb, ymax = mf_ub), 
                 alpha = 0.5, fill = "deepskyblue1") +
-    geom_smooth(aes(x = nd$biomass_tot, y = exp(pred2[,1])), alpha = 0.5, color = "deepskyblue1") +
+    geom_smooth(aes(x = nd$biomass_tot, y = mf_m), alpha = 0.5, color = "deepskyblue1") +
     theme_bw() +
     theme(panel.grid = element_blank()) +
     labs(x = "Biomass (g/m2)", y = "Multifunction") +
@@ -1815,22 +1840,6 @@ make_corplot <- function(mod_mvfun_bm){
   ggsave("output/plots/corplot.png", plot2, width = 13, height = 8)
   ggsave("output/plots/corplot.pdf", plot2, width = 13, height = 8)
 }
-
-
-
-test <- summary_transect_imp %>%
-  mutate(Fn_t = Fn> quantile(Fn, 0.75),
-         Fp_t = Fp > quantile(Fp, 0.75),
-         Gc_t = Gc > quantile(Gc, 0.75),
-         Iherb_t = I_herb > quantile(I_herb, 0.75),
-         Ipisc_t = I_pisc > quantile(I_pisc, 0.75)) %>%
-  mutate(MF50 = Fn_t + Fp_t + Gc_t + Iherb_t + Ipisc_t)
-
-summary(test$MF50)
-hist(test$MF50)
-sum(test$MF50==5)/nrow(test)
-ggplot(test) +
-  geom_point(aes(x = log(Fp), y = log(multi)))
 
 
 

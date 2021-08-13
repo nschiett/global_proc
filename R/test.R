@@ -558,3 +558,50 @@ mod_mf_siteloc %>%
             rtot_ub = quantile(r_tot, 0.975),
             )
 ran
+
+
+
+loadd(mod_mvfun_bm)
+
+nd <- data.frame(biomass_tot = seq(50,500, 4), mean = 26, locality = NA, sites = NA)
+
+fit <- predict(mod_mvfun_bm, newdata = nd, summary = F, nsamples = 1000)
+ef <- fit
+
+ef[,,1] <- normalize(exp(ef[,,1]))
+ef[,,2] <- normalize(exp(ef[,,2])) 
+ef[,,3] <- normalize(exp(ef[,,3])) 
+ef[,,4] <- normalize(exp(ef[,,4])) 
+ef[,,5] <- normalize(exp(ef[,,5])) 
+
+mf <- apply(ef, 1:2, geomean)
+mf[,] <- normalize(mf[,])
+
+f1_m <- apply(ef[,,1], 2, mean) 
+mf_m <- apply(mf, 2, mean) 
+mf_lb <- apply(mf, 2, quantile, 0.025) 
+mf_ub <- apply(mf, 2, quantile, 0.975) 
+
+ggplot() +
+  geom_ribbon(aes(x = nd$biomass_tot, ymin = mf_lb, ymax = mf_ub), alpha = 0.5)+
+  geom_line(aes(x = nd$biomass_tot, y= (mf_m))) 
+
+lm(log(mf_m)~log(nd$biomass_tot))
+lm(log(f1_m)~log(nd$biomass_tot))
+
+sub <- ef[,1,]
+hist(sub[,1])
+
+test <- apply(sub, 1, geomean)
+
+summary(test)
+
+sub <- ef[,100,]
+hist(sub[,1])
+
+test <- apply(sub, 1, geomean)
+
+summary(test)
+
+
+

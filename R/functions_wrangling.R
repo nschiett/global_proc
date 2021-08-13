@@ -330,7 +330,8 @@ comm <-
   }) %>% plyr::ldply()
 
 ## combine all variables per transect
-tfs <- left_join(tfs, comm)
+tfs <- left_join(tfs, comm) 
+
 
 return(tfs)
 }
@@ -436,7 +437,11 @@ tfs <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>%
   dplyr::summarise(
     I_herb = sum(I[herb == TRUE], na.rm = TRUE),
     I_pisc = sum(I[pisc == TRUE], na.rm = TRUE),
-  ) %>% ungroup() 
+  ) %>% ungroup() %>%
+  mutate(I_herb = case_when(I_herb == 0 ~ NA_real_,
+                            TRUE ~ I_herb),
+         I_pisc = case_when(I_pisc == 0 ~ NA_real_,
+                            TRUE ~ I_pisc))
 
 
 contr <- dplyr::group_by(tfish, region, locality, sites, area, transect_id) %>% 
