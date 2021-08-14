@@ -1,5 +1,5 @@
 
-make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
+make_fig1 <- function(mod_mv_siteloc, coords, summary_transect){
   
   nsiteloc <- summary_transect %>%
     group_by(locality) %>%
@@ -374,7 +374,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mf_siteloc, coords, summary_transect){
 
 
 
-make_fig2 <- function(commodels){
+make_fig2 <- function(mod_mvfun_com){
   
   fe <- brms::fixef(mod_mvfun_com) %>%
     as.data.frame() %>%
@@ -422,7 +422,7 @@ make_fig2 <- function(commodels){
                    position = position_dodge(.7), size = 1, linetype = 1) +
     geom_point(aes(x = var, y = Estimate, color = dep), position = position_dodge(.7), size = 3) +
     coord_flip() +
-    scale_y_continuous(lim = c(-0.22, 0.22)) +
+   # scale_y_continuous(lim = c(-0.22, 0.22)) +
     theme_minimal() +
     scale_color_fish_d(option = "Callanthias_australis",
                        labels = c("N excretion", "P excretion", "Production", "Herbivory", "Piscivory"),
@@ -443,55 +443,6 @@ make_fig2 <- function(commodels){
     )  
   slopes
   ggsave("output/plots/fig2_com_slopes.png", slopes, width = 8, height = 9)
-  
-  
-  fe2 <-
-    brms::fixef(mod_mf_com) %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("name") %>%
-    dplyr::filter(!name == "Intercept") %>%
-    filter(!name == "standardlogbiomass_tot") %>%
-    filter(!name == "standardmean") %>%
-    mutate(name = fct_relevel(name,
-                              "standardimm_q1",
-                              "standardimm_m",
-                              "standardimm_q3",
-                              "standardsize_q1",
-                              "standardsize_m",
-                              "standardsize_q3",
-                              "standardtroph_q1",
-                              "standardtroph_m",
-                              "standardtroph_q3",
-                              "standardnspec"
-    ))
-  
-  slopes2 <-
-    ggplot(fe2) +
-    geom_vline(xintercept = seq(1, 10 ,1) + .5, color = "lightgrey",
-               size = 0.5, linetype = 1, alpha = 0.7) +
-    geom_hline(yintercept = 0, size = 1, color = "black") +
-    geom_linerange(aes(x = name, ymin = Q2.5, ymax = Q97.5),
-                   position = position_dodge(.7), size = 1, linetype = 1) +
-    geom_point(aes(x = name, y = Estimate), position = position_dodge(.7), size = 3) +
-    coord_flip() +
-    theme_minimal() +
-    labs(y = "Effect size", x = "") +
-    scale_y_continuous(lim = c(-0.22, 0.22)) +
-    scale_x_discrete(
-      labels = rev(c( "Richness", "Trophic level (upper)", "Trophic level (median)", "Trophic level (lower)",
-                      "Size (upper)", "Size (median)", "Size (lower)",
-                      "Immaturity (upper)", "Immaturity (median)", "Immaturity (lower)"
-      ))
-    ) +
-    
-    theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
-          axis.title = element_text(size = 12), legend.text = element_text(size = 12),
-          axis.line.x = element_line(), axis.ticks.x = element_line(),
-          panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
-          panel.grid.major.y = element_blank()
-    )  
-
-  slopes + slopes2
   
   
 }
