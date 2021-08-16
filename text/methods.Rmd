@@ -14,13 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 # Methods
 
 ## 1. Underwater visual census database
-\noindent We used a published global database of reef fish abundance and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (within 98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, and Western Atlantic. Sites are defined as small islands or stretches of continuous reefs in larger coastlines and localities encompass sites that belong to the same biogeographic sub-provinces [see @Barneche2019]. The database only includes transects at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We selected the species inside families for which we have body stoichiometric data, that were at least 7cm to minimize the bias related to the identification of small individuals, and finally we discarded rare species, for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species that belong to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
-Sea surface temperature (SST) for each site was obtained from daily time‐series data from the National Oceanicand Atmospheric Administration of the USA (NOAA) covering a 5‐year period (°C; 0.25° resolution) (@Reynolds2007; available from https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.highres.html). Further, for each transect (fish community), we calculated the species richness and estimated the total standing stock biomass of fishes by using Bayesian length-weight relationships available from Fishbase [@Froese2013]. All data wrangling and analyses were performed in the software program R (version 4.0.2; R core team 2020).
+\noindent We used a published global database of reef fish abundances and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (within 98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, and Western Atlantic. Sites are defined as small islands or stretches of continuous reefs in larger coastlines and localities encompass sites that belong to the same biogeographic sub-provinces [see @Barneche2019]. The database only includes transects at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We discarded the species inside families for which we did not have body stoichiometry data, individuals that were smaller than 7cm to minimize the bias related to the identification of small individuals, and rare species for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species belonging to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
+Sea surface temperature (SST) for each site was obtained from daily time‐series data from the National Oceanicand Atmospheric Administration of the USA (NOAA) covering a 5‐year period (°C; 0.25° resolution) (@Reynolds2007; available from https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.highres.html). Further, for each transect, we calculated the species richness and estimated the total standing stock biomass of fishes by using Bayesian length-weight relationships available from Fishbase [@Froese2013]. All data wrangling and analyses were performed in the software program R (version 4.0.2; R core team 2020).
 
 ## 2. Quantification of functions
-\noindent For each transect, we estimated five key process-based functions mediated by fishes: N excretion rate (gN/day/m^2^), P excretion rate (gP/day/m^2^), production of body mass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^) [@Brandl2019front]. These five functions were estimated in each transect using individual-based bioenergetic models that predict elemental fluxes, including ingestion rate, excretion rates of N and P, and growth rate.
-The bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We ran an individual bioenergetic model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each process in each transect and the summed estimates on the fish community level per surface area (m^2^). Each function is thus expressed in dry mass (of C, N, or P) per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild [@Parravicini2020]. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
-Finally, we estimated multifunction, i.e. one measure that combines all five functions by taking the geometric average of the five standardized functions. We used the geometric mean because functions are dependent on each other and may vary considerably. 
+\noindent For each transect, we estimated five key process-based functions mediated by fishes: nitrogen excretion rate (gN/day/m^2^), phosphorus excretion rate (gP/day/m^2^), production of biomass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^) [@Brandl2019front]. These five functions were estimated for each transect using individual-based bioenergetic models predicting fluxes of carbon (C), nitrogen (N), and phosphorus (P) (e.g. daily C intake rates, N and P excretion rates, growth rates) [@Schiettekatte2020].
+This bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We then ran a unique bioenergetic model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each function in each transect. Finally, we summarized functions on the community level by summing up all individual contributions inside a transect and deviding the sum by the surface area. Each function is thus expressed as dry mass (of C, N, or P) per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild as defined by @Parravicini2020. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
+Finally, we estimated multifunction, i.e. one measure that combines all five functions by taking the geometric average of the five standardized functions. We used the geometric mean because functions are dependent on each other and may vary considerably.
 
 
 ## 3. Community structure variables
@@ -32,79 +32,87 @@ We quantified a set of variables that characterize the fish community structure.
 where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is the species-specific asymptotic adult length, and $l_i$ is the total length of individual i. Essentially, this is the derivative of the Von Bertalanffy growth model for a certain length, and the higher this value is, the younger the individual. Finally, the trophic level was extracted from fishbase [@Froese2018].
 
 
-## 4. Data analysis
+## 4. Multivariate regression models
 
-### 4.1 Imputation of herbivory and piscivory
-In the underwater visual transect database, 291 transects (3%) did not contained herbivores and 4467 transects (49%) did not contain piscivores yielding false zeros for herbivory and piscivory, respectively. We considered these zeros as missing values because the absence of the observation of a herbivore or piscivore does not prove the actual absence of herbivores and piscivores. In fact, it is highly unlikely that a coral reef fish community contains no herbivores and piscivores at all. To avoid removing all transects with missing values for herbivory or piscivory (n = 4620) from our database when running multivariate analyses, we imputed the missing values by fitting two models using the observed herbivory and piscivory rates and then imputing the missing values by taking the means of posterior predictions. In other words, we used the predictor values corresponding to missing responses to predict herbivory and piscivory rates. As predictor variables, we used all community structure variables described above and sea surface temperature. Additionally, we added random effects for localities and sites.
+We fitted three multivariate Bayesian models with all five functions to (1) predict functions on the locality level, (2) investigate the effects of bioimass and sst, and the correlations among functions independent of biomass and sst, and (3) estimate the effects of the community structure on each function. \par
+
+In the underwater visual transect database, 291 transects (3%) did not contained herbivores and 4467 transects (49%) did not contain piscivores yielding false zeros for herbivory and piscivory, respectively. We considered these zeros as missing values because the absence of the observation of a herbivore or piscivore does not prove the actual absence of herbivores and piscivores. In fact, it is highly unlikely that a coral reef fish community contains no herbivores and piscivores at all. To avoid removing all transects with missing values for herbivory or piscivory (n = 4620) from our database when running multivariate analyses, we imputed the missing values by adding these observations as parameters in the multivariate models. \par
+
+First, we performed a multivariate intercept-only regression model with the five -log-transformed functions to estimate the functions per locality. The model structure includes intercepts and random effects for localities and sites:
+
+$$\begin{bmatrix}y_{ExN,i} \\ y_{ExP,i} \\ y_{Prod,i} \\ y_{Herb,i} \\ y_{Pisc,i} \end{bmatrix} \sim MVNormal\left(\begin{bmatrix} \mu_{ExN,i} \\ \mu_{ExP,i} \\ \mu_{Prod,i} \\ \mu_{Herb,i} \\ \mu_{Pisc,i}\end{bmatrix}, S \right),$$
+
+$$
+\mu_{\textrm{ExN,i}}  = (\beta0_{ExN}  +  \delta_{ExN, loc}  +  \delta_{ExN, site}) \\
+\mu_{\textrm{ExP,i}}  = (\beta0_{ExP}  +  \delta_{ExP, loc}  +  \delta_{ExP, site})  \\
+\mu_{\textrm{Prod,i}} = (\beta0_{Prod} +  \delta_{Prod, loc} +  \delta_{Prod, site}) \\
+\mu_{\textrm{Herb,i}} = (\beta0_{Herb} +  \delta_{Herb, loc} +  \delta_{Herb, site}) \\
+\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) ,
+$$
+
+$$
+S = \begin{bmatrix}
+\sigma_{ExN} & 0 & 0 & 0 & 0\\
+0 & \sigma_{ExP} & 0 & 0 & 0 \\
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\
+0 & 0 & 0 & \sigma_{Herb} & 0\\
+0 & 0 & 0 & 0 & \sigma_{Pisc}
+\end{bmatrix}
+R
+\begin{bmatrix}
+\sigma_{ExN} & 0 & 0 & 0 & 0\\
+0 & \sigma_{ExP} & 0 & 0 & 0 \\
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\
+0 & 0 & 0 & \sigma_{Herb} & 0\\
+0 & 0 & 0 & 0 & \sigma_{Pisc}
+\end{bmatrix},
+$$
+
+where i is the index of the transect, y_{ExN,i} is the N excretion rate of transect i, y_{ExP,i} is the P excretion rate, y_{Prod,i} is the biomass production rate, y_{Herb,i} is the herbivory rate, y_{ExN,i} is the piscivory rate, \sigma represents the residual error of each function (ExN, ExP, Prod, Herb, and Pisc), R is the correlation matrix of the residuals. Locality- and site-level effects are also structured including covariation among functions. There are thus three correlation matrices in total, or in other words the model will estimate the correlation between functions (independent of biomass and SST) on three levels: locality-level, site-level, and transect-level.
+
+\noindent We used non-centered parametrisation for site and location effects and all standard deviations had the following prior: $\sigma \sim student(3, 0, 2.5)$. We used a lkj_corr prior for each of the three correlation matrices ($R \sim lkj\_corr(1)$).
 
 
-
-First, we simultaneously investigated the effects of biomass and sst on all functions and the correlations among functions (independent of biomass and sst). 
-The standing stock biomass of communities is inevitably positively related to all functions because of the additive nature of the quantification and metabolic theory [@Brown2004]. Further, because of the known relationship between temperature and parameters related to growth and respiration (see suppl. methods), functions are expected to be affected by temperature. To model the effects of biomass and sst while simultaneously investigating the correlations between the five functions, we fitted a multivariate Bayesian mixed-effect model using transect-level log-transformed functions that included random effects for sites and localities:
+Second, we ran a mixed-effect model to simultaneously investigate the effects of biomass and sst on all functions and the correlations among functions (independent of biomass and sst).
+The standing stock biomass of communities is inevitably positively related to all functions because of the additive nature of the quantification and metabolic theory [@Brown2004]. Further, because of the known relationship between temperature and parameters related to growth and respiration (see suppl. methods), functions are expected to be affected by temperature. We thus fitted a multivariate Bayesian mixed-effect model using transect-level log-transformed functions that included random effects for sites and localities:
 
 
 $$\begin{bmatrix}y_{ExN,i} \\ y_{ExP,i} \\ y_{Prod,i} \\ y_{Herb,i} \\ y_{Pisc,i} \end{bmatrix} \sim MVNormal\left(\begin{bmatrix} \mu_{ExN,i} \\ \mu_{ExP,i} \\ \mu_{Prod,i} \\ \mu_{Herb,i} \\ \mu_{Pisc,i}\end{bmatrix}, S \right),$$
 
-$$S = \begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\ 
-0 & \sigma_{ExP} & 0 & 0 & 0 \\ 
-0 & 0 & \sigma_{Prod,i} & 0 & 0\\ 
-0 & 0 & 0 & \sigma_{Herb} & 0\\ 
-0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix} 
-R 
-\begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\ 
-0 & \sigma_{ExP} & 0 & 0 & 0 \\ 
-0 & 0 & \sigma_{Prod,i} & 0 & 0\\ 
-0 & 0 & 0 & \sigma_{Herb} & 0\\ 
+$$S = \begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\
+0 & \sigma_{ExP} & 0 & 0 & 0 \\
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\
+0 & 0 & 0 & \sigma_{Herb} & 0\\
+0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix}
+R
+\begin{bmatrix}\sigma_{ExN} & 0 & 0 & 0 & 0\\
+0 & \sigma_{ExP} & 0 & 0 & 0 \\
+0 & 0 & \sigma_{Prod,i} & 0 & 0\\
+0 & 0 & 0 & \sigma_{Herb} & 0\\
 0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix}$$
 
-           
-$$\mu_{\textrm{ExN,i}} = (\beta0_{ExN} +  \delta_{ExN, loc} +  \delta_{ExN, site}) +{\beta1_{ExP}} {x_{log(biomass),i}} + {\beta2_{ExN}} {x_{sst,i}} \\
+
+$$\mu_{\textrm{ExN,i}} = (\beta0_{ExN} +  \delta_{ExN, loc} +  \delta_{ExN, site}) +{\beta1_{ExN}} {x_{log(biomass),i}} + {\beta2_{ExN}} {x_{sst,i}} \\
 \mu_{\textrm{ExP,i}} = (\beta0_{ExP} +  \delta_{ExP, loc} +  \delta_{ExP, site}) +{\beta1_{ExP}} {x_{log(biomass),i}} + {\beta2_{ExP}} {x_{sst,i}} \\
 \mu_{\textrm{Prod,i}} = (\beta0_{Prod} +  \delta_{Prod, loc} +  \delta_{Prod, site}) +{\beta1_{Prod}} {x_{log(biomass),i}} + {\beta2_{Prod}} {x_{sst,i}} \\
 \mu_{\textrm{Herb,i}} = (\beta0_{Herb} +  \delta_{Herb, loc} +  \delta_{Herb, site}) +{\beta1_{Herb}} {x_{log(biomass),i}} + {\beta2_{Herb}} {x_{sst,i}} \\
-\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) +{\beta1_{Pisc}} {x_{log(biomass),i}} + {\beta2_{Pisc}} {x_{sst,i}} 
+\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) +{\beta1_{Pisc}} {x_{log(biomass),i}} + {\beta2_{Pisc}} {x_{sst,i}}
 $$
 
-where i is the transect, Y_{ExN,i} is N excretion, Y_{ExP,i} is P excretion, Y_{Prod,i} is biomass production, Y_{Herb,i} is herbivory, Y_{ExN,i} is piscivory, \sigma represents the residual error of each function (ExN, ExP, Prod, Herb, and Pisc), R is the correlation matrix of the residuals. Locality- and site-level effects are also structured including covariation among functions. There are thus three correlation matrices in total, or in other words the model will estimate the correlation between functions (independent of biomass and SST) on three levels: locality-level, site-level, and transect-level.
+where $\beta1_{ExN}, \beta1_{ExP}, \beta1_{Prod}, \beta1_{Herb}, \beta1_{Pisc}$ are the fixed effects of the log-transformed biomass, and $\beta2_{ExN}, \beta2_{ExP}, \beta2_{Prod}, \beta2_{Herb}, \beta2_{Pisc}$ are the fixed effects of sst. Locality- and site-level effects are now thus structured including covariation among functions, independent of biomassand sst. Similarly, the residual variation of functions incorporates the correlations between functions, without the effect of biomass and sst.
+We used similar priors as describved above, and we used weakly-informative normal priors for the model slopes ($\beta1 \sim normal(1,1)$, $\beta2 \sim normal(0,1)$).
 
+\noindent Finally, to investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, we fitted a mixed effect multivariate model similar to the model specified above, but adding all community structure variables:
 
-\noindent We used non-centered parametrisation for site and location effects and all standard deviations had the following prior: $\sigma \sim student(3, 0, 2.5)$. We used a lkj_corr prior for each of the three correlation matrices ($R \sim lkj\_corr(1)$) (ADD REF). We used weakly-informative normal priors for the model slopes ($\beta1 \sim normal(1,1)$, $\beta2 \sim normal(0,1)$).
+$$\begin{array}{c} \mu_{\textrm{function,i}}  = \beta0_{function} + \beta1_{function} x_{log(biomass),i} + \beta2_{function} x_{sst,i}  + \beta3_{function} x_{richness,i}  + \beta4_{function} x_{size_m,i}  + \beta5_{function} x_{size_{2.5\%},i} +  \beta6_{function} x_{size_{97.5\%},i} + \\ \beta7_{function} x_{troph_m,i}  + \beta8_{function} x_{troph_{2.5\%},i} +  \beta9_{function} x_{troph_{97.5\%},i} + \beta10_{function} x_{imm_m,i}  + \beta11_{function} x_{imm_{2.5\%},i} +  \beta12_{function} x_{imm_{97.5\%},i} $$
 
-\noindent All parameters $\beta$ were given weakly-informative priors ($\beta1 \sim  normal(1, 1), \beta2 \sim  normal(0, 1)$). We applied non-centered parametrisation for site and location effects ($\delta_{loc}, \delta_{site}$) which also included the correlation between site and locality effects across functions. The model thus included a total of three correlation matrices that each had the same prior ($R \sim lkj\_corr(1)$). All standard deviations had a general weakly-informative prior: $\sigma \sim student(3, 0, 2.5)$. 
+where richness is the species richness, $size$ is the total length, $troph$ is the trophic level, $imm$ is the immaturity, and $m$, $2.5\%$, and $97.5\%$ respectively represent the 50\%, 2.5\%, and 97.5\% quantiles across the fish community.
+For these models, we used weakly informative priors for the fixed effect parameters ($\beta3-\beta12 \sim normal(0,1)$) and the same priors as described above for other parameters. par
 
-The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots. Posterior predictive checks for are provided in Supporting Information xxxx.
-
-\noindent The multivariate and mixed structure of the above-mentioned model allowed us to extract the correlations between the five functions on the location, site, and  We then assessed the covariation between functions, independent of biomass and sst. To do so, we first extracted the median residuals for each function per transect. In some transects, there were no piscivores or herbivores observed. In those cases, we did not include these transects in the analysis. We then quantified the correlations that exist among the different functions using these median residuals. Finally, for the purpose of visualizing the residual variation of functions per locality on a world map, we ran a supplemental model, similar to the model described above but including random effects both per site and locality. We then extracted and plotted the location effects, which can be interpreted as the average variation per locality.  
-
-
-
-### 4.3 Intercepts-only models
-Additionally, we performed a multivariate intercept-only model to estimate the functions per locality, and a univariate intercept-only model to estimate the multifunction per locality. The model structures were similar as the above-mentioned models, the only difference being the exclusion of the predictor variables (sst and biomass).
-Further, we fitted a similar univariate model to predict the multifunction per locality:
-$$\mu_{\textrm{multi,i}} = \beta0_{multi} +  \delta_{multi, loc} +  \delta_{multi, site} $$
-
-
-
-
-### 4.4 Effect of community structure on ecosystem functions
-\noindent To investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, Additionally, we quantified the transect-level species richness.
-For each log-transformed function we then fitted a Bayesian mixed-effect model with all 12 above-mentioned variables, after verifying that there are no strong correlations between variables (the highest correlation coefficient was 0.5, and 50% of the variable pair correlations varied between -0.1 and 0.2).
-
-
-$$y_\textrm{j} \sim N(\mu_j, \sigma_j),$$
-
-$\begin{array}{c} \mu_{j} = \beta_0 + \beta_1 x_{log(biomass),j} + \beta_2 x_{sst,j}  + \beta_3 x_{richness,j}  + \beta_4 x_{size_m,j}  + \beta_5 x_{size_{2.5\%},j} +  \beta_6 x_{size_{97.5\%},j} + \\ \beta_7 x_{troph_m,j}  + \beta_8 x_{troph_{2.5\%},j} +  \beta_9 x_{troph_{97.5\%},j} + \beta_{10} x_{imm_m,j}  + \beta_{11} x_{imm_{2.5\%},j} +  \beta_{12} x_{imm_{97.5\%},j} \end{array}$
-
-
-where $i$ represents the transects, $\beta_0$ is the intercept, $\beta_1$ to $\beta_{12}$ are the fixed effect parameters, $\delta_{loc}$ is the random effect of the locality, $\delta_{site}$ is the random effect of the site, biomass represents the total standing stock biomass of the community, sst the sea surface temperature, richness is the species richness, size is the total length, troph is the trophic level, imm is the immaturity, and $m$, $2.5\%$, and $97.5\%$ respectively represent the 50\%, 2.5\%, and 97.5\% quantiles across the fish community.
-For these models, we used uninformative priors for the fixed effect parameters ($\beta_{1-12}$) and weakly informative priors for the standard deviations of residuals and random effects (ADD THE PRIOR).
-To insure that the performed Imputationdidn't change main results of the downstream regression models, we repeated all below-mentioned models on a subset of the transect data, excluding the original missing values. Results of models are shown in the supplementary information xxxxxxx.
-
-### 4.5 Model specifications
+All models were fitted using brms (ref). The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots. Posterior predictive checks for are provided in Supporting Information xxxx.
 We ran all Bayesian reggression models using the R package *brms* which uses the stan algorithm.
 The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions.
-For all models we inspected the MCMC chains and the Rhat for convergence and peformed posterior predictive checks (Appendix xxxx).
-We used Bayesian R2 to estimate the amount of explained variation of each model.
+
 
 
 ## 5. Species dominance and contributions to functions
