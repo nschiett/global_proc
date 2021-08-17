@@ -34,11 +34,11 @@ where $\kappa$ is the species-specific growth rate parameter and $l_{\infty}$ is
 
 ## 4. Multivariate regression models
 
-We fitted three multivariate Bayesian models with all five functions to (1) predict functions on the locality level, (2) investigate the effects of bioimass and sst, and the correlations among functions independent of biomass and sst, and (3) estimate the effects of the community structure on each function. \par
+We fitted three multivariate Bayesian models with all five functions to (1) predict functions on the locality level, (2) investigate the effects of bioimass and sst, and the correlations among functions independent of biomass and sst, and (3) estimate the effects of the community structure on each function. For each model, functions were log-transformed to ensure the normal distribution of residuals and to allow the allometric relationship with biomass, hypothesized by metabolic theory [@Brown2004].\par
 
 In the underwater visual transect database, 291 transects (3%) did not contained herbivores and 4467 transects (49%) did not contain piscivores yielding false zeros for herbivory and piscivory, respectively. We considered these zeros as missing values because the absence of the observation of a herbivore or piscivore does not prove the actual absence of herbivores and piscivores. In fact, it is highly unlikely that a coral reef fish community contains no herbivores and piscivores at all. To avoid removing all transects with missing values for herbivory or piscivory (n = 4620) from our database when running multivariate analyses, we imputed the missing values by adding these observations as parameters in the multivariate models. \par
 
-First, we performed a multivariate intercept-only regression model with the five -log-transformed functions to estimate the functions per locality. The model structure includes intercepts and random effects for localities and sites:
+First, we performed a multivariate intercept-only regression model with the five log-transformed functions to estimate the functions per locality. The model structure includes intercepts and random effects for localities and sites:
 
 $$\begin{bmatrix}y_{ExN,i} \\ y_{ExP,i} \\ y_{Prod,i} \\ y_{Herb,i} \\ y_{Pisc,i} \end{bmatrix} \sim MVNormal\left(\begin{bmatrix} \mu_{ExN,i} \\ \mu_{ExP,i} \\ \mu_{Prod,i} \\ \mu_{Herb,i} \\ \mu_{Pisc,i}\end{bmatrix}, S \right),$$
 
@@ -109,16 +109,13 @@ $$\begin{array}{c} \mu_{\textrm{function,i}}  = \beta0_{function} + \beta1_{func
 where richness is the species richness, $size$ is the total length, $troph$ is the trophic level, $imm$ is the immaturity, and $m$, $2.5\%$, and $97.5\%$ respectively represent the 50\%, 2.5\%, and 97.5\% quantiles across the fish community.
 For these models, we used weakly informative priors for the fixed effect parameters ($\beta3-\beta12 \sim normal(0,1)$) and the same priors as described above for other parameters. par
 
-All models were fitted using brms (ref). The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots. Posterior predictive checks for are provided in Supporting Information xxxx.
-We ran all Bayesian reggression models using the R package *brms* which uses the stan algorithm.
-The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by  using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions.
-
+All Bayesian models were fitted using the R package *brms* (ref) which uses Stan, a C++ package for performing full Bayesian inference. The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots. Posterior predictive checks for are provided in Supporting Information xxxx.
 
 
 ## 5. Species dominance and contributions to functions
 We quantified the relative contribution of each species to each function for all transects as followed:
 <!-- \begin{equation} -->
-$$	\textrm{contribution}_{f,i,j} = \frac{\sum F_{f,i,j}}{\sum F_{f,j}},$$
+$$	\textrm{contribution}_{f,i,j} = \frac{F_{f,i,j}}{\sum F_{f,j}},$$
 <!-- 	\label{con} -->
 <!-- \end{equation} -->
 where i is a certain species, j is a transect, F is the value of function f.
@@ -148,11 +145,20 @@ $$	\textrm{A} = \sum_{i = 2}^R \frac{C_i + C_{i-1}}{2},$$
 
 where $C_i$ is the contribution of a certain species and R is the number of species contributing to a certain function. The degree of dominance thus ranges between 0 and 1, where 0 means that each species contributes equally and 1 means that a single species performs the entire function. In the case of N excretion, P excretion, and production, R equals the species richness, while for herbivory and piscivory R represents the number of herbivores and piscivores, respectively.
 
-Finally, to know how often species are contributing more than average for a certain function, we quantified the frequency of dominance, i.e. the number of times a species is dominant divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function.
+Finally, we quantified the frequency of dominance per species, i.e. the number of transects in which a species is dominant for a given function divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function.
 
 ## 6. Vulnerability to fishing and climate change
-For each species, we quantified two measures of vulnerability: vulnerability to climate change and vulnerability to fishing pressure [@Graham2011]. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change induced coral loss is related to diet specialization, habitat specialization for live coral and body size [@Graham2011]. Graham et al. (2011) [@Graham2011] developed a score for climate change vulnerability for 134 species. We used these scores to fit a Bayesian mixed effect predictive model that relates the vulnerability with the log-transformed maximum size of fish (extracted from Fishbase @Froese2018), the dependence on coral for food (3 categories: not dependent, facultative corallivore, and obligate corallivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent) [@Coker2014; @Cole2008]. We also included a random effect for family. To verify the fit of the model we inspected the posterior predictive plot, which indicated a good fit. Further, the model had a Bayesian R2 of 0.97. We thus used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. For species' vulnerability to fishing, we extracted the index from Cheung et al. (2005) [@Cheung2005].
-Next, we calculated vulnerability scores per function on the community level by averaging the species-level scores weighted by the contributions to function of species. We also calculated community-level vulnerability scores based on biomass contributions as a comparison. Finally, we calculated the proportions of communities that had a higher vulnerability score of functions, compared to the vulnerability score based on biomass alone. In other words, we quantified the proportions of communities that have an increased functional vulnerability.
+First, we estimated or extracted two measures of vulnerability per species: vulnerability to climate change and vulnerability to fishing pressure [@Graham2011]. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change induced coral loss is related to diet specialization, habitat specialization for live coral, and body size [@Graham2011]. Specifically, we used a score for climate change vulnerability for 134 species found in Graham et al. (2011) [@Graham2011] and fitted a Bayesian mixed effect predictive model that relates these vulnerability scores with the log-transformed maximum size of fish (extracted from Fishbase @Froese2018), the dependence on coral for food (3 categories: not dependent, facultative corallivore, and obligate corallivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent) [@Coker2014; @Cole2008]. We also included a random effect for family:
+$$ y_i \sim normal(\mu_i, \sigma)$$
+$$
+\mu_i = (\beta0 +  \delta_{family}) + \beta1 log(sizemax) + \beta2 HD + \beta3 FD  ,
+$$
+with $y_i$ the vulnerability score of species i, $\mu_i$ the average predicted vulnerability score, sizemax the maximum length of the species, HD de dependence for habitat, and FD the depedendence for food.
+To verify the fit of the model we inspected the posterior predictive plot, which indicated a good fit. Further, the model had a Bayesian R2 of 0.97. We then used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. We provide the model parameters in supplementary table xx. \par For species' vulnerability to fishing, we extracted the index from Cheung et al. (2005) [@Cheung2005].
+Next, we calculated vulnerability scores per function on the community level by averaging the species-level scores weighted by the contributions to function of species.
+Finally, we fitted a mixed model to predict the average vulnerability to climate change and fishing for each function.
+
+
 
 
 ## References
