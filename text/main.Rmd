@@ -63,8 +63,8 @@ Therefore, trade-offs between functions, their drivers, and their vulnerability 
 Coral reefs are among the most diverse and productive ecosystems on Earth and provide essential ecosystem services [@Teh2013].
 Yet, their integrity is threatened by a plethora of anthropogenic stressors [@Hughes2017].
 Severe declines in habitat quality and fish biomass have brought coral reef functioning to the forefront of scientific discourse [@Bellwood2019; @Brandl2019front].
-However, our capacity to evaluate reef functioning typically relies on static proxies of functions, such as live coral cover, standing stock biomass of reef fishes, or the diversity of qualitative traits [e.g. @Cinner2020].
-Conversely, we know comparatively little about actual functions - fluxes of elements and energy - and their drivers (but see [@Allgeier2016]), which constitutes a severe limitation to efficient management [@Brandl2019front].
+Our capacity to evaluate reef functioning typically relies on static proxies of functions, such as live coral cover, standing stock biomass of reef fishes, or the diversity of qualitative traits [e.g. @Cinner2020].
+However, we know comparatively little about actual functions - fluxes of elements and energy - and their drivers (but see [@Allgeier2016]), which constitutes a severe limitation to efficient management [@Brandl2019front]. How can we protect functions if we can not quantify them?
 
 Here, we integrate biogeochemistry and community ecology to advance our understanding of the elemental fluxes that underpin reef fish functioning.
 Using empirically-collected species-specific data on basic organismal processes and Bayesian phylogenetic models, we parameterize individual-level bioenergetic models to estimate five key ecosystem functions: nitrogen (N) excretion, phosphorus (P) excretion, biomass production, herbivory, and piscivory.
@@ -73,25 +73,38 @@ We apply these bioenergetic models to 9,118 reef fish communities across 585 sit
 (2) extract the community- and species-level effects on these functions, and
 (3) gauge the vulnerability of reef fish functioning in the Anthropocene.
 
+## Results
+By combining individual-level bioenergetic models and global underwater visual transect data, we quantified five key ecosystem functions across the globe.
+By running a multivariate Bayesian model with, we estimated the average functions per locality as well as a combined measure of multifunction (Fig. 1).
+Functions across localities show similar spatial patterns, yet a high level of function does not nescessarily ensure a high level of another function. For example, xxxx.
 
-The five key ecosystem functions performed by fishes across the world's coral reefs exhibit high variability (Fig. 1).
-Biomass is the most commonly employed indicator of coral reef functioning [@Cinner2020; @Brandl2019front], and we observed a predictably strong relationship between fish biomass and all five functions (Fig. S1a-e, Fig. S2).
-However, our analyses demonstrate striking variability after accounting for biomass: in communities with similar biomass, functions may differ by two orders of magnitude or more (Fig. S1a-f).
-Thus, using biomass as a proxy for functioning masks fundamental differences in critical community-level functions.
-Further, we demonstrate strong trade-offs among the five functions, independent of biomass (Fig.1, Fig. S1g).
-For example, high herbivory rates and nitrogen excretion negatively correlate with rates of phosphorus excretion.
+Biomass is the most commonly employed indicator of coral reef functioning [@Cinner2020; @Brandl2019front], and we observed a predictably strong relationship between fish biomass and all five functions (Fig. 1). We ran a multivariate mixed effect Bayesian model to assess the relationship between all five functions and biomass. We also incorporated sea surface temperature (sst) because it affects the metabolic and groth rates of fishes, which scales up to the community [@Barneche2019].
+We found positive slopes xxx for biomass and xxx for sst.
+
+The above-mentioned multivariate model also allowed us to estimate the correlations between functions, independent of the effects of biomass and sst.
+Specifically, we estimated correlations between functions on three levels: the locality effects, the site effects, and the residual variations (Fig. 2).
+The correlations mostly overlapped across the three levels for a given pair of functions. We found consistently negative trade-offs between P excretion and N excretion, P excretion and biomass production. Further, there were slightly weaker negative correlations between piscivory and N excretion and between piscivory and herbivory. As a consequence of the negative correlations, there are no transects that can have a high value of production and P excretion simultaneously for example.
+
+To explore what drives the residual variation and trade-offs of functions beyond the effects of biomass and sst, we conducted a multivariate Bayesian mixed effect model by adding ten variables that describe the community structure: species richness and the median, lower, and upper 95% quantiles of size, immaturity, and trophic level of the individuals inside a community. We found that the community structure drives the observed trade-offs (Fig. 3).
+
+We also questioned if functions tend to be driven by specific species. We quantified the degree of dominance inside each community and found that functions are on average charachterized by a high level of dominance, i.e. in most communities, a small proportion of species perform most of a function (Fig. 4a). As a comparison, we simulated random communities ranging from 5 to 50 species which yielded an average XX. The predicted average of the degree of dominance was x, x, x, x, and x for each function respectively.
+We also calculated the proportion of species that is dominant in at least one transect (i.e. species that contribute more than a community in which each species contributes equally). We found that most species play a dominant role, and 70% of all species contributed disproportionally to a function in at least one community (Fig. 4b).
+We finally investigate how often species are dominant across their range and found that very few species are dominant throughout their range (Fig. 4c). Together, this means that functions inside communities tend to be driven by few dominant species, but that the identity of these dominant species varies highly across communities.
+
+
+## Discussion
+
+By quantifying five key functions mediated by coral reef fishes, we demonstrate that ecosystem-wide functioning is driven by both fish biomass and community structure due to variations in organismal physiology and life-history traits [@Schiettekatte2020; @Schramski2015].
+While biomass is one of the most commonly employed indicator of coral reef functioning [@Cinner2020; @Brandl2019front], our analyses suggests that biomass alone does not sufficiently characterize functioning and using biomass as a proxy for functioning masks fundamental differences in critical community-level functions.
+Further, we demonstrate strong trade-offs among the five functions, independent of biomass.
 Consequently, for a given value of biomass, no reef can yield above average values across all five functions.
-While many reefs may stand out as hotspots for one function, none can holistically maximize functioning (Fig. 1).
+While many reefs may stand out as hotspots for one function, none can holistically maximize functioning.
 
-
-Community structure and species-specific traits clearly impact rates of functioning.
-First, using community-level ecological predictors known to affect elemental fluxes (body size, trophic level, species richness, biomass, temperature, and age structure [@Schiettekatte2020]; Fig. 2), we show that correlations between functions are mediated by contrasting aspects of community structure (Fig. 2; Table S2; Fig. S2).
+Due to variations in organismal physiology and life-history traits [@Schiettekatte2020], fish community structure significantly impacts ecosystem-wide functioning [@Schramski2015].
 For example, phosphorus excretion and piscivory are higher in communities that include large-bodied fishes or occupy high trophic levels (Fig. 2; @Allgeier2014).
 In contrast, biomass production is highest in communities dominated by small and/or immature fishes at low trophic levels, creating a trade-off between biomass production and phosphorus excretion.
 Metabolic theory predicts that small-bodied individuals have higher mass-specific metabolic rates, leading to elevated consumption rates and disproportionate contributions to functions that rely on rapid energetic turnover [@Barneche2018; @Morais2020glob; @Brandl2019science].
 Conversely, fishes in early life stages or with a nutrient-poor diet are often limited by phosphorus [@Schiettekatte2020], resulting in low contributions to phosphorus excretion.
-Thus, due to variations in organismal physiology and life-history traits [@Schiettekatte2020], fish community structure significantly impacts ecosystem-wide functioning [@Schramski2015].
-
 
 
 Secondly, alongside community structure, functions may also be influenced by specific high-performing taxa (Fig. 3a; Fig. S3,S4), which may disproportionately impact rates of functioning at the community level due to high biomass or abundance [@Topor2019].
@@ -103,13 +116,13 @@ Despite high species richness on coral reefs, researchers often report the exist
 Our results reveal that while functional dominance is indeed prevalent, the identity of local, dominant species vary strongly across locations [@Lefcheck2019].
 
 
-The critical importance of both reef fish community structure and species-specific contributions shines new light on the vulnerability of coral reef functioning in our changing world.
+Considering multiple functions sheds light on how human-induced shifts in reef fish community structure may impact coral reef ecosystems.
 Anthropogenic stressors have caused severe changes in reef fish biomass and community structure [@Hughes2017], and our findings suggest that these changes will have strong effects on ecosystem functioning.
 For example, intensive fishing and associated reductions in biomass of large fishes truncates the size, age, and trophic structure of fish communities [@Graham2017].
 When accounting for the effect of biomass, these effects can enhance nitrogen excretion and production [e.g. @Morais2020glob] but negatively impact phosphorus excretion, herbivory, and piscivory (Fig. 2).
 On the other hand, declines in coral cover related to climate change are often associated with a shift toward herbivores, which may deter algal domination [@Graham2006].
 However, herbivores have a minor contribution to phosphorus excretion [@Allgeier2014; @Schiettekatte2020], so a shift to herbivore dominance and the subsequent decline of community-level phosphorus excretion may change the balance of nutrient cycling on reefs, potentially favoring algal growth [@Burkepile2013].
-Thus, considering multiple functions paints a more nuanced picture of how human-induced shifts in reef fish community structure may impact coral reef ecosystems.
+
 
 Similarly, the species-specific vulnerability of functionally-dominant species heavily affects the vulnerability of functions.
 By combining species-level vulnerability scores to fishing and climate change induced coral loss [@Graham2011] and the contributions of each species to each function, we illustrate that the loss of individuals most vulnerable to fishing will have greatest impacts on piscivory, followed by phosphorus excretion (Fig. 4).
