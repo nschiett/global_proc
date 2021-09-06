@@ -319,6 +319,79 @@ get_dd <- function(contributions, herb_pisc){
   return(key)
 }
 
+get_dd_site <- function(contributions, herb_pisc){
+  
+  # combine data
+  
+  
+  nspec <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+    ungroup() %>% group_by(sites) %>%
+    dplyr::summarise(nspec = length(unique(species)),
+                     nspec_h = length(unique(species[I_herb_p>0])),
+                     nspec_p = length(unique(species[I_pisc_p>0])))
+  
+  
+  ### function to calculate area of ranked function contribution !! 
+  # data has to be ordered
+  # y = cumsum!!
+  rank_area <- function(y) {
+    n <- length(y)
+    a <- y[2:n]
+    b <- y[1:(n-1)]
+    area <- sum(a + b)/2
+    return(area)
+  }
+  
+  # dominance function
+  ks_area <- function(data, var){
+    
+    if (var %in% c("I_herb_p", "I_pisc_p")){
+      data <- data %>%
+        filter(.data[[var]] > 0)
+    }
+    
+    if (nrow(data) == 0){
+      return(NA)
+    }else if (nrow(data) == 1){
+      return(1)
+    }else{
+      drank <- data %>% 
+        mutate(rank = dplyr::dense_rank(desc(.data[[var]]))) %>%
+        dplyr::arrange(rank) %>%
+        mutate(cumsum = cumsum(.data[[var]]))
+      
+      A <- rank_area(drank$cumsum)
+      
+      r <- nrow(data) # species richness
+      A_max <- 1 * (r - 1) # maximum if first species performs 100% (rectangle)
+      A_min <- (r^2-1)/(2*r) # minimum if all sp contribute equally (trapezium)
+      
+      dd <- (A - A_min)/(A_max - A_min)
+      
+      return(dd)
+    }
+  }
+  
+  con <- ungroup(tfs)
+  
+  key <- parallel::mclapply(unique(con$sites), function(x){
+    
+    t <- dplyr::filter(con, sites == x)
+    
+    result <- data.frame(
+      sites = x,
+      dd_Fn = ks_area(t, "Fn_p"),
+      dd_Fp = ks_area(t, "Fp_p"),
+      dd_Gc = ks_area(t, "Gc_p"),
+      dd_I_herb = ks_area(t, "I_herb_p"),
+      dd_I_pisc = ks_area(t, "I_pisc_p")
+    )
+    return(result)
+  }, mc.cores = 40) %>%plyr::ldply()
+  
+  return(key)
+}
+
 # median contributions families 
 get_cf <- function(contributions, herb_pisc){
   
@@ -344,6 +417,7 @@ get_importance <- function(contributions, herb_pisc){
   
   con <- left_join(contributions, herb_pisc$contributions_herb_pisc)
   
+  
   parallel::mclapply(unique(con$transect_id), function(x){
     sub <- filter(con, transect_id == x)
     nherb <- sum(sub$I_herb_p>0)
@@ -361,6 +435,29 @@ get_importance <- function(contributions, herb_pisc){
   }, mc.cores = 30) %>% plyr::ldply()
   
 }
+
+get_importance_site <- function(con){
+  
+  # if con > 1/N !!
+  
+  imp <- parallel::mclapply(unique(con$sites), function(x){
+    sub <- filter(con, sites == x)
+    nspec <- length(unique(sub$species))
+    nherb <- sum(sub$I_herb_p>0)
+    npisc <- sum(sub$I_pisc_p>0)
+    sub <- sub %>%
+      mutate(Gc_i = Gc_p > 1/nspec,
+             Fn_i = Fn_p > 1/nspec,
+             Fp_i = Fp_p > 1/nspec,
+             I_pisc_i = I_pisc_p > 1/npisc,
+             I_herb_i = I_herb_p > 1/nherb) %>%
+      mutate(I_pisc_i = case_when(I_pisc_p == 0 ~ NA, TRUE ~ I_pisc_i),
+             I_herb_i = case_when(I_herb_p == 0 ~ NA, TRUE ~ I_herb_i)) %>%
+      dplyr::select(sites, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i)
+    return(sub)
+  }, mc.cores = 30) %>% plyr::ldply()
+  
+}
   
 get_fd <- function(sp_importance){
   # relative frequency when important 
@@ -371,6 +468,18 @@ get_fd <- function(sp_importance){
     group_by(species, occ) %>%
     dplyr::summarise_if(is.logical, function(x){sum(x, na.rm = TRUE)/length(x[!is.na(x)])})
 }
+
+
+get_fd_site <- function(sp_importance){
+  # relative frequency when important 
+  sp_importance %>%
+    dplyr::select(sites, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i) %>%
+    group_by(species) %>%
+    mutate(occ = length(Gc_i)) %>%
+    group_by(species, occ) %>%
+    dplyr::summarise_if(is.logical, function(x){sum(x, na.rm = TRUE)/length(x[!is.na(x)])})
+}
+
  
 get_spi_vuln <- function(sp_importance, vulnerability){
   

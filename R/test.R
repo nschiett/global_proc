@@ -74,17 +74,19 @@ rank_area <- function(y) {
   return(area)
 }
 
-list <- parallel::mclapply(21, function(j){
-  te <- (simplex.sample(j, 1000, sort=FALSE))[[1]]
+list <- parallel::mclapply(2:277, function(j){
+  te <- (simplex.sample(j, 500, sort=FALSE))[[1]]
    dd <- (apply(te, 1, ks_area))
    data.frame(nspec = j, dd = dd)
 }, mc.cores = 50)
 
-vec <- plyr::ldply(list)
+vec <- plyr::ldply(list) %>%
+  group_by(nspec) %>%
+  dplyr::summarize(dd = mean(dd))
 
 summary(vec$dd)
 
-plot(5:100, vec)
+plot(vec$nspec, vec$dd)
 
 hist(vec$dd)
 
@@ -310,6 +312,7 @@ predsim <- fitted(fit_sim)
  
   
    ####### vuln ######
+  loadd(contributions, vulnerability, herb_pisc)
   
   con <- left_join(contributions, vulnerability) %>%
     left_join(herb_pisc$contributions_herb_pisc) %>%
@@ -336,7 +339,7 @@ predsim <- fitted(fit_sim)
     filter(!fun == "bm")
   
   ggplot(con) +
-    geom_point(aes(x = vuln_Fp_cl, y = vuln_Fp_fi)) +
+    geom_point(aes(x = vuln_Fp_cl, y = vuln_Fp_fi), alpha = 0.2) +
     geom_smooth(aes(x = vuln_Fp_cl, y = vuln_Fp_fi))
   
   con <- left_join(con, summary_transect_imp)
@@ -347,7 +350,7 @@ predsim <- fitted(fit_sim)
   con_long <- left_join(con_long, select(summary_transect_imp, sites, locality, transect_id, nspec, biomass_tot))
   
   
-  fit_v <- brm(mvbind(fi, cl) ~ fun + fun:log(nspec) + fun:log(biomass_tot),#+ (1|sites) + (1|locality),
+  fit_v <- brm(mvbind(fi, cl) ~ fun + fun:nspec + fun:log(biomass_tot) + (fun|sites) + (fun|locality),
   data = con_long, cores = 4,
   backend = "cmdstanr",
   threads = threading(15))
@@ -360,9 +363,9 @@ predsim <- fitted(fit_sim)
   
   v1 <-
   ggplot(fe1) +
-    geom_line(aes(x = log(effect1__), y = estimate__, color = effect2__)) +
-    labs(x = "log(Richness)", y = "Vulnerability to climate change") +
-    geom_ribbon(aes(x = log(effect1__), ymin = lower__, ymax = upper__, fill = effect2__), alpha = 0.4) +
+    geom_line(aes(x = (effect1__), y = estimate__, color = effect2__)) +
+    labs(x = "Richness", y = "Vulnerability to climate change") +
+    geom_ribbon(aes(x = (effect1__), ymin = lower__, ymax = upper__, fill = effect2__), alpha = 0.4) +
     scale_fill_fish_d(name = "Function",
                        option = "Callanthias_australis",
                        labels = c("N excretion",
@@ -382,8 +385,8 @@ predsim <- fitted(fit_sim)
     
   v2 <- 
     ggplot(fe2) +
-    geom_line(aes(x = log(effect1__), y = estimate__, color = effect2__)) +
-    geom_ribbon(aes(x = log(effect1__), ymin = lower__, ymax = upper__, fill = effect2__), alpha = 0.4) +
+    geom_line(aes(x = (effect1__), y = estimate__, color = effect2__)) +
+    geom_ribbon(aes(x = (effect1__), ymin = lower__, ymax = upper__, fill = effect2__), alpha = 0.4) +
     scale_fill_fish_d(name = "Function",
                       option = "Callanthias_australis",
                       labels = c("N excretion",
@@ -391,7 +394,7 @@ predsim <- fitted(fit_sim)
                                  "Production", 
                                  "Herbivory",
                                  "Piscivory" )) +
-    labs(x = "log(Richness)", y = "Vulnerability to fishing") +
+    labs(x = "Richness", y = "Vulnerability to fishing") +
     scale_color_fish_d(name = "Function",
                        option = "Callanthias_australis",
                        labels = c("N excretion",
@@ -603,5 +606,474 @@ test <- apply(sub, 1, geomean)
 
 summary(test)
 
+####### multi comm #####
+
+loadd(mod_mvfun_com)
+me <- conditional_effects(mod_mvfun_com, "troph_m")
+
+df <- data.frame(
+  effect1 = me[[1]]$effect1__,
+  Fn = exp(normalize(me[[1]]$estimate__)),
+  Fp = exp(normalize(me[[2]]$estimate__)),
+  Gc = exp(normalize(me[[3]]$estimate__)),
+  Iherb = exp(normalize(me[[4]]$estimate__)),
+  Ipisc = exp(normalize(me[[5]]$estimate__))
+)
+
+nd <- me[[1]]
+
+df <- fitted(mod_mvfun_com2, newdata = nd)
+
+normc <- function(x, min, max){
+  100 * (x - min/(max- min))
+}
+
+
+
+pred <- fitted(mod_mvfun_com2)
+
+me_plot <- function(var){
+  names <- c("biomass_tot" , "mean"        ,    "nspec"              ,        "size_m",                    
+   "imm_m"             ,         "size_q3"              ,  "troph_m",    "troph_q3" ,                 
+   "imm_q1"            ,         "imm_q3"            ,         "troph_q1" ,                 
+   "size_q1"   ,"sites", "locality"  )
+  
+  nd <- matrix(nrow = 100, ncol = 14, data = 0) %>% as.data.frame()
+    colnames(nd) <- names
+    
+    nd <- sapply(names, function(x){
+      nd[,x] <- rep(mean(simplify(summary_transect_complete[,x])), 100)
+    }) %>% as.data.frame()
+    
+  nd[,var] <- seq(min(summary_transect[,var]), max(summary_transect[,var]), 
+                   (max(summary_transect[,var]) - min(summary_transect[,var]))/99)
+
+  df <- fitted(mod_mvfun_com2, newdata = nd)
+  
+  df
+  
+  df2 <- data.frame(
+    effect = nd[,var],
+    Fn = normc(exp(df[,1,1]), exp(min(pred[,1,1])), exp(max(pred[,1,1]))),
+    Fp = normc(exp(df[,1,2]), exp(min(pred[,1,2])), exp(max(pred[,1,2]))),
+    Gc = normc(exp(df[,1,3]), exp(min(pred[,1,3])), exp(max(pred[,1,3]))),
+    Iherb = normc(exp(df[,1,4]), exp(min(pred[,1,4])), exp(max(pred[,1,4]))),
+    Ipisc = normc(exp(df[,1,5]), exp(min(pred[,1,5])), exp(max(pred[,1,5])))
+  ) %>% rowwise() %>%
+    mutate(mf = geomean(Fn, Fp, Gc, Iherb, Ipisc))
+  
+  }
+
+df[,1,] <- normalize(exp(df[,1,]))
+
+df2 <- data.frame(
+  effect1 = nd$effect1__,
+  Fn = normalize(exp(df[,1,1])),
+  Fp = normalize(exp(df[,1,2])),
+  Gc = normalize(exp(df[,1,3])),
+  Iherb = normalize(exp(df[,1,4])),
+  Ipisc = normalize(exp(df[,1,5]))
+) %>% rowwise() %>%
+  mutate(mf = geomean(Fn, Fp, Gc, Iherb, Ipisc))
+
+
+ggplot(df2) +
+  geom_line(aes(x = effect, y = mf))
+
+
+
+df <- pred
+
+df2 <- data.frame(
+  Fn = normalize(exp(df[,1,1])),
+  Fp = normalize(exp(df[,1,2])),
+  Gc = normalize(exp(df[,1,3])),
+  Iherb = normalize(exp(df[,1,4])),
+  Ipisc = normalize(exp(df[,1,5]))
+) %>% 
+  mutate(mf = (Fn * Fp *Gc * Iherb * Ipisc)^(1/5)) 
+
+df2 <- cbind(summary_transect_imp[,names], df2)
+
+ggplot(df2) +
+  geom_point(aes(x = troph_q3, y = log(mf/biomass_tot))) +
+  geom_smooth(aes(x = troph_q3, y = log(mf/biomass_tot)), method = "lm")
+
+ggplot(df2) +
+  geom_point(aes(x = troph_q1, y = log(mf/biomass_tot))) +
+  geom_smooth(aes(x = troph_q1, y = log(mf/biomass_tot)), method = "lm")
+
+ggplot(df2) +
+  geom_point(aes(x = troph_m, y = log(mf/biomass_tot))) +
+  geom_smooth(aes(x = troph_m, y = log(mf/biomass_tot)), method = "lm")
+
+ggplot(df2) +
+  geom_point(aes(x = size_q1, y = log(mf/biomass_tot)), alpha = 0.2) +
+  geom_smooth(aes(x = size_q1, y = log(mf/biomass_tot)), method = "lm")
+
+ggplot(df2) +
+  geom_point(aes(x = imm_m, y = (mf/biomass_tot))) +
+  geom_smooth(aes(x = imm_m, y = (mf/biomass_tot)))
+
+ggplot(df2) +
+  geom_point(aes(x = troph_m, y = log(mf/biomass_tot))) +
+  geom_smooth(aes(x = troph_m, y = log(mf/biomass_tot)))
+
+names <- c( "nspec"              ,        "size_m",                    
+           "imm_m"             ,         "size_q3"              ,  "troph_m",    "troph_q3" ,                 
+           "imm_q1"            ,         "imm_q3"            ,         "troph_q1" ,                 
+           "size_q1"   )
+
+nd <- matrix(nrow = 3, ncol = 10, data = 0) %>% as.data.frame()
+colnames(nd) <- names
+nd <- as.data.frame(nd)
+summary_transect_complete <- as.data.frame(summary_transect_complete)
+
+nd <-  sapply(names, function(x){
+  print(x)
+  nd[,x] <- c(min(summary_transect_complete[,x]), 
+              median(as.numeric(summary_transect_complete[,x])), 
+              max(summary_transect_complete[,x])) %>% 
+    as.data.frame()
+  
+}) %>% bind_cols()
+colnames(nd) <- names
+
+nd <- as.data.frame(nd)
+
+
+
+nd2 <- tidyr::expand_grid(nd$nspec, nd$size_m, nd$imm_m, 
+                          nd$size_q3, nd$troph_m, nd$troph_q3, 
+                          nd$imm_q1, nd$imm_q3, nd$troph_q1, nd$size_q1)
+colnames(nd2) <- names
+
+nd2$biomass_tot <- 100
+nd2$mean <- 27
+nd2$locality <- NA
+nd2$sites <- NA
+
+pred <- fitted(mod_mvfun_com2, newdata = nd2)
+
+df2 <- data.frame(
+  Fn = normalize(exp(pred[,1,1])),
+  Fp = normalize(exp(pred[,1,2])),
+  Gc = normalize(exp(pred[,1,3])),
+  Iherb = normalize(exp(pred[,1,4])),
+  Ipisc = normalize(exp(pred[,1,5]))
+) %>% 
+  mutate(mf = (Fn * Fp *Gc * Iherb * Ipisc)^(1/5)) 
+
+df2 <- cbind(nd2, df2) %>% unique() %>%
+  dplyr::filter(size_q1 < size_m , size_m<size_q3,
+         troph_q1<troph_m, troph_m< troph_q3,
+         imm_q1<imm_m, imm_m<imm_q3)
+
+hist(log(summary_transect_complete$biomass_tot))
+exp(5)
+test <- filter(summary_transect_imp, biomass_tot>80 & biomass_tot<120) %>%
+  mutate(upper = multi > quantile(multi, 0.9),
+         lower = multi < quantile(multi, 0.1))
+
+ggplot(test) +
+  geom_boxplot(aes(x = "test", y = troph_q3), data = test) +
+  geom_boxplot(aes(x = "high", y = troph_q3), data = test[test$upper == T,]) +
+  geom_boxplot(aes(x = "low", y = troph_q3), data = test[test$lower == T,])
+  
+ggplot(test, aes(y = nspec)) +
+  geom_boxplot(aes(x = "test"), data = test) +
+  geom_boxplot(aes(x = "high"), data = test[test$upper == T,]) +
+  geom_boxplot(aes(x = "low"), data = test[test$lower == T,])
+
+ggplot(test, aes(y = nspec)) +
+  geom_boxplot(aes(x = "test"), data = test) +
+  geom_boxplot(aes(x = "high"), data = test[test$upper == T,]) +
+  geom_boxplot(aes(x = "low"), data = test[test$lower == T,])
+
+
+ggplot(test, aes(y = troph_q1)) +
+  geom_boxplot(aes(x = "test"), data = test) +
+  geom_boxplot(aes(x = "high"), data = test[test$upper == T,]) +
+  geom_boxplot(aes(x = "low"), data = test[test$lower == T,])
+
+
+# dominance site #####
+
+
+get_dd_site <- function(contributions, herb_pisc){
+  
+  # combine data
+  
+  
+  nspec <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+    ungroup() %>% group_by(sites) %>%
+    dplyr::summarise(nspec = length(unique(species)),
+                     nspec_h = length(unique(species[I_herb_p>0])),
+                     nspec_p = length(unique(species[I_pisc_p>0])))
+  
+  
+  ### function to calculate area of ranked function contribution !! 
+  # data has to be ordered
+  # y = cumsum!!
+  rank_area <- function(y) {
+    n <- length(y)
+    a <- y[2:n]
+    b <- y[1:(n-1)]
+    area <- sum(a + b)/2
+    return(area)
+  }
+  
+  # dominance function
+  ks_area <- function(data, var){
+    
+    if (var %in% c("I_herb_p", "I_pisc_p")){
+      data <- data %>%
+        filter(.data[[var]] > 0)
+    }
+    
+    if (nrow(data) == 0){
+      return(NA)
+    }else if (nrow(data) == 1){
+      return(1)
+    }else{
+      drank <- data %>% 
+        mutate(rank = dplyr::dense_rank(desc(.data[[var]]))) %>%
+        dplyr::arrange(rank) %>%
+        mutate(cumsum = cumsum(.data[[var]]))
+      
+      A <- rank_area(drank$cumsum)
+      
+      r <- nrow(data) # species richness
+      A_max <- 1 * (r - 1) # maximum if first species performs 100% (rectangle)
+      A_min <- (r^2-1)/(2*r) # minimum if all sp contribute equally (trapezium)
+      
+      dd <- (A - A_min)/(A_max - A_min)
+      
+      return(dd)
+    }
+  }
+  
+  con <- ungroup(tfs)
+  
+  key <- parallel::mclapply(unique(con$sites), function(x){
+    
+    t <- dplyr::filter(con, sites == x)
+    
+    result <- data.frame(
+      sites = x,
+      dd_Fn = ks_area(t, "Fn_p"),
+      dd_Fp = ks_area(t, "Fp_p"),
+      dd_Gc = ks_area(t, "Gc_p"),
+      dd_I_herb = ks_area(t, "I_herb_p"),
+      dd_I_pisc = ks_area(t, "I_pisc_p")
+    )
+    return(result)
+  }, mc.cores = 40) %>%plyr::ldply()
+  
+  return(key)
+}
+
+
+key <- left_join(nspec, key) %>%
+  left_join(vec)
+
+hist(key$dd_Fn)
+
+ggplot(key[key$nspec_p>2,], aes(x = nspec_p, y = dd_I_pisc)) +
+  geom_point() +
+  geom_smooth()
+
+ggplot(key[key$nspec_h>2,], aes(x = nspec_h, y = dd_I_herb)) +
+  geom_point() +
+  geom_smooth()
+
+
+
+ggplot(key, aes(x = nspec-median(nspec), y = dd_Gc)) +
+  geom_point() +
+  geom_smooth()
+
+
+ggplot(key, aes(x = nspec-median(nspec), y = dd_Fn)) +
+  geom_point() +
+  geom_smooth()
+
+
+ggplot(key, aes(x = nspec-median(nspec), y = dd_Fp)) +
+  geom_point() +
+  geom_smooth()
+
+
+ggplot(key, aes(x = nspec-median(nspec), y = dd_Gc)) +
+  geom_point() +
+  geom_smooth()
+
+
+####### importance######
+get_importance <- function(con){
+  
+  # if con > 1/N !!
+  
+  imp <- parallel::mclapply(unique(con$sites), function(x){
+    sub <- filter(con, sites == x)
+    nspec <- length(unique(sub$species))
+    nherb <- sum(sub$I_herb_p>0)
+    npisc <- sum(sub$I_pisc_p>0)
+    sub <- sub %>%
+      mutate(Gc_i = Gc_p > 1/nspec,
+             Fn_i = Fn_p > 1/nspec,
+             Fp_i = Fp_p > 1/nspec,
+             I_pisc_i = I_pisc_p > 1/npisc,
+             I_herb_i = I_herb_p > 1/nherb) %>%
+      mutate(I_pisc_i = case_when(I_pisc_p == 0 ~ NA, TRUE ~ I_pisc_i),
+             I_herb_i = case_when(I_herb_p == 0 ~ NA, TRUE ~ I_herb_i)) %>%
+      dplyr::select(sites, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i)
+    return(sub)
+  }, mc.cores = 30) %>% plyr::ldply()
+  
+}
+
+imp <- get_importance(con)
+
+get_fd <- function(sp_importance){
+  # relative frequency when important 
+  sp_importance %>%
+    dplyr::select(sites, species, Gc_i, Fn_i, Fp_i, I_pisc_i, I_herb_i) %>%
+    group_by(species) %>%
+    mutate(occ = length(Gc_i)) %>%
+    group_by(species, occ) %>%
+    dplyr::summarise_if(is.logical, function(x){sum(x, na.rm = TRUE)/length(x[!is.na(x)])})
+}
+
+fd <- get_fd(imp)
+
+
+plot1 <-
+  ggplot() + 
+  geom_jitter(aes(y = "e", x = dd_Fn), color = cols[1],
+              data = key, alpha = 0.5, size = 0.1) +
+  geom_jitter(aes(y = "d", x = dd_Fp), color = cols[2],
+              data = key, alpha = 0.5, size = 0.1) +
+  geom_jitter(aes(y = "c", x = dd_Gc), color = cols[3],
+              data = key, alpha = 0.5, size = 0.1) +
+  geom_jitter(aes(y = "b", x = dd_I_herb), color = cols[4],
+              data = key, alpha = 0.5, size = 0.1, width = 0.01) +
+  geom_jitter(aes(y = "a", x = dd_I_pisc), color = cols[5],
+              data = key, alpha = 0.5, size = 0.1, width = 0.01) +
+  # geom_pointrange(aes(y = "e", x = pr1[1], xmin = pr1[3], xmax = pr1[4])) +
+  # geom_pointrange(aes(y = "d", x = pr2[1], xmin = pr2[3], xmax = pr2[4])) + 
+  # geom_pointrange(aes(y = "c", x = pr3[1], xmin = pr3[3], xmax = pr3[4])) +
+  # geom_pointrange(aes(y = "b", x = pr4[1], xmin = pr4[3], xmax = pr4[4])) +
+  # geom_pointrange(aes(y = "a", x = pr5[1], xmin = pr5[3], xmax = pr5[4])) +
+  geom_vline(xintercept = mean(vec$dd), linetype = 2) +
+  theme_bw() +
+  theme(panel.grid = element_blank()) +
+  scale_y_discrete(labels = c("Piscivory", 
+                              "Herbivory", 
+                              "Production", 
+                              "P excretion", 
+                              "N excretion")) +
+  labs(x = "Degree of dominance (communities)", y = "") +
+  theme(plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"),
+        legend.position = "none", 
+        panel.border = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        axis.line.x = element_line())
+plot1
+
+spi_sp_long <- fd %>%
+  pivot_longer(c(Fn_i, Fp_i, Gc_i, I_herb_i, I_pisc_i)) %>%
+  drop_na() %>%
+  filter(occ>1, value > 0) 
+
+a <- spi_sp_long %>% group_by(name) %>%
+  summarize(n = n())
+
+b <- fd %>%
+  pivot_longer(c(Fn_i, Fp_i, Gc_i, I_herb_i, I_pisc_i)) %>%
+  drop_na() %>%
+  filter(occ>1) %>% 
+  group_by(name) %>%
+  summarize(ntot = n())
+
+ab <- left_join(a,b) %>%
+  mutate(prop = n/ntot)
+
+
+plot2 <- 
+  ggplot(ab) +
+  geom_col(aes(x = prop, y = reorder(name, desc(name)), fill = name),
+           alpha = 0.9) +
+  geom_text(aes(x = prop - 0.1, y = reorder(name, desc(name)), 
+                label = paste0(round(100*prop), " %")),
+            size = 4) +
+  scale_fill_fish_d(option = "Callanthias_australis") +
+  theme_bw() +
+  theme(panel.grid = element_blank()) +
+  scale_y_discrete(labels = c("Piscivory", 
+                              "Herbivory", 
+                              "Production", 
+                              "P excretion", 
+                              "N excretion")) +
+  scale_color_fish_d(option = "Callanthias_australis") +
+  theme(legend.position = "none", axis.title.y = element_blank(),
+        axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(x = "Proportion of dominant species") +
+  theme(plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"),
+        legend.position = "none", 
+        panel.border = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        axis.line.x = element_line())
+plot2
+
+fit_occ <- brm(value ~ name,
+               cores = 4, family = "beta",
+               backend = "cmdstanr",
+               threads = threading(12),
+               data = spi_sp_long)
+
+pr <- fitted(fit_occ, newdata = data.frame(name = unique(spi_sp_long$name)))
+
+plot3 <- 
+  ggplot() + 
+  geom_jitter(aes(y = reorder(name, desc(name)), x = value, color = name),
+              data = spi_sp_long, alpha = 0.5, size = 0.2) +
+  geom_pointrange(aes(y = 5, x = pr[1,1], xmin = pr[1,3], xmax = pr[1,4])) +
+  geom_pointrange(aes(y = 4, x = pr[2,1], xmin = pr[2,3], xmax = pr[2,4])) +
+  geom_pointrange(aes(y = 3, x = pr[3,1], xmin = pr[3,3], xmax = pr[3,4])) +
+  geom_pointrange(aes(y = 2, x = pr[4,1], xmin = pr[4,3], xmax = pr[4,4])) +
+  geom_pointrange(aes(y = 1, x = pr[5,1], xmin = pr[5,3], xmax = pr[5,4])) +
+  theme_bw() +
+  theme(panel.grid = element_blank()) +
+  scale_y_discrete(labels = c("Piscivory", 
+                              "Herbivory", 
+                              "Production", 
+                              "P excretion", 
+                              "N excretion")) +
+  scale_color_fish_d(option = "Callanthias_australis") +
+  theme(legend.position = "none", axis.title.y = element_blank(),
+        axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(x = "Frequency of dominance per species") +
+  theme(plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"),
+        legend.position = "none", 
+        panel.border = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        axis.line.x = element_line())
+plot3
+
+
+plot <- plot1 + plot2 + plot3 + plot_annotation(tag_levels = "a")
+ggsave("output/plots/fig4_dd.png", plot, width = 9, height = 4)
 
 

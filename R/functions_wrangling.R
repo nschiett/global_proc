@@ -6,13 +6,7 @@ load("data/fishtree_glob.RData")
 
 ##### sptl #####
 get_sptl <- function(x){
-  sptl <- read.csv("data/species_list_tl.csv")
-  sptl$Species <- gsub("_", " ", sptl$species)
-  tax <- dplyr::collect(rfishbase::load_taxa())
-  sptl <- right_join(dplyr::select(tax, Species, Family), sptl)
-  sptl[sptl$species == "Rhinesomus_triqueter", "Family"] <- "Ostraciidae"
-  sptl[sptl$species == "Abudefduf_luridus", "Family"] <- "Pomacentridae"
-  sptl[sptl$Family == "Scaridae", "Family"] <- "Labridae"
+  sptl <- read_csv("data/species_list_tl.csv")
   return(sptl)
 }
 
@@ -407,6 +401,61 @@ get_contributions <- function(tfish, cnpflux, params, summary_transect){
     filter(!is.na(nspec))
   
   return(tfss)
+}
+
+get_contributions_site <- function(tfish, cnpflux, params, summary_transect){
+  
+  diet <- read.csv("data/extrapolation_trophic_guilds.csv") 
+  
+  diets <- diet %>%
+    select(species, p2_m, p4_m, trophic_guild_predicted = trophic_guild_predicted) %>% 
+    mutate(herb = trophic_guild_predicted == 2 & p2_m > 0.5,
+           pisc = trophic_guild_predicted == 4 & p4_m > 0.5) %>%
+    select(species, herb, pisc)
+  
+  tfish <- left_join(tfish, cnpflux) %>% 
+    left_join(select(params, Species, lwa_m, lwb_m, trophic_guild_predicted)) %>% 
+    mutate(
+      Fc = Fc_median * abun,
+      Fn = Fn_median * abun,
+      Fp = Fp_median * abun,
+      Ic = Ic_median * abun,
+      In = In_median * abun,
+      Ip = Ip_median * abun,
+      Gc = Gc_median * abun,
+      Gn = Gn_median * abun,
+      Gp = Gp_median * abun,
+      Wc = Wc_median * abun,
+      Wn = Wn_median * abun,
+      Wp = Wp_median * abun,
+      biomass = abun * lwa_m * size_cm^lwb_m) %>%
+    select(region, locality, sites, species, transect_id, Fn, Fp, Gc, Ic, biomass)
+  
+  tfs <- left_join(tfish, diets) %>%
+    group_by(region, locality, sites) %>% 
+    dplyr::mutate(
+      Fn_s = sum(Fn),
+      Fp_s = sum(Fp),
+      Ic_s = sum(Ic),
+      Gc_s = sum(Gc),
+      I_herb_s = sum(Ic[herb == TRUE], na.rm = TRUE),
+      I_pisc_s = sum(Ic[pisc == TRUE], na.rm = TRUE),
+      biomass_s = sum(biomass),
+      n_transect = length(unique(transect_id))
+    ) %>% group_by(region, locality, sites, n_transect,
+             species, herb, pisc) %>%
+    dplyr::summarise(
+      Fn_p = sum(Fn)/unique(Fn_s),
+      Fp_p = sum(Fp)/unique(Fp_s),
+      Ic_p = sum(Ic)/unique(Ic_s),
+      Gc_p = sum(Gc)/unique(Gc_s),
+      I_herb_p = sum(Ic[herb == TRUE], na.rm = TRUE)/unique(I_herb_s),
+      I_pisc_p = sum(Ic[pisc == TRUE], na.rm = TRUE)/unique(I_pisc_s),
+      biomass_p = sum(biomass)/unique(biomass_s)
+    ) %>% ungroup()
+  
+  
+  return(tfs)
 }
 
 

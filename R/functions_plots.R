@@ -1,5 +1,5 @@
 
-make_fig1 <- function(mod_mv_siteloc, coords, summary_transect){
+make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
   
   nsiteloc <- summary_transect %>%
     group_by(locality) %>%
@@ -30,17 +30,6 @@ make_fig1 <- function(mod_mv_siteloc, coords, summary_transect){
            r5 = normalize(r1_loc_Ipisc)) %>%
     rowwise() %>%
     mutate(r_multi = geomean(r1, r2, r3, r4, r5))
-  
-  # re2 <- ranef(mod_mf_siteloc)
-  # re_loc2 <- re2$locality[,1,1] %>%
-  #   as.data.frame()
-  # re_site2 <- re1$sites[,1,1] %>%
-  #   as.data.frame()
-  # re_loc2[ls1,] <- re_loc2[ls1,] + re_site2[ls2,]
-  # colnames(re_loc2) <- c("r1_loc_mf")
-  # re_loc2 <- re_loc2 %>%
-  #   rownames_to_column("locality") 
- 
 
   
   coords <- coords %>%
@@ -50,11 +39,6 @@ make_fig1 <- function(mod_mv_siteloc, coords, summary_transect){
   data <- re_loc1 %>%
     left_join(coords) %>%
     unique()
-  
-  # 
-  # data2 <- (re_loc2) %>%
-  #   left_join(coords) %>%
-  #   unique()
   
   library("rnaturalearth")
   library("rnaturalearthdata")
@@ -270,7 +254,7 @@ make_fig1 <- function(mod_mv_siteloc, coords, summary_transect){
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -175, y = 30, label = "Multifunction"), size = 3, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "Multifunctionality"), size = 3, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap()+ 
@@ -1713,84 +1697,206 @@ make_map_multi_supp <- function(model, coords){
 ##### correlations #####
 
 make_corplot <- function(mod_mvfun_bm){
+  
   sum <- summary(mod_mvfun_bm)
   rescor <- sum$rescor_pars
   loc <- sum$random$locality[-c(1:5),]
   site <- sum$random$sites[-c(1:5),]
   
-  col <- fish(n = 3, option = "Ostracion_whitleyi", begin = 0.2, end = 0.8)
+  col <- fish(n = 10, option = "Ostracion_whitleyi", begin = 0, end = 1)
   
   nd <- data.frame(biomass_tot = 100, mean = 27, locality = NA, sites = NA)
   
   pred <- fitted(mod_mvfun_bm, newdata = nd, summary = FALSE, nsamples = 1000)
 
-  pl1 <-
+  
+  
+  p1 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,2]), x = exp(pred[,1,1])),
+               color = col[1], alpha = 0.5) +
+    theme_bw() +
+    labs(x = "N excretion (gN/m2/day)", y = "P excretion (gP/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p2 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,3]), x = exp(pred[,1,1])),
+               color = col[2], alpha = 0.5) +
+    theme_bw() +
+    labs(x = "N excretion (gN/m2/day)", y = "Production (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p3 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,1])),
+               color = col[3], alpha = 0.5) +
+    theme_bw() +
+    labs(x = "N excretion (gN/m2/day)", y = "Herbivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p4 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,1])),
+               color = col[4], alpha = 0.5) +
+    theme_bw() +
+    labs(x = "N excretion (gN/m2/day)", y = "Piscivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p5 <-
   ggplot() +
     geom_point(aes(y = exp(pred[,1,3]), x = exp(pred[,1,2])),
-               color = col[1], alpha = 0.7) +
+               color = col[5], alpha = 0.5) +
     theme_bw() +
     labs(x = "P excretion (gP/m2/day)", y = "Production (gC/m2/day)") +
-    theme(panel.grid.minor = element_blank())
-  pl2 <-
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p6 <-
   ggplot() +
     geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,2])),
-               color = col[1], alpha = 0.7)  +
+               color = col[6], alpha = 0.5)  +
     theme_bw() +
     labs(x = "P excretion (gP/m2/day)", y = "Herbivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p7 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,2])),
+               color = col[6], alpha = 0.5)  +
+    theme_bw() +
+    labs(x = "P excretion (gP/m2/day)", y = "Piscivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank())
-  pl3 <-
+  p8 <-
     ggplot() +
     geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,3])),
-               color = col[1], alpha = 0.7)  +
+               color = col[8], alpha = 0.5)  +
     theme_bw() +
     labs(x = "Production (gC/m2/day)", y = "Herbivory (gC/m2/day)") +
-    theme(panel.grid.minor = element_blank())
-  
-  
-  
-  
-  corplot <- function(j, name){
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  p9 <-
     ggplot() +
-      geom_vline(aes(xintercept = 0), linetype = 2) +
-      geom_pointrange(aes(x = rescor[j,1], y = "sigma", xmin =  rescor[j,3], xmax = rescor[j,4]),
-                      color = col[1], size = 2, fatten = 2) +
-      geom_pointrange(aes(x = loc[j,1], y = "loc", xmin =  loc[j,3], xmax = loc[j,4]),
-                      color = col[2], size = 2, fatten = 2) +
-      geom_pointrange(aes(x = site[j,1], y = "asite", xmin =  site[j,3], xmax = site[j,4]),
-                      color = col[3], size = 2, fatten = 2) +
-      scale_x_continuous(limits = c(-0.9,0.9), expand = c(0, 0)) +
-      labs(x = "", title = name) +
-      theme_bw() +
-      theme(axis.title= element_blank(), axis.ticks.y = element_blank(), 
-            axis.text.y = element_blank(), panel.grid = element_blank(),
-            axis.text.x = element_text(size = 14, color = "black"))
-  }
-  
-  p1 <- corplot(1, "cor(N excretion, P excretion)")
-  p2 <- corplot(2, "cor(N excretion, Production)")
-  p3 <- corplot(3, "cor(P excretion, Production)")
-  p4 <- corplot(4, "cor(N excretion, Herbivory)")
-  p5 <- corplot(5, "cor(P excretion, Herbivory)")
-  p6 <- corplot(6, "cor(Production,  Herbivory)")
-  p7 <- corplot(7, "cor(N excretion, Piscivory)")
-  p8 <- corplot(8, "cor(P excretion, Piscivory)")
-  p9 <- corplot(9, "cor(Production, Piscivory)")
-  p10 <- corplot(10, "cor(Herbivory, Piscivory)")
-  
-  plot <- p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 +
-    plot_layout(nrow = 2) + plot_annotation(tag_levels = "a")
-  
+    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,3])),
+               color = col[9], alpha = 0.5)  +
+    theme_bw() +
+    labs(x = "Production (gC/m2/day)", y = "Piscivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank())
+  p10 <-
+    ggplot() +
+    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,4])),
+               color = col[10], alpha = 0.5)  +
+    theme_bw() +
+    labs(x = "Herbivory (gC/m2/day)", y = "Piscivory (gC/m2/day)") +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))  
 
-  plot1 <- pl1 + pl2 + pl3 + plot_annotation(tag_levels = "a")
+  rescor <- as.data.frame(rescor) %>% 
+    rownames_to_column("pair")
+  
+  corr <- 
+  ggplot(rescor) +
+    geom_vline(xintercept = 0, linetype = 2) +
+    geom_pointrange(aes(y = reorder(pair, desc(pair)), 
+                   x = Estimate, xmin = `l-95% CI`, xmax = `u-95% CI`,
+                   color = reorder(pair, (pair)))) +
+    scale_color_fish_d(option = "Ostracion_whitleyi", begin = 0, end = 1) +
+    scale_y_discrete(labels = rev(c("log(Nex) - log(Pex)",
+                                "log(Nex) - log(Prod)",
+                                "log(Nex) - log(Herb)",
+                                "log(Nex) - log(Pisc)",
+                                "log(Pex) - log(Prod)",
+                                "log(Pex) - log(Herb)",
+                                "log(Pex) - log(Pisc)",
+                                "log(Prod) - log(Herb)",
+                                "log(Prod) - log(Pisc)",
+                                "log(Herb) - log(Pisc)"))) +
+    labs(y = "", x = "Residual correlation") +
+    theme_minimal() +
+    theme(legend.position = "none", 
+          axis.line.x = element_line(),
+          axis.ticks = element_line()) +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  corr
   
   
-  detach("package:cowplot", unload = TRUE)
-  library(cowplot)
-  plot2 <- plot_grid(plot, plot1, nrow = 2, ncol = 1)
+  layout <- "
+  abcd
+  aefg
+  hijk
+  "
+  plot <- 
+  corr + p1 + p2 + p3 + p4 + p5 + p6 + p7 + 
+    theme(axis.title.y = 
+            element_text(margin = margin(r = -100, unit = "pt"))) +
+    p8 +
+    p9 + p10 +
+    plot_layout(design = layout) + 
+    plot_annotation(tag_levels = "a")
   
-  ggsave("output/plots/corplot.png", plot2, width = 13, height = 8)
-  ggsave("output/plots/corplot.pdf", plot2, width = 13, height = 8)
-}
+  ggsave("output/plots/fig2_corplot.png", plot, width = 11, height = 7)
+
+  # supplemental graph
+  loc <- as.data.frame(loc) %>% 
+    rownames_to_column("pair")
+  site <- as.data.frame(site) %>% 
+    rownames_to_column("pair")
+  
+  cor_loc <- 
+    ggplot(loc) +
+    geom_vline(xintercept = 0, linetype = 2) +
+    geom_pointrange(aes(y = reorder(pair, desc(pair)), 
+                        x = Estimate, xmin = `l-95% CI`, xmax = `u-95% CI`)) +
+    scale_y_discrete(labels = rev(c("log(Nex) - log(Pex)",
+                                    "log(Nex) - log(Prod)",
+                                    "log(Nex) - log(Herb)",
+                                    "log(Nex) - log(Pisc)",
+                                    "log(Pex) - log(Prod)",
+                                    "log(Pex) - log(Herb)",
+                                    "log(Pex) - log(Pisc)",
+                                    "log(Prod) - log(Herb)",
+                                    "log(Prod) - log(Pisc)",
+                                    "log(Herb) - log(Pisc)"))) +
+    labs(y = "", x = "Locality-level correlation") +
+    theme_minimal() +
+    theme(legend.position = "none", 
+          axis.line.x = element_line(),
+          axis.ticks = element_line()) +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  cor_loc
+  
+  cor_site <- 
+    ggplot(site) +
+    geom_vline(xintercept = 0, linetype = 2) +
+    geom_pointrange(aes(y = reorder(pair, desc(pair)), 
+                        x = Estimate, xmin = `l-95% CI`, xmax = `u-95% CI`)) +
+    scale_y_discrete(labels = rev(c("log(Nex) - log(Pex)",
+                                    "log(Nex) - log(Prod)",
+                                    "log(Nex) - log(Herb)",
+                                    "log(Nex) - log(Pisc)",
+                                    "log(Pex) - log(Prod)",
+                                    "log(Pex) - log(Herb)",
+                                    "log(Pex) - log(Pisc)",
+                                    "log(Prod) - log(Herb)",
+                                    "log(Prod) - log(Pisc)",
+                                    "log(Herb) - log(Pisc)"))) +
+    labs(y = "", x = "Site-level correlation") +
+    theme_minimal() +
+    theme(legend.position = "none", 
+          axis.line.x = element_line(),
+          axis.ticks = element_line()) +
+    theme(panel.grid.minor = element_blank(),
+          axis.text = element_text(color = "black"))
+  cor_site
+  
+  plot2 <- 
+  cor_loc + cor_site
+  
+  ggsave("output/plots/figSx_corplot.png", plot2, width = 8, height = 4)
+  
+  
+   }
 
 
 
