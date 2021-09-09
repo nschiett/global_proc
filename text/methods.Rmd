@@ -20,7 +20,7 @@ Sea surface temperature (SST) for each site was obtained from daily time‐serie
 ## 2. Quantification of functions
 \noindent For each transect, we estimated five key process-based functions mediated by fishes: nitrogen excretion rate (gN/day/m^2^), phosphorus excretion rate (gP/day/m^2^), production of biomass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^) [@Brandl2019front]. These five functions were estimated for each transect using individual-based bioenergetic models predicting fluxes of carbon (C), nitrogen (N), and phosphorus (P) (e.g. daily C intake rates, N and P excretion rates, growth rates) [@Schiettekatte2020].
 This bioenergetic model framework integrates elements of metabolic theory, stoichiometry, and flexible elemental limitation [@Schiettekatte2020]. We quantified the input parameters, including elements of metabolism, growth, and diet and body stoichiometry, for all 1110 species through the integration of empirical data, data synthesis, and Bayesian phylogenetic models (See supplementary methods). We then ran a unique bioenergetic model for each combination of species identity, body size, and sea surface temperature (n = 30668) to get the contribution of each individual to each function in each transect. Finally, we summarized functions on the community level by summing up all individual contributions inside a transect and deviding the sum by the surface area. Each function is thus expressed as dry mass (of C, N, or P) per day per square meter. We note that N excretion, P excretion, and biomass production include contributions of all fishes, whereas herbivory and piscivory are carried out by a subset of the community, with respect to their trophic guild as defined by @Parravicini2020. To reduce the occurrence of misclassification of herbivores and piscivores, we categorized a species as a herbivore or piscivore if it had both the highest probability to be classified in that trophic group and this probability was more than 0.5, based on the probability scores of trophic guilds for a global fish species database that defines trophic guilds based on empirical data using a quantitative, unbiased, and fully reproducible framework [@Parravicini2020]. Further, as a comparison, we quantified herbivory and piscivory rates using two alternative trophic guild classifications based on expert opinion [@Mouillot2014; @Parravicini2020] (Fig. S5). Both the herbivory and piscivory rates are congruent with the expert opinion trophic guild classifications.
-Finally, we estimated multifunction, i.e. one measure that combines all five functions by taking the geometric average of the five standardized functions. We used the geometric mean because functions are dependent on each other and may vary considerably.
+Finally, we estimated multifunction, i.e. one measure that combines all five functions by taking the geometric average of the five functions ( nomalized to range between zero and 100). We used the geometric mean because functions are dependent on each other and may vary considerably.
 
 
 ## 3. Community structure variables
@@ -102,25 +102,25 @@ $$
 where $\beta1_{ExN}, \beta1_{ExP}, \beta1_{Prod}, \beta1_{Herb}, \beta1_{Pisc}$ are the fixed effects of the log-transformed biomass, and $\beta2_{ExN}, \beta2_{ExP}, \beta2_{Prod}, \beta2_{Herb}, \beta2_{Pisc}$ are the fixed effects of sst. Locality- and site-level effects are now thus structured including covariation among functions, independent of biomassand sst. Similarly, the residual variation of functions incorporates the correlations between functions, without the effect of biomass and sst.
 We used similar priors as describved above, and we used weakly-informative normal priors for the model slopes ($\beta1 \sim normal(1,1)$, $\beta2 \sim normal(0,1)$).
 
-\noindent Finally, to investigate the effect of the community structure while still accounting for the effects of standing biomass and sea surface temperature, we fitted a mixed effect multivariate model similar to the model specified above, but adding all community structure variables:
+\noindent Finally, to investigate the effect of the community structure while still accounting for the effects of standing biomass and sst, we fitted a mixed effect multivariate model similar to the model specified above, but adding all community structure variables:
 
 $$\begin{array}{c} \mu_{\textrm{function,i}}  = \beta0_{function} + \beta1_{function} x_{log(biomass),i} + \beta2_{function} x_{sst,i}  + \beta3_{function} x_{richness,i}  + \beta4_{function} x_{size_m,i}  + \beta5_{function} x_{size_{2.5\%},i} +  \beta6_{function} x_{size_{97.5\%},i} + \\ \beta7_{function} x_{troph_m,i}  + \beta8_{function} x_{troph_{2.5\%},i} +  \beta9_{function} x_{troph_{97.5\%},i} + \beta10_{function} x_{imm_m,i}  + \beta11_{function} x_{imm_{2.5\%},i} +  \beta12_{function} x_{imm_{97.5\%},i} $$
 
 where richness is the species richness, $size$ is the total length, $troph$ is the trophic level, $imm$ is the immaturity, and $m$, $2.5\%$, and $97.5\%$ respectively represent the 50\%, 2.5\%, and 97.5\% quantiles across the fish community.
 For these models, we used weakly informative priors for the fixed effect parameters ($\beta3-\beta12 \sim normal(0,1)$) and the same priors as described above for other parameters. par
 
-All Bayesian models were fitted using the R package *brms* (ref) which uses Stan, a C++ package for performing full Bayesian inference. The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots. Posterior predictive checks for are provided in Supporting Information xxxx.
+All Bayesian models were fitted using the R package *brms* [@Burkner2017] which uses Stan, a C++ package for performing full Bayesian inference [@Carpenter2017]. The posterior distributions of model parameters were estimated using Markov chain Monte Carlo (MCMC) methods by using four chains of 2,000 samples, including 1,000 samples as a warm‐up, meaning that a total of 4,000 samples were used to estimate posterior distributions. The convergence and fit of the models were verified by examining the Rhat, parameter trace plots, and posterior prediction plots (Fig Sx).
 
 
 ## 5. Species dominance and contributions to functions
-We quantified the relative contribution of each species to each function for all transects as followed:
+We quantified the relative contribution of each species to each function for all sites as followed:
 <!-- \begin{equation} -->
 $$	\textrm{contribution}_{f,i,j} = \frac{F_{f,i,j}}{\sum F_{f,j}},$$
 <!-- 	\label{con} -->
 <!-- \end{equation} -->
-where i is a certain species, j is a transect, F is the value of function f.
+where i is a certain species, j is a site, F is the value of function f.
 
-Then, we quantified the degree of species dominance per function for each transect.
+Then, we quantified the degree of species dominance per function for each site.
 We did this by first ranking species according to their contribution to function, followed by quantifying the cumulative contributions of species to functions. Then, we used the area under the species accumulation curve as a measure for the degree of dominance.
 Specifically, the degree of dominance (DD) was calculated as followed:
 <!-- \begin{equation} -->
@@ -145,18 +145,7 @@ $$	\textrm{A} = \sum_{i = 2}^R \frac{C_i + C_{i-1}}{2},$$
 
 where $C_i$ is the contribution of a certain species and R is the number of species contributing to a certain function. The degree of dominance thus ranges between 0 and 1, where 0 means that each species contributes equally and 1 means that a single species performs the entire function. In the case of N excretion, P excretion, and production, R equals the species richness, while for herbivory and piscivory R represents the number of herbivores and piscivores, respectively.
 
-Finally, we quantified the frequency of dominance per species, i.e. the number of transects in which a species is dominant for a given function divided by the total number of transects in which that species is observed. A species is considered dominant for a certain function in a given transect if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function.
-
-## 6. Vulnerability to fishing and climate change
-First, we estimated or extracted two measures of vulnerability per species: vulnerability to climate change and vulnerability to fishing pressure [@Graham2011]. For species' vulnerability to climate change, we solely focus on their vulnerability to the loss of live corals. Vulnerability to climate change induced coral loss is related to diet specialization, habitat specialization for live coral, and body size [@Graham2011]. Specifically, we used a score for climate change vulnerability for 134 species found in Graham et al. (2011) [@Graham2011] and fitted a Bayesian mixed effect predictive model that relates these vulnerability scores with the log-transformed maximum size of fish (extracted from Fishbase @Froese2018), the dependence on coral for food (3 categories: not dependent, facultative corallivore, and obligate corallivore), and dependence on coral for habitat (2 categories: dependent vs. not dependent) [@Coker2014; @Cole2008]. We also included a random effect for family:
-$$ y_i \sim normal(\mu_i, \sigma)$$
-$$
-\mu_i = (\beta0 +  \delta_{family}) + \beta1 log(sizemax) + \beta2 HD + \beta3 FD  ,
-$$
-with $y_i$ the vulnerability score of species i, $\mu_i$ the average predicted vulnerability score, sizemax the maximum length of the species, HD de dependence for habitat, and FD the depedendence for food.
-To verify the fit of the model we inspected the posterior predictive plot, which indicated a good fit. Further, the model had a Bayesian R2 of 0.97. We then used this model to extrapolate the vulnerability measure to all 1110 species in our dataset. We provide the model parameters in supplementary table xx. \par For species' vulnerability to fishing, we extracted the index from Cheung et al. (2005) [@Cheung2005].
-Next, we calculated vulnerability scores per function on the community level by averaging the species-level scores weighted by the contributions to function of species.
-Finally, we fitted a mixed model to predict the average vulnerability to climate change and fishing for each function.
+Finally, we quantified the frequency of dominance per species, i.e. the number of sites in which a species is dominant for a given function divided by the total number of sites in which that species is observed. A species is considered dominant for a certain function in a given site if their contribution is higher than 1/R, i.e. they contribute more than the situation in which each species contributes equally to a certain function.
 
 
 

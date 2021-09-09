@@ -14,54 +14,101 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Supplementary methods
 
-To apply the bioenergetic model that estimates fluxes of carbon (C), nitrogen (N), and phosphorus (P), a number of parameters are required [see @Schiettekatte2020]. Here, we describe how these parameters were quantified for all 1110 species in our database, with a combination of literature, empirical measures, and Bayesian models. All protocols related to the capture and handling of fish complied to the ethical standards of CRIOBE and EPHE, and the University of California Santa Barbara’s Institutional Animal Care and Use Committee (IACUC #915 2016-2019). Extraction and transport of samples were approved by the government of French Polynesia. All analyzes were carried out in R v.3.6.3 and Bayesian modes were run using Stan [@Carpenter2017] and the R package brms [@Burkner2017]. 
+We used individual-based bioenergetic models to estimate key fish-mediated functions in global coral reefs. We first assembled a global species list based on an openly accessible database of reef fish abundances and sizes collected during belt transects by divers [@Barneche2019]. We used a subset of available data (see methods) and included 1110 species that belong to 25 families: Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae.
+To apply bioenergetic models and estimate fluxes of carbon (C), nitrogen (N), and phosphorus (P) for all species in the underwater visual census database across their entire temperature range, a number of parameters are required [Table 1; @Schiettekatte2020]. Here, we describe how these parameters were quantified for all 1110 species through a combination of literature, empirical measures, and Bayesian models.
+
+All protocols related to the capture and handling of fish complied to the ethical standards of CRIOBE and EPHE, and the University of California Santa Barbara’s Institutional Animal Care and Use Committee (IACUC #915 2016-2019). Extraction and transport of samples were approved by the government of French Polynesia. All analyzes were carried out in R v.3.6.3 and Bayesian modes were run using Stan [@Carpenter2017] and the R package brms [@Burkner2017].
+
+Table 1. Overview of model parameters and variables, including input parameters, to be specified by the user of the model, which are indicated with \(\times\). Main output variables, predicted by the model are indicated with \(\star\). VBGC = von Bertalanffy growth curve.
+| **Symbol**                    | **Description**                                           | **Unit**                                              |
+|-------------------------------|-----------------------------------------------------------|-------------------------------------------------------|
+| \(k\)                         | Index for element C, N or P                               | \(\_\)                                                |
+| \(S_\textrm{k}\) \(\star\)    | Element-specific minimal supply rate                      | \(\textrm{g d}^{-1}\)                                 |
+| \(G_\textrm{k}\) \(\star\)    | Element-specific growth                                   | \(\textrm{g d}^{-1}\)                                 |
+| \(F_\textrm{0k}\) \(\star\)   | Element-specific minimal inorganic flux                   | \(\textrm{g d}^{-1}\)                                 |
+| \(a_\textrm{k}\) \(\times\)   | Element-specific assimilation efficiency                  | \(\_\)                                                |
+| \(l_\textrm{t}\) \(\times\)   | Total length of individual at time t                      | cm                                                    |
+| \(t\)                         | Age                                                       | yr                                                    |
+| \(l_{\infty}\) \(\times\)     | Asymptotic adult length (VBGC)                            | cm                                                    |
+| \(\kappa\) \(\times\)         | Growth rate parameter (VBGC)                              | \(\textrm{yr}^{-1}\)                                  |
+| \(t_0\) \(\times\)            | Age at settlement (VBGC)                                  | \(\textrm{yr}\)                                       |
+| \(lw_a\) \(\times\)           | Parameter length-weight relationship                      | \(\textrm{g cm}^{-1}\)                                |
+| \(lw_b\) \(\times\)           | Parameter length-weight relationship                      | \(\_\)                                                |
+| \(Q_\textrm{k}\) \(\times\)   | Element-specific body content percentage of dry mass      | \(\%\)                                                |
+| \(m_\textrm{w}\)              | Wet body mass                                             | g                                                     |
+| \(F_\textrm{0Cr}\)            | Resting metabolic rate                                    | \(\textrm{g d}^{-1}\)                                 |
+| \(F_\textrm{0Cz}\)            | Mass-specific turnover rate of C                          | \(\textrm{g C} \textrm{g}^{-1} \textrm{d}^{-1}\)      |
+| \(F_\textrm{0Cs}\)            | Rate of C spent in body mass growth                       | \(\textrm{g d}^{-1}\)                                 |
+| \(f_\textrm{0}\) \(\times\)   | Metabolic normalisation constant independent of body mass | \(\textrm{g C} \textrm{g}^{-\alpha} \textrm{d}^{-1}\) |
+| \(\alpha\) \(\times\)         | Mass-scaling exponent                                     | \(\_\)                                                |
+| \(m_{w\infty}\)               | Asymptotic wet mass of an adult individual                | g                                                     |
+| \(\phi\)                      | Cost of growth                                            | \(\textrm{g C g}^{-1}\)                               |
+| \(\theta\) \(\times\)         | Activity scope                                            | \(\_\)                                                |
+| \(v\) \(\times\)              | Environmental temperature                                 | \(\textdegree C\)                                     |
+| \(h\) \(\times\)              | trophic level                                             | \(\_\)                                                |
+| \(r\) \(\times\)              | Aspect ratio of caudal fin                                | \(\_\)                                                |
+| \(F_\textrm{0Nz}\) \(\times\) | Mass-specific turnover rate of N                          | \(\textrm{g N} \textrm{g}^{-1} \textrm{d}^{-1}\)      |
+| \(F_\textrm{0Pz}\) \(\times\) | Mass-specific turnover rate of P                          | \(\textrm{g P} \textrm{g}^{-1} \textrm{d}^{-1}\)      |
+| \(m_\textrm{dw}\)             | Ratio of dry mass and wet mass of fish                    | \(\_\)                                                |
+| \(m_\textrm{d}\)              | Dry body mass                                             | g                                                     |
+| \(D_\textrm{k}\) \(\times\)   | Element-specific diet content percentage of dry mass      | \(\%\)                                                |
+| \(I_\textrm{k}\) \(\star\)    | Element-specific ingestion rate                           | \(\textrm{g d}^{-1}\)                                 |
+| \(W_\textrm{k}\) \(\star\)    | Element-specific egestion rate                            | \(\textrm{g d}^{-1}\)                                 |
+| \(F_\textrm{rk}\) \(\star\)   | Element-specific residual inorganic flux                  | \(\textrm{g d}^{-1}\)                                 |
+| \(F_\textrm{k}\) \(\star\)    | Element-specific total inorganic flux                     | \(\textrm{g d}^{-1}\)                                 |
+
+
 
 ## 1. Growth parameters
 
-The developed bioenergetic model `fishflux` uses the Von Bertalanffy growth function to calculate daily growth.
+The used bioenergetic model uses the Von Bertalanffy growth function to calculate daily growth.
 This growth function relies on three parameters: $l_{\infty}$, $\kappa$, and $t_0$.
 For $\kappa$, we used a standardized coefficient that describes the potential growth trajectory of an individual if $l_{\infty}$ were to be equal to its maximum length [i.e., $k_{max}$, @Morais2018].
 For simplicity, we kept $t0$ constant at 0 for all species.
 
 
 ### 1.1 Data compilation
-We first compiled maximum lengths for all species using Fishbase [@Froese2018] and used these lengths for the $l_{\infty}$. Then, we extracted the available data for $k_{max}$ from Morais & Bellwood (2018), which are essentially $\kappa$ values from Fishbase, standardized to the maximum length [@Morais2018]. We filtered out the species of our species list and only included the $k_{max}$ estimates coming from otolith studies.
+We first compiled maximum lengths for all species using Fishbase [@Froese2018] and used these lengths for the $l_{\infty}$. Then, we extracted the available data for $k_{max}$ from Morais & Bellwood (2018), which are essentially $\kappa$ values from Fishbase, standardized to the maximum length [@Morais2018]. We selected the species of our species list and only included the $k_{max}$ estimates coming from otolith studies.
 In total, this selection process resulted in 439 observations of kmax for varying species and temperatures. \par
 
-Further, we used an openly accessible otolith dataset, including measurements of fishes from five French Polynesian islands, and to which we contributed through data collection and analysis [@Morat2020].
+Further, we used an openly accessible otolith dataset, including measurements of fishes from five French Polynesian islands [@Morat2020].
 This dataset includes total length measurements to the nearest millimeter and fish weights to the nearest 0.1 grams. Further, it includes distances between annual growth increments, measured by two independent researchers to prevent biases induced by a single observer.
-These data can be used to estimate growth rate parameters using a two-step approach: back-calculation to achieve individual-level size-at-age data and hierarchical regression to fit the Von Bertalanffy growth curve (see REF FISHGROWBOT). \par
+These data can be used to estimate growth rate parameters using a two-step approach: back-calculation to achieve individual-level size-at-age data and hierarchical regression to fit the Von Bertalanffy growth curve [@Morat2020]. \par
 
-Specifically, we used the Modified Fry back-calculation model (MF) [@Vigliola2000] to estimate fish lengths at previous ages. We adapted the traditional model to also estimate the uncertainty around the obtained length estimates and allow for the inclusion of missing values using a Bayesian approach (see ref fishgrowbot for details). Then, we fitted the Von Bertalanffy growth model to all species at each location for which there were at least 3 individuals, using Bayesian hierarchical regression models. Both steps of this procedure were carried out using the developed R package 'fishgrowbot' (ref). The package also automatically estimates the parameter $k_{max}$. \par
+Specifically, we used the Modified Fry back-calculation model (MF) [@Vigliola2000] to estimate fish lengths at previous ages. We adapted the traditional model to also estimate the uncertainty around the obtained length estimates and allow for the inclusion of missing values using a Bayesian approach (see ref fishgrowbot for details). Then, we fitted the Von Bertalanffy growth model to all species at each location for which there were at least 3 individuals, using Bayesian hierarchical regression models. Both steps of this procedure were carried out using the developed R package 'fishgrowbot'. The package also automatically estimates the parameter $k_{max}$. \par
 
 After combining the two data sources, we obtained 496 estimates of $k_{max}$ for 181 species across varying temperatures.
 
 ### 1.2 Data analysis and extrapolation
 
-\noindent Aside from phylogeny, $k_{max}$ is mostly determined by body size and temperature [@Morais2018]. 
+Aside from phylogeny, $k_{max}$ is mostly determined by body size and temperature [@Morais2018]. I therefore aimed to predict $k_{max}$ based on body size, temperature, and phylogeny by using a phylogenetic regression model. \par
 
-We applied a Bayesian hierarchical model to predict the growth rate of fishes as a function of body size, temperature and phylogeny:  
+I extracted the phylogenetic position of all species included through the Fish Tree of Life [@Rabosky2018]. I retrieved 100 synthetic stochastically resolved phylogenies where missing taxa were placed according to the highest level of taxonomy using the function `fishtree_complete_phylogeny()` in the R package fishtree [@Chang2019]. For each tree, I calculated the correlation matrix and then averaged each element across the 100 matrices to get one correlation matrix that could be used in the regression model. \par
 
+I then fitted a Bayesian phylogenetic regression to predict the growth rate parameter of fishes depending on body size, temperature, and phylogeny with the R package brms [@Burkner2017]:
 <!-- \begin{equation} -->
-$$\textrm{ln}kmax = (\beta_{\textrm{0}} + \gamma_{\textrm{0phy}}) +  \beta_{\textrm{1}} \textrm{ln}sizemax +  \beta_{\textrm{2}} sst + \epsilon,$$
+$$\textrm{ln}k_{max} \sim normal(mu, sigma)$$
+$$mu = (\beta_{\textrm{0}} + \gamma_{\textrm{0phy}}) +  \beta_{\textrm{1}} \textrm{ln}sizemax +  \beta_{\textrm{2}} sst ,$$
 <!-- \label{kmax} -->
 <!-- \end{equation} -->
+where $\textrm{ln}k_{max}$ represents the natural log-transformed $k_{max}$ value, mu is the predicted average, and sigma is the standard deviation, $\beta_\textrm{0}$ is the fixed-effect intercept, $\gamma_\textrm{0phy}$ is the vector of random-effect coefficients that account for the residual intercept variation, based on the relatedness as described by the phylogeny, $\beta_\textrm{1}$ is the slope for the natural transformed maximum body size, $\beta_\textrm{2}$ is the slope for the average ambient sea surface temperature.
+I used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains. \par
 
-\noindent where $\textrm{ln}kmax$ represents the natural log-transformed kmax value, $\beta_\textrm{0}$ is the fixed-effect intercept, $\gamma_\textrm{0phy}$ is the vector of random-effect coefficients that account for the residual intercept variation, based on the relatedness as described by the phylogeny, $\beta_\textrm{1}$ is the slope for the natural transformed maximum body size, $\beta_\textrm{2}$ is the slope for the average ambient sea surface temperature, $\epsilon$ is the residual variation.
-\noindent We used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains. 
-\noindent The model fit confirmed a negative relationship of $\textrm{ln}kmax$ with $\textrm{ln}size$, and a positive relationship with sea surface temperature. The Bayesian R2 of the model was 0.738 (95\%CI: 0.702-0.769). 
-\noindent The phylogenetic heritability (equivalent to Pagel’$\lambda$) was estimated as the proportion of total variance, conditioned on the effects, attributable to the phylogeny(i.e. $\lambda = \frac{{\textrm{sd}(\gamma_{\textrm{0phy}})}^2} {{\textrm{sd}(\gamma_\textrm{0phy})}^2 + \epsilon^2}$). This calculation resulted in a phylogenetic signal of 0.74 (95\% CI: 0.70 - 0.77). 
+The model fit confirmed a negative relationship of $\textrm{ln}k_{max}$ with maximum body size, and a positive relationship with sea surface temperature (figure \@ref(fig:c4f1)). I verified model convergence and fit by checking the posterior predictive plot, inspecting parameter trace plots, and checking the R statistic. The Bayesian R2 of the model was 0.738 (95\%CI: 0.702-0.769). \par
 
-\noindent We extrapolated $kmax$ for all species across the full temperature range in which those species occur in the database, with temperature rounded to the °C, which results in 4712 unique temperature and species combinations.  
-There is currently no streamlined method to make predictions for new species from a phylogenetic regression model. We circumvented the issue by extracting draws of the phylogenetic effect, $\gamma_\textrm{0phy}$ for each species included in the model. We subsequently predicted these phylogenetic effects for missing species with the help of the function phyEstimate in the picante package for R [@Kembel2010]. This function uses phylogenetic ancestral state estimation to infer trait values for new species on a phylogenetic tree by rerooting the tree to the parent edge for the node to be predicted [@Kembel2012]. We repeated this for all 100 trees and 1000 draws. Per draw, we averaged the extrapolated values per species for the hundred trees. Then, by combining the predicted phylogenetic effects with the global intercept and slopes for body size and temperatures for each draw, we predicted $\kappa$ for each species. We only use one chain in order to keep computational time reasonable. Finally, we summarised all $\kappa$ predictions per sst per species by taking the mean and standard deviation across the 1000 draws. 
+The phylogenetic heritability (equivalent to Pagel’$\lambda$) was estimated as the proportion of total variance, conditioned on the effects attributable to the phylogeny (i.e., $\lambda = \frac{{\textrm{sd}(\gamma_{\textrm{0phy}})}^2} {{\textrm{sd}(\gamma_\textrm{0phy})}^2 + \epsilon^2}$). This calculation resulted in a phylogenetic signal of 0.74 (95\% CI: 0.70 - 0.77).
+This means that most of the variation is ecplained by phylogeny.
 
-## 2 Body stoichiometry    
-### 2.1 Data collection    
+\noindent We extrapolated $kmax$ for all species across the full temperature range in which those species occur in the database, with temperature rounded to the °C, which results in 4712 unique temperature and species combinations.
+There is currently no streamlined method to make predictions for new species from a phylogenetic regression model. We circumvented the issue by extracting draws of the phylogenetic effect, $\gamma_\textrm{0phy}$ for each species included in the model. We subsequently predicted these phylogenetic effects for missing species with the help of the function phyEstimate in the picante package for R [@Kembel2010]. This function uses phylogenetic ancestral state estimation to infer trait values for new species on a phylogenetic tree by rerooting the tree to the parent edge for the node to be predicted [@Kembel2012]. We repeated this for all 100 trees and 1000 draws. Per draw, we averaged the extrapolated values per species for the hundred trees. Then, by combining the predicted phylogenetic effects with the global intercept and slopes for body size and temperatures for each draw, we predicted $\kappa$ for each species. We only use one chain in order to keep computational time reasonable. Finally, we summarised all $\kappa$ predictions per sst per species by taking the mean and standard deviation across the 1000 draws.
+
+## 2 Body stoichiometry
+### 2.1 Data collection
 \noindent 1633 individuals of 108 species and 25 families were collected between 2015 and 2017 in Mo'orea (Parravicini, unpub.), the Caribbean [@Allgeier2020sci], and Palmyra (Bukepile unpub.). Their gut contents were removed and the whole body was freeze-dried and ground to powder with a Precellys homogenizer. Whole body elemental proportions ($Q_\textrm{k}$) were then measured in the lab using standard methods. Specifically, ground samples were analyzed for \%C and \%N content using a CHN Carlo-Erba elemental analyzer (NA1500), and for \%P using dry oxidation-acid hydrolysis extraction followed by a colorimetric analysis [@Allen1974]. Elemental content was calculated based on dry mass.
 
-### 2.2 Data analysis and extrapolation  
+### 2.2 Data analysis and extrapolation
 
-\noindent The CNP\% content of organisms is known to be highly conserved within families [@Allgeier2020sci]. We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
+\noindent The CNP\% content of organisms is known to be highly conserved within taxa [@Allgeier2020sci]. We therefore use phylogeny to extrapolate these values. We fitted C, N and P contents (\%) through a hierarchical phylogenetic multivariate normal model with phylogenetic effects and random effects per species.
 
 <!-- \begin{equation} -->
 $$\begin{bmatrix}Y_1 \\ Y_2 \\ Y_3\end{bmatrix} \sim MVNormal(\begin{bmatrix}mu1 \\ mu2 \\ mu3\end{bmatrix}, S),$$
@@ -74,29 +121,35 @@ $$mu_{\textrm{n}\times\textrm{k}} = \beta_\textrm{0 k} + \gamma_{\textrm{0phy}\t
 
 \noindent where $Y_1$, $Y_2$ and $Y_3$ are the \% content of $\textrm{C}$, $\textrm{N}$, and $\textrm{P}$ respectively, $mu_{\textrm{n}\times\textrm{k}}$ represents the average \% content of element $k$ ($\textrm{C}$, $\textrm{N}$, and $\textrm{P}$) per species, $\beta_\textrm{0 k}$ is the fixed-effect intercept for each element $k$, $\gamma_{\textrm{0phy}\times\textrm{k}}$ is the matrix of random-effect coefficients that account for the intercept variation, based on the relatedness as described by the phylogeny per element k, $\gamma_{\textrm{0sp}\times\textrm{k}}$ is the matrix of random-effect coefficients that account for the residual species-level intercept variation per element k.
 
-\noindent We used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains. 
-\noindent The Bayesian R2 of the model was 0.39 (95\%CI: 0.36-0.42), 0.50 (95\%CI: 0.48-0.53), and 0.43 (95\%CI: 0.40-0.46) for C, N and P respectively. 
+\noindent We used uninformative priors and ran the model for 2000 iterations with a warm-up of 1000 iteration for 4 chains.
+\noindent The Bayesian R2 of the model was 0.39 (95\%CI: 0.36-0.42), 0.50 (95\%CI: 0.48-0.53), and 0.43 (95\%CI: 0.40-0.46) for C, N and P respectively.
 \noindent The phylogenetic heritability was 0.41 (95\%CI: 0.28-0.55), 0.58 (95\%CI: 0.4-0.66), and 0.57 (95\%CI: 0.46-0.69) for C, N, and P respectively.
-                
-\noindent As before, we used 1000 fitted draws for each species, and 100 phylogenetic trees to extrapolate to all species with unknown body stoichiometry. Specifically, we used the phylopars function from the Rphylopars package [@Bruggeman2009]. This function uses ancectral state reconstruction and brownian motion, and takes the correlation between C, N and P into account.      
 
-## 3 Diet     
-### 3.1 Data collection 
-\noindent We collected 571 adult individuals of 51 species between 2018 and 2019 in Mo'orea and Tetiaroa, and Mangareva, three Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab for CNP content analysis using similar methods as for the fish body stoichiometry described above. 
+\noindent As before, we used 1000 fitted draws for each species, and 100 phylogenetic trees to extrapolate to all species with unknown body stoichiometry. Specifically, we used the phylopars function from the Rphylopars package [@Bruggeman2009]. This function uses ancectral state reconstruction and brownian motion, and takes the correlation between C, N and P into account.
 
-### 3.2 Data analysis and extrapolation  
-\noindent Using trophic guilds defined by @Parravicini2020, we fitted a multivariate Bayesian regression model to summarize CNP\% content data per trophic guild with random effects at the species level. This model had a median Bayesian R2 of 0.62, 0.62, and 0.48 for C, N and P respectively.           
-Next, we extracted 1000 draws of the predicted CNP\% per trophic guild. Parravicini et al. 2020 [@Parravicini2020] provides the probability of reef fish species to be assigned to each of the eight defined trophic guilds(i.e. sessile invertivores; herbivores, microvores, and detrivores; corallivores; piscivores; microinvertivores; macroinvertivores; crustacivores; planktivores). By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. We then took the average and standard deviation across all 1000 draws. While we recognize the bias of using diet CNP\% estimates of a dataset in one region, we argue that variability between food categories e.g. animal material and primary producers is likely to be higher than regional differences within trophic categorizations. Further, since the used trophic guild classification includes probabilities to belong to each group, variation is included when the trophic categorization is not well known. For example, if a species has a 50% probability to be a herbivore and a 50% probability to be a sessile invertivore this uncertainty will be reflected the estimation of the diet CNP\%.
+## 3 Diet
+### 3.1 Data collection
+\noindent We collected 571 adult individuals of 51 species between 2018 and 2019 in Mo'orea and Tetiaroa, and Mangareva, three Polynesian islands. We extracted the stomach content and stored it in a 2ml tube. After freezing the samples, we dry-froze all samples for at least 24 hours, and ground to powder. Then, samples were sent to the lab for CNP content analysis using similar methods as for the fish body stoichiometry described above.
 
-## 4 Metabolic parameters    
-### 4.1 Data collection and lab experiments    
+### 3.2 Data analysis and extrapolation
+\noindent Using trophic guilds defined by @Parravicini2020, we fitted a multivariate Bayesian regression model to summarize CNP\% content data per trophic guild with random effects at the species level. This model had a median Bayesian R2 of 0.62, 0.62, and 0.48 for C, N and P respectively.
+Next, we extracted 1000 draws of the predicted CNP\% per trophic guild. Parravicini et al. 2020 [@Parravicini2020] provides the probability of reef fish species to be assigned to each of the eight defined trophic guilds(i.e. sessile invertivores; herbivores, microvores, and detrivores; corallivores; piscivores; microinvertivores; macroinvertivores; crustacivores; planktivores). By combining these probabilities with the predicted diet contents per trophic guild, we finally estimated the diet CNP\% for each species in our database. Essentially, we performed a weighted average od CNP content across diet groups for each species, where the weights represent the probability of being in a certain trophic guild. We then took the average and standard deviation across all 1000 draws. While we recognize the bias of using diet CNP\% estimates of a dataset in one region, we argue that variability between food categories e.g. animal material and primary producers is likely to be higher than regional differences within trophic categorizations. Further, since the used trophic guild classification includes probabilities to belong to each group, variation is included when the trophic categorization is not well known. For example, if a species has a 50% probability to be a herbivore and a 50% probability to be a sessile invertivore this uncertainty will be reflected the estimation of the diet CNP\%.
+
+## 4 Metabolic parameters
+### 4.1 Data collection and lab experiments
 To quantify standard metabolic rate (SMR) and maximum metabolic rate (MMR), we carried out intermittent-closed respirometry experiments [@Steffensen1989; @Clark2013].
-In the period between 2018 and 2019, we collected 1393 individuals of 61 species and 18 families with a minimum of 3 replicates per species using hand nets and clove oil (Parravicini, Brandl, and Mercière, unpub.).
+In the period between 2018 and 2019, we collected 1393 individuals of 61 species and 18 families with a minimum of 3 replicates per species in Moorea, French Polynesia. Fishes were capturedby scuba divers using hand nets and clove oil and immidiately transported to the laboratory in coolers with ambient seawater and oxygen stones. MORE INFO TO ADD??
 After an acclimatization and fasting period of 48 h in aquaria, the fishes were individually transferred to a water-filled tub at 28°C (ambient sea water temperature) and manually chased by the experimenter until exhausted [@Norin2011; @Clark2012]. Then, they were placed in respirometry chambers submersed in an ambient and temperature-controlled tank, where they were left for ~23 h. The intermittent respirometry cycles started immediately after a fish was placed in its respirometry chamber. The cycles consisted of a measurement (sealed) period followed by a flush period during which the respirometry chambers were flushed with fully aerated water from the ambient tank. Because fishes were exhausted right before entering the respirometry chambers, it was possible to measure the approximate MMR. Depending on fish size, 8 respirometry chambers ranging in volume (including tubes and pumps) from 0.4 to 4.4 L were run in parallel, and measurement and flush periods lasted between 3 to 15 min and 3 to 5 min, respectively. SMR was calculated as the average of the 10 \% lowest values measured during the entire period, after the removal of outliers [@Chabot2016]. MMR was calculated from the slope of the first measurement period. \par
 
 
-### 4.3 Data analysis and extrapolation
-To retrieve the parameters $f_\textrm{0}$ (Metabolic normalisation constant independent of body mass; $\textrm{g C} \textrm{g}^{-\alpha} \textrm{d}^{-1}$), $\alpha$ (mass-scaling exponent), and $\theta$ (factorial activity scope), we fitted a normal Bayesian mixed effect model predicting the log10-transformed metabolic rate using the log10-transformed biomass including random effects of family, species, and mr type (SMR or MMR) on both the species and family intercept effect using brms [@Burkner2017]. We ran the model for 4000 iterations, with a warm-up of 2000 iterations, and four chains. Further, we used an informative prior for the slope ($\alpha \sim normal(0.8, 0.5)$. The model had a Bayesian R2 of 0.973 (95\%CI: 0.972-0.974).
+### 4.2 Data analysis and extrapolation
+To retrieve the parameters $f_\textrm{0}$ (Metabolic normalisation constant independent of body mass; $\textrm{g C} \textrm{g}^{-\alpha} \textrm{d}^{-1}$), $\alpha$ (mass-scaling exponent), and $\theta$ (factorial activity scope), we fitted a normal Bayesian mixed effect model predicting the log10-transformed metabolic rate using the log10-transformed biomass including random effects of family, species, and mr type (SMR or MMR) on both the species and family intercept effect using brms [@Burkner2017]:
+$$
+log(mr) \sim normal(\mu, \sigma),\\
+\mu = f_\textrm{0} + \alpha log(biomass)
+$$
+
+We ran the model for 4000 iterations, with a warm-up of 2000 iterations, and four chains. Further, we used an informative prior for the slope ($\alpha \sim normal(0.8, 0.5)$. The model had a Bayesian R2 of 0.973 (95\%CI: 0.972-0.974).
 We then predicted the family-level $\alpha$ by summing the slope of the model with the effects of the family on the slope of the SMR. We did this for all iterations and then took the mean and standard deviation. In a similar way, we extracted the family-level intercept for SMR and MMR (figure \@ref(fig:c4f4)), and then quantified mean and standard deviation of $f_\textrm{0}$ after the back-transformation of all iterations of the intercept (i.e., the intercept for SMR).
 Finally, we estimated $\theta$ as followed, based on the assumption that fishes rest 12h a day and they on average spend the remaining 12 hours at a metabolic rate that is the average of their SMR and MMR:
 <!-- \begin{equation} -->
@@ -104,20 +157,14 @@ $$\theta = \frac{3\textrm{SMR} + \textrm{MMR}}{4\textrm{SMR}},$$
 <!-- 	\label{theta} -->
 <!-- \end{equation} -->
 where all iterations of the back-transformed family-level intercepts were used for SMR and MMR. We then summarized these predictions by taking the mean and standard deviation.
-We used the family-level estimates for these parameters for all species in our database. For families that were not represented in our respirometry dataset, we used the average across all families. The parameter $f0$ was adjusted for each temperature in the varying locations of the underwater visual census database, following @Barneche2014:
+We used the family-level estimates for these parameters for all species in our database. For families that were not represented in our respirometry dataset, we used the average across all families.
+The parameter $f0$ was adjusted for each temperature in the varying locations of the underwater visual census database, following @Barneche2014:
 
 $$f0_{adjusted} = f0(T_{ref}) e^{E_r(\frac{1}{\kappa T_ref} - \frac{1}{\kappa T})},$$
 where $\kappa$ is the Boltsmann's constant ($8.62 * 10^{-5} eV K^{-1}$), $E_r$ is the activation energy (0.59 eV, extracted from @Barneche2014), $f0(T_{ref})$ is the value of the metabolic normalization at a fixed reference temperature (301.15 K = 28 + 273.15K), $T$ is the temperature of interest (K).
 
-## 5. Additional parameters  
-We retrieved the parameters $lw_a$, $lw_b$, $h$, and $r$ from fishbase [@Froese2018]. For the mass-specific turnover rates for N and P($F_\textrm{0Nz}$; $F_\textrm{0Pz}$), we used the estimates provided in Schiettekatte et al. (2020) [@Schiettekatte2020]. 
+## 5. Additional parameters
+We retrieved the parameters $lw_a$, $lw_b$, $h$, and $r$ from fishbase [@Froese2018]. For the mass-specific turnover rates for N and P($F_\textrm{0Nz}$; $F_\textrm{0Pz}$), we used the estimates provided in Schiettekatte et al. (2020) [@Schiettekatte2020].
 
 
 ## References
-
-
-
-
-
-
-
