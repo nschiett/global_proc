@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Underwater visual census database
 \noindent We used a published global database of reef fish abundances and sizes collected along belt transects [@Barneche2019]. This database encompasses 9118 transects across 585 sites (within 98 localities) in the Central Indo-Pacific, Central Pacific, Eastern Pacific, Western Indian, Eastern Atlantic, and Western Atlantic. Sites are defined as small islands or stretches of continuous reefs in larger coastlines and localities encompass sites that belong to the same biogeographic sub-provinces [see @Barneche2019]. The database only includes transects at the outer reef slope and with a hard reef bottom. Transects were carried out at a constant depth, parallel to the reef crest. We discarded the species inside families for which we did not have body stoichiometry data, individuals that were smaller than 7cm to minimize the bias related to the identification of small individuals, and rare species for which less than 20 individuals were ever recorded across all transects. The dataset then included 1110 species belonging to 25 families (Acanthuridae, Balistidae, Bothidae, Chaetodontidae, Cirrhitidae, Fistulariidae, Haemulidae, Holocentridae, Kyphosidae, Labridae, Lethrinidae, Lutjanidae, Monacanthidae, Mugilidae, Mullidae, Ostraciidae, Pempheridae, Pomacanthidae, Pomacentridae, Sciaenidae, Scorpaenidae, Serranidae, Siganidae, Tetraodontidae, Zanclidae).
-Sea surface temperature (SST) for each site was obtained from daily time‐series data from the National Oceanicand Atmospheric Administration of the USA (NOAA) covering a 5‐year period (°C; 0.25° resolution) (@Reynolds2007; available from https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.highres.html). Further, for each transect, we calculated the species richness and estimated the total standing stock biomass of fishes by using Bayesian length-weight relationships available from Fishbase [@Froese2013]. All data wrangling and analyses were performed in the software program R (version 4.0.2; R core team 2020).
+Sea surface temperature (SST) for each site was obtained from daily time‐series data from the National Oceanicand Atmospheric Administration of the USA (NOAA) covering a 5‐year period (°C; 0.25° resolution) (@Reynolds2007; available from https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.highres.html). Further, for each transect, we calculated the species richness and estimated the total standing stock biomass of fishes by using Bayesian length-weight relationships available from Fishbase [@Froese2014]. All data wrangling and analyses were performed in the software program R (version 4.0.2; R core team 2020).
 
 ## 2. Quantification of functions
 \noindent For each transect, we estimated five key process-based functions mediated by fishes: nitrogen excretion rate (gN/day/m^2^), phosphorus excretion rate (gP/day/m^2^), production of biomass through growth (gC/day/m^2^), herbivory, i.e. ingestion rate of macrophytes (gC/day/m^2^), and piscivory, i.e. ingestion rate of fishes (g/day/m^2^) [@Brandl2019front]. These five functions were estimated for each transect using individual-based bioenergetic models predicting fluxes of carbon (C), nitrogen (N), and phosphorus (P) (e.g. daily C intake rates, N and P excretion rates, growth rates) [@Schiettekatte2020].
@@ -43,11 +43,11 @@ First, we performed a multivariate intercept-only regression model with the five
 $$\begin{bmatrix}y_{ExN,i} \\ y_{ExP,i} \\ y_{Prod,i} \\ y_{Herb,i} \\ y_{Pisc,i} \end{bmatrix} \sim MVNormal\left(\begin{bmatrix} \mu_{ExN,i} \\ \mu_{ExP,i} \\ \mu_{Prod,i} \\ \mu_{Herb,i} \\ \mu_{Pisc,i}\end{bmatrix}, S \right),$$
 
 $$
-\mu_{\textrm{ExN,i}}  = (\beta0_{ExN}  +  \delta_{ExN, loc}  +  \delta_{ExN, site}) \\
+\begin{array}{c} \mu_{\textrm{ExN,i}}  = (\beta0_{ExN}  +  \delta_{ExN, loc}  +  \delta_{ExN, site}) \\
 \mu_{\textrm{ExP,i}}  = (\beta0_{ExP}  +  \delta_{ExP, loc}  +  \delta_{ExP, site})  \\
 \mu_{\textrm{Prod,i}} = (\beta0_{Prod} +  \delta_{Prod, loc} +  \delta_{Prod, site}) \\
 \mu_{\textrm{Herb,i}} = (\beta0_{Herb} +  \delta_{Herb, loc} +  \delta_{Herb, site}) \\
-\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) ,
+\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) , \end{array}
 $$
 
 $$
@@ -92,11 +92,11 @@ R
 0 & 0 & 0 & 0 & \sigma_{Pisc} \end{bmatrix}$$
 
 
-$$\mu_{\textrm{ExN,i}} = (\beta0_{ExN} +  \delta_{ExN, loc} +  \delta_{ExN, site}) +{\beta1_{ExN}} {x_{log(biomass),i}} + {\beta2_{ExN}} {x_{sst,i}} \\
+$$\begin{array}{c} \mu_{\textrm{ExN,i}} = (\beta0_{ExN} +  \delta_{ExN, loc} +  \delta_{ExN, site}) +{\beta1_{ExN}} {x_{log(biomass),i}} + {\beta2_{ExN}} {x_{sst,i}} \\
 \mu_{\textrm{ExP,i}} = (\beta0_{ExP} +  \delta_{ExP, loc} +  \delta_{ExP, site}) +{\beta1_{ExP}} {x_{log(biomass),i}} + {\beta2_{ExP}} {x_{sst,i}} \\
 \mu_{\textrm{Prod,i}} = (\beta0_{Prod} +  \delta_{Prod, loc} +  \delta_{Prod, site}) +{\beta1_{Prod}} {x_{log(biomass),i}} + {\beta2_{Prod}} {x_{sst,i}} \\
 \mu_{\textrm{Herb,i}} = (\beta0_{Herb} +  \delta_{Herb, loc} +  \delta_{Herb, site}) +{\beta1_{Herb}} {x_{log(biomass),i}} + {\beta2_{Herb}} {x_{sst,i}} \\
-\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) +{\beta1_{Pisc}} {x_{log(biomass),i}} + {\beta2_{Pisc}} {x_{sst,i}}
+\mu_{\textrm{Pisc,i}} = (\beta0_{Pisc} +  \delta_{Pisc, loc} +  \delta_{Pisc, site}) +{\beta1_{Pisc}} {x_{log(biomass),i}} + {\beta2_{Pisc}} {x_{sst,i}} \end{array}
 $$
 
 where $\beta1_{ExN}, \beta1_{ExP}, \beta1_{Prod}, \beta1_{Herb}, \beta1_{Pisc}$ are the fixed effects of the log-transformed biomass, and $\beta2_{ExN}, \beta2_{ExP}, \beta2_{Prod}, \beta2_{Herb}, \beta2_{Pisc}$ are the fixed effects of sst. Locality- and site-level effects are now thus structured including covariation among functions, independent of biomassand sst. Similarly, the residual variation of functions incorporates the correlations between functions, without the effect of biomass and sst.
@@ -104,7 +104,8 @@ We used similar priors as describved above, and we used weakly-informative norma
 
 \noindent Finally, to investigate the effect of the community structure while still accounting for the effects of standing biomass and sst, we fitted a mixed effect multivariate model similar to the model specified above, but adding all community structure variables:
 
-$$\begin{array}{c} \mu_{\textrm{function,i}}  = \beta0_{function} + \beta1_{function} x_{log(biomass),i} + \beta2_{function} x_{sst,i}  + \beta3_{function} x_{richness,i}  + \beta4_{function} x_{size_m,i}  + \beta5_{function} x_{size_{2.5\%},i} +  \beta6_{function} x_{size_{97.5\%},i} + \\ \beta7_{function} x_{troph_m,i}  + \beta8_{function} x_{troph_{2.5\%},i} +  \beta9_{function} x_{troph_{97.5\%},i} + \beta10_{function} x_{imm_m,i}  + \beta11_{function} x_{imm_{2.5\%},i} +  \beta12_{function} x_{imm_{97.5\%},i} $$
+$$\begin{array}{c} \mu_{\textrm{function,i}}  = \beta0_{function} + \beta1_{function} x_{log(biomass),i} + \beta2_{function} x_{sst,i}  + \beta3_{function} x_{richness,i}  + \beta4_{function} x_{size_m,i}  + \beta5_{function} x_{size_{2.5\%},i} +  \beta6_{function} x_{size_{97.5\%},i} + \\
+\beta7_{function} x_{troph_m,i}  + \beta8_{function} x_{troph_{2.5\%},i} +  \beta9_{function} x_{troph_{97.5\%},i} + \beta10_{function} x_{imm_m,i}  + \beta11_{function} x_{imm_{2.5\%},i} +  \beta12_{function} x_{imm_{97.5\%},i} \end{array}$$
 
 where richness is the species richness, $size$ is the total length, $troph$ is the trophic level, $imm$ is the immaturity, and $m$, $2.5\%$, and $97.5\%$ respectively represent the 50\%, 2.5\%, and 97.5\% quantiles across the fish community.
 For these models, we used weakly informative priors for the fixed effect parameters ($\beta3-\beta12 \sim normal(0,1)$) and the same priors as described above for other parameters. par
