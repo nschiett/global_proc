@@ -37,6 +37,7 @@ plan <- drake_plan(
   output_fluxsum = write.csv(summary_transect, "output/data/flux_summary_transect.csv", row.names = FALSE),
   
   contributions = get_contributions(tfish, cnpflux, params, summary_transect),
+  contributions_site = get_contributions_site(tfish, cnpflux, params, summary_transect),
   sp_loc = unique(select(ungroup(contributions), bioregion, species)),
   
   # herbivory, piscivory 
@@ -65,10 +66,13 @@ plan <- drake_plan(
   #tab_mod_mvfun_com2 = make_table_mod_mvfun_com(mod_mvfun_com2),
   
   ##### contribution analysis #####
-  contr_family = get_cf(contributions, herb_pisc),
-  degree_dominance = get_dd_site(contributions, herb_pisc),
-  sp_importance = get_importance_site(contributions, herb_pisc),
+  #contr_family = get_cf(contributions, herb_pisc),
+  degree_dominance = get_dd_site(contributions_site),
+  sp_importance = get_importance_site(contributions_site),
   freq_dominance = get_fd_site(sp_importance),
+  
+  mod_dd = fit_mod_dd(degree_dominance),
+  mod_fd = fit_mod_fd(freq_dominance),
 
   ##### Species vulnerability #####
   #vulnerability = get_vuln(sptl),

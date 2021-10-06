@@ -319,14 +319,13 @@ get_dd <- function(contributions, herb_pisc){
   return(key)
 }
 
-get_dd_site <- function(contributions, herb_pisc){
-  
-  # combine data
+get_dd_site <- function(contributions){
   
   
-  nspec <- left_join(contributions, herb_pisc$contributions_herb_pisc) %>%
+  
+  con <- contributions %>%
     ungroup() %>% group_by(sites) %>%
-    dplyr::summarise(nspec = length(unique(species)),
+    dplyr::mutate(nspec = length(unique(species)),
                      nspec_h = length(unique(species[I_herb_p>0])),
                      nspec_p = length(unique(species[I_pisc_p>0])))
   
@@ -372,8 +371,7 @@ get_dd_site <- function(contributions, herb_pisc){
     }
   }
   
-  con <- ungroup(tfs)
-  
+
   key <- parallel::mclapply(unique(con$sites), function(x){
     
     t <- dplyr::filter(con, sites == x)
@@ -436,9 +434,12 @@ get_importance <- function(contributions, herb_pisc){
   
 }
 
-get_importance_site <- function(con){
+get_importance_site <- function(contributions, herb_pisc){
   
   # if con > 1/N !!
+  
+  con <- contributions
+  
   
   imp <- parallel::mclapply(unique(con$sites), function(x){
     sub <- filter(con, sites == x)
@@ -507,6 +508,59 @@ get_spi_vuln <- function(sp_importance, vulnerability){
            n_prop = n/n_spec_tot) %>% # proportion of species in vuln category
     mutate(perc = 100 * ep_prop/n_prop)
   
+}
+
+fit_mod_dd <- function(dd) {
+  fit1 <- brm(dd_Fn ~ 1, data = dd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit2 <- brm(dd_Fp ~ 1, data = dd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit3 <- brm(dd_Gc ~ 1, data = dd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit4 <- brm(dd_I_herb ~ 1, 
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10),
+              data = filter(dd, dd_I_herb>0))
+  fit5 <- brm(dd_I_pisc ~ 1,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10),
+              data = filter(dd, dd_I_pisc>0))
+  list(fit1, fit2, fit3, fit4, fit5)
+}
+
+
+fit_mod_fd <- function(fd) {
+  fit1 <- brm(Fn_i ~ 1, data = fd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit2 <- brm(Fp_i ~ 1, data = fd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit3 <- brm(Gc_i ~ 1, data = fd,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10))
+  fit4 <- brm(I_herb_i ~ 1, 
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10),
+              data = filter(fd, I_herb_i>0))
+  fit5 <- brm(I_pisc_i ~ 1,
+              cores = 4,
+              backend = "cmdstanr",
+              threads = threading(10),
+              data = filter(fd, I_pisc_i>0))
+  list(fit1, fit2, fit3, fit4, fit5)
 }
 
 ############# multivariate ################

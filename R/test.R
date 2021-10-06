@@ -947,6 +947,7 @@ get_fd <- function(sp_importance){
 
 fd <- get_fd(imp)
 
+key <- degree_dominance
 
 plot1 <-
   ggplot() + 
@@ -965,7 +966,7 @@ plot1 <-
   # geom_pointrange(aes(y = "c", x = pr3[1], xmin = pr3[3], xmax = pr3[4])) +
   # geom_pointrange(aes(y = "b", x = pr4[1], xmin = pr4[3], xmax = pr4[4])) +
   # geom_pointrange(aes(y = "a", x = pr5[1], xmin = pr5[3], xmax = pr5[4])) +
-  geom_vline(xintercept = mean(vec$dd), linetype = 2) +
+   #geom_vline(xintercept = mean(vec$dd), linetype = 2) +
   theme_bw() +
   theme(panel.grid = element_blank()) +
   scale_y_discrete(labels = c("Piscivory", 

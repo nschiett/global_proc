@@ -110,30 +110,7 @@ get_lw <- function(sptl){
 ##### ar and troph #####
 
 get_artr <- function(sptl){
- ar <- map(as.list(sptl$Species), possibly(fishflux::aspect_ratio, otherwise =  NA_real_))
- ar2 <- lapply(ar, function(x){
-   if(is.data.frame(x)){
-     return(x$aspect_ratio)
-   } else{return(NA)}
-   }) %>% unlist()
- tr <- map(as.list(sptl$Species), possibly(fishflux::trophic_level, otherwise =  NA_real_))
- tr2 <- lapply(tr, function(x){
-   if(is.data.frame(x)){
-     return(x$trophic_level)
-   } else{return(NA)}
- }) %>% unlist()
- res <- sptl %>% mutate(h_m = tr2, r_m = ar2)
-
- # Family level average for missing
- ar_fam <- group_by(res, Family) %>% 
-   summarize(ar_fam = mean(r_m, na.rm = TRUE), tr_fam = mean(h_m, na.rm = TRUE))
- res <- left_join(res, ar_fam)
-
- res[is.na(res$r_m), "r_m"] <- res[is.na(res$r_m), "ar_fam"]
- res[is.na(res$h_m), "h_m"] <- res[is.na(res$h_m), "tr_fam"]
-
- res <- dplyr::select(res, Species, Family, r_m, h_m)
- 
+ res <- read_csv("data/params_h_r.csv")
  # add weight prop
  wp <- lapply(res$Family, fishflux::wprop) %>% plyr::ldply()
  res$mdwm <- wp$ww
