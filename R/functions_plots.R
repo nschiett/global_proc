@@ -107,7 +107,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, 
                   label = as.character(expression(paste("N excretion (gN ", m^{-2}, day^{-1}, ")")))), 
-              size = 3, hjust = 0, parse = T) +
+              size = 2, hjust = 0, parse = T) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 1))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
@@ -139,7 +139,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, 
                   label = as.character(expression(paste("P excretion (gP ", m^{-2}, day^{-1}, ")")))), 
-              size = 3, hjust = 0, parse = T) +
+              size = 2, hjust = 0, parse = T) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
@@ -171,7 +171,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, 
                   label = as.character(expression(paste("Production (gC ", m^{-2}, day^{-1}, ")")))), 
-              size = 3, hjust = 0, parse = T) +
+              size = 2, hjust = 0, parse = T) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.9))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
@@ -208,7 +208,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, label = 
                     as.character(expression(paste("Herbivory (gC ", m^{-2}, day^{-1}, ")")))), 
-              size = 3, hjust = 0, parse = T) +
+              size = 2, hjust = 0, parse = T) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap() + 
@@ -243,7 +243,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
     geom_text(aes(x = -175, y = 30, 
                   label = as.character(expression(paste("Piscivory (gC ", m^{-2}, day^{-1}, ")")))), 
-              size = 3, hjust = 0, parse = T) +
+              size = 2, hjust = 0, parse = T) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap()+ 
@@ -270,7 +270,7 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     scale_color_manual(values = pal, name = "",
                        drop = TRUE, na.translate = F) +
     coord_sf(ylim = c(-35, 35), expand = FALSE) +
-    geom_text(aes(x = -175, y = 30, label = "Multifunctionality"), size = 3, hjust = 0) +
+    geom_text(aes(x = -175, y = 30, label = "Multifunctionality"), size = 2, hjust = 0) +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 0.8))) +
     scale_size_continuous(range = c(0.5, 4), guide = FALSE) +
     theme_worldmap()+ 
@@ -369,8 +369,8 @@ make_fig1 <- function(mod_mv_siteloc, mod_mvfun_bm, coords, summary_transect){
     plot_layout(ncol = 2, widths = c(4,1))# + plot_annotation(tag_levels = "a")
   
   #multimap
-  ggsave("output/plots/fig1_multimap.png", multimap, width = 10, height = 10)
-  ggsave("output/plots/fig1_multimap.pdf", multimap, width = 10, height = 10)
+  ggsave("output/plots/fig1_multimap.png", multimap, width = 180, height = 210, units = "mm")
+  ggsave("output/plots/fig1_multimap.pdf", multimap, width = 180, height = 210, units = "mm")
 }
 
 
@@ -421,7 +421,7 @@ make_fig2 <- function(mod_mvfun_com){
     geom_hline(yintercept = 0, size = 1, color = "black") +
     geom_linerange(aes(x = var, ymin = Q2.5, ymax = Q97.5, color = dep),
                    position = position_dodge(.7), size = 1, linetype = 1) +
-    geom_point(aes(x = var, y = Estimate, color = dep), position = position_dodge(.7), size = 3) +
+    geom_point(aes(x = var, y = Estimate, color = dep), position = position_dodge(.7), size = 2) +
     coord_flip() +
    # scale_y_continuous(lim = c(-0.22, 0.22)) +
     theme_minimal() +
@@ -436,14 +436,16 @@ make_fig2 <- function(mod_mvfun_com){
       ))
     ) +
     
-    theme(legend.position = "bottom", axis.text = element_text(size = 12, color = "black"),
-          axis.title = element_text(size = 12), legend.text = element_text(size = 12),
+    theme(legend.position = "bottom", axis.text = element_text(size = 9, color = "black"),
+          axis.title = element_text(size = 12), legend.text = element_text(size = 10),
           axis.line.x = element_line(), axis.ticks.x = element_line(),
           panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
-          panel.grid.major.y = element_blank()
-    )  
+          panel.grid.major.y = element_blank() 
+    ) + guides(color=guide_legend(nrow=2, byrow=TRUE))
+
   slopes
-  ggsave("output/plots/fig2_com_slopes.png", slopes, width = 8, height = 9)
+  ggsave("output/plots/fig2_com_slopes.png", slopes, width = 180, height = 200, units ="mm") 
+  ggsave("output/plots/fig2_com_slopes.pdf", slopes, width = 180, height = 200, units ="mm")
   
   
 }
@@ -522,7 +524,7 @@ make_fig3 <- function(contributions, herb_pisc, degree_dominance, freq_dominance
    theme(plot.tag = element_text(size = 12), legend.position = "bottom") 
   
   
-  ggsave("output/plots/fig3_contributions.png", plot,  width = 6, height = 6)
+  ggsave("output/plots/fig3_contributions.png", plot,  width = 88, height = 100, units = "mm")
   
 }
 
@@ -647,6 +649,13 @@ make_fig4 <- function(degree_dominance, sp_importance, freq_dominance, mod_dd, m
   ab <- left_join(a,b) %>%
     mutate(prop = n/ntot)
   
+  # get value of prop species important sometimes for a function
+  freq_dominance %>%
+    mutate(imp = Fn_i>0|Fp_i>0|Gc_i>0|I_pisc_i>0|I_herb_i>0) %>%
+    group_by() %>%
+    summarize(prop = sum(imp, na.rm = T)/n())
+  # 49%
+  
   
   plot2 <- 
     ggplot(ab) +
@@ -714,8 +723,11 @@ make_fig4 <- function(degree_dominance, sp_importance, freq_dominance, mod_dd, m
           panel.grid.major.y = element_blank(),
           axis.line.x = element_line())
   
-  plot <- plot1 + plot2 + plot3 + plot_annotation(tag_levels = "a")
-  ggsave("output/plots/fig4_dd.png", plot, width = 9, height = 4)
+  plot <- plot1 + plot2 + plot3 + plot_annotation(tag_levels = "a") &
+    theme(plot.tag = element_text(face = 'bold'), axis.title.x = element_text(size = 9))
+  
+  ggsave("output/plots/fig4_dd.png", plot, width = 180, height = 90)
+  ggsave("output/plots/fig4_dd.pdf", plot, width = 180, height = 90)
   
   
 }
@@ -1109,9 +1121,11 @@ make_pp_plots <- function(mod_mv_siteloc, mod_mvfun_bm, mod_mvfun_com2){
   
   pp_plots <- a1 + a2 + a3 + a4 + a5 + b1 + b2 + b3 + b4 + b5 + c1 + c2 + c3 + c4 + c5 + 
     plot_layout(ncol = 3) +
-    plot_annotation(tag_levels = 'a', tag_suffix = ")")
+    plot_annotation(tag_levels = 'a', tag_suffix = ")") &
+    theme(plot.tag = element_text(face = 'bold'))
   
   ggsave("output/plots/pp_plots.png", pp_plots, width = 18, height = 12)
+  ggsave("output/plots/pp_plots.pdf", pp_plots, width = 18, height = 12)
   
 }
 
@@ -1188,7 +1202,7 @@ alt_diet <- function(tfish, cnpflux){
   
   p <-  b1 + b2 + c1 + c2 +plot_layout(ncol = 2)
   
-  ggsave("output/plots/Supplemental_herbivory_piscivory_alternative_classification.png", 
+  ggsave("output/plots/Supplemental_herbivory_piscivory_alternative_classification.pdf", 
          plot = p, 
          height = 6, width = 8)
   
@@ -1518,90 +1532,101 @@ make_corplot <- function(mod_mvfun_bm){
   
   col <- fish(n = 10, option = "Ostracion_whitleyi", begin = 0, end = 1)
   
-  nd <- data.frame(biomass_tot = 100, mean = 27, locality = NA, sites = NA)
-  
-  pred <- fitted(mod_mvfun_bm, newdata = nd, summary = FALSE, nsamples = 1000)
+  # nd <- data.frame(biomass_tot = 100, mean = 27, locality = NA, sites = NA)
+  # 
+  # pred <- fitted(mod_mvfun_bm, newdata = nd, summary = FALSE, nsamples = 1000)
 
+  pred <- residuals(mod_mvfun_bm)
   
   
   p1 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,2]), x = exp(pred[,1,1])),
-               color = col[1], alpha = 0.5) +
+    geom_point(aes(y = (pred[,1,2]), x = (pred[,1,1])),
+               color = col[1], alpha = 0.2, size = 0.5) +
     theme_bw() +
     labs(x = "N excretion (gN/m2/day)", y = "P excretion (gP/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p2 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,3]), x = exp(pred[,1,1])),
-               color = col[2], alpha = 0.5) +
+    geom_point(aes(y = (pred[,1,3]), x = (pred[,1,1])),
+               color = col[2], alpha = 0.2, size = 0.5) +
     theme_bw() +
     labs(x = "N excretion (gN/m2/day)", y = "Production (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p3 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,1])),
-               color = col[3], alpha = 0.5) +
+    geom_point(aes(y = (pred[,1,4]), x = (pred[,1,1])),
+               color = col[3], alpha = 0.2, size = 0.5) +
     theme_bw() +
     labs(x = "N excretion (gN/m2/day)", y = "Herbivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p4 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,1])),
-               color = col[4], alpha = 0.5) +
+    geom_point(aes(y = (pred[,1,5]), x = (pred[,1,1])),
+               color = col[4], alpha = 0.2, size = 0.5) +
     theme_bw() +
     labs(x = "N excretion (gN/m2/day)", y = "Piscivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p5 <-
   ggplot() +
-    geom_point(aes(y = exp(pred[,1,3]), x = exp(pred[,1,2])),
-               color = col[5], alpha = 0.5) +
+    geom_point(aes(y = (pred[,1,3]), x = (pred[,1,2])),
+               color = col[5], alpha = 0.2, size = 0.5) +
     theme_bw() +
     labs(x = "P excretion (gP/m2/day)", y = "Production (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"),
+          axis.title = element_text(size = 8))
   p6 <-
   ggplot() +
-    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,2])),
-               color = col[6], alpha = 0.5)  +
+    geom_point(aes(y = (pred[,1,4]), x = (pred[,1,2])),
+               color = col[6], alpha = 0.2, size = 0.5)  +
     theme_bw() +
     labs(x = "P excretion (gP/m2/day)", y = "Herbivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p7 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,2])),
-               color = col[6], alpha = 0.5)  +
+    geom_point(aes(y = (pred[,1,5]), x = (pred[,1,2])),
+               color = col[6], alpha = 0.2, size = 0.5)  +
     theme_bw() +
     labs(x = "P excretion (gP/m2/day)", y = "Piscivory (gC/m2/day)") +
-    theme(panel.grid.minor = element_blank())
+    theme(panel.grid.minor = element_blank(), 
+          axis.title = element_text(size = 8))
   p8 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,4]), x = exp(pred[,1,3])),
-               color = col[8], alpha = 0.5)  +
+    geom_point(aes(y = (pred[,1,4]), x = (pred[,1,3])),
+               color = col[8], alpha = 0.2, size = 0.5)  +
     theme_bw() +
     labs(x = "Production (gC/m2/day)", y = "Herbivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   p9 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,3])),
-               color = col[9], alpha = 0.5)  +
+    geom_point(aes(y = (pred[,1,5]), x = (pred[,1,3])),
+               color = col[9], alpha = 0.2, size = 0.5)  +
     theme_bw() +
     labs(x = "Production (gC/m2/day)", y = "Piscivory (gC/m2/day)") +
-    theme(panel.grid.minor = element_blank())
+    theme(panel.grid.minor = element_blank(), 
+          axis.title = element_text(size = 8))
   p10 <-
     ggplot() +
-    geom_point(aes(y = exp(pred[,1,5]), x = exp(pred[,1,4])),
-               color = col[10], alpha = 0.5)  +
+    geom_point(aes(y = (pred[,1,5]), x = (pred[,1,4])),
+               color = col[10], alpha = 0.2, size = 0.5)  +
     theme_bw() +
     labs(x = "Herbivory (gC/m2/day)", y = "Piscivory (gC/m2/day)") +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))  
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))  
 
   rescor <- as.data.frame(rescor) %>% 
     rownames_to_column("pair")
@@ -1629,7 +1654,8 @@ make_corplot <- function(mod_mvfun_bm){
           axis.line.x = element_line(),
           axis.ticks = element_line()) +
     theme(panel.grid.minor = element_blank(),
-          axis.text = element_text(color = "black"))
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(size = 8))
   corr
   
   
@@ -1645,10 +1671,12 @@ make_corplot <- function(mod_mvfun_bm){
     p8 +
     p9 + p10 +
     plot_layout(design = layout) + 
-    plot_annotation(tag_levels = "a")
+    plot_annotation(tag_levels = "a") &
+    theme(plot.tag = element_text(face = 'bold'))
   
   ggsave("output/plots/fig2_corplot.png", plot, width = 11, height = 7)
-
+  ggsave("output/plots/fig2_corplot.pdf", plot, width = 8, height = 5)
+  
   # supplemental graph
   loc <- as.data.frame(loc) %>% 
     rownames_to_column("pair")
@@ -1704,9 +1732,10 @@ make_corplot <- function(mod_mvfun_bm){
   cor_site
   
   plot2 <- 
-  cor_loc + cor_site
+  cor_loc + cor_site 
   
   ggsave("output/plots/figSx_corplot.png", plot2, width = 8, height = 4)
+  ggsave("output/plots/figSx_corplot.pdf", plot2, width = 8, height = 4)
   
   
    }
