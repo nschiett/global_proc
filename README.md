@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Global drivers and vulnerability of coral reef fish functions
+# Biological trade-offs underpin coral reef ecosystem functioning
 
 <!-- badges: start -->
 
@@ -27,7 +27,7 @@ The directory contains:
     \- **functions\_plots.R**: Contains functions to create figures
     presenting the results.  
   - [:file\_folder: data](/data): Folder containing all data.
-  - [:file\_folder: text](/text): All files to create output documents
+  - [:file\_folder: output](/text): All output including results and figures
     for publication.
   - make.R File: Script to run the whole project.
 
@@ -139,4 +139,3 @@ sessionInfo()
 #> [143] numDeriv_2016.8-1.1       scatterplot3d_0.3-41     
 #> [145] shiny_1.4.0               dygraphs_1.1.1.6
 ```
-adding a line
