@@ -1,0 +1,61 @@
+response,term,Estimate,l-95% CI,u-95% CI,type
+log(N excretion),Intercept,-9.0693354125,-9.32828625,-8.80793675,fixed
+log(P excretion),Intercept,-11.61275045,-11.9676025,-11.2594975,fixed
+log(production),Intercept,-9.7902411675,-10.487805,-9.085888,fixed
+log(herbivory),Intercept,-10.742778985,-12.278955,-9.23380525,fixed
+log(piscivory),Intercept,-6.984606465,-8.70692575,-5.19933675,fixed
+log(N excretion),log(biomass),0.93158199575,0.929039925,0.93410605,fixed
+log(N excretion),sst,0.038870865425,0.02892283,0.0485313975,fixed
+log(P excretion),log(biomass),1.0513419725,1.04663975,1.05585025,fixed
+log(P excretion),sst,0.012156329447905,-0.0011370345,0.0255436025,fixed
+log(production),log(biomass),0.77155627825,0.7639218,0.779463375,fixed
+log(production),sst,0.080889031975,0.0545081475,0.106941975,fixed
+log(herbivory),log(biomass),0.9396871415,0.9234201,0.955764425,fixed
+log(herbivory),sst,0.149099465725,0.09274778,0.20583295,fixed
+log(piscivory),log(biomass),0.667861199,0.63635195,0.70060445,fixed
+log(piscivory),sst,-0.0457309768447775,-0.1114416,0.019307875,fixed
+log(N excretion),sigma,0.11941478275,0.117687,0.1211692,_
+log(P excretion),sigma,0.2232375595,0.22001275,0.226581175,_
+log(production),sigma,0.38646498725,0.380796325,0.39215265,_
+log(herbivory),sigma,0.784267536,0.77216745,0.796445175,_
+log(piscivory),sigma,1.0890441375,1.06566975,1.113542,_
+_,"rescor(logFn,logFp)",-0.163718405,-0.18481655,-0.14369015,_
+_,"rescor(logFn,logGc)",0.54178041975,0.52666065,0.5562407,_
+_,"rescor(logFp,logGc)",-0.54472107675,-0.559284475,-0.52994645,_
+_,"rescor(logFn,logIherb)",0.044277286595,0.023150055,0.06543047,_
+_,"rescor(logFp,logIherb)",-0.48979073775,-0.505483325,-0.472615475,_
+_,"rescor(logGc,logIherb)",0.2504052375,0.229383575,0.2706016,_
+_,"rescor(logFn,logIpisc)",-0.131225638975,-0.163685575,-0.0977525525,_
+_,"rescor(logFp,logIpisc)",0.2043878965,0.1720312,0.235641,_
+_,"rescor(logGc,logIpisc)",-0.08591460905,-0.117143825,-0.0549465275,_
+_,"rescor(logIherb,logIpisc)",-0.16319397825,-0.19363535,-0.1327586,_
+_,sd(logFn_Intercept),0.1005708422,0.08093001,0.1223443,random locality
+_,sd(logFp_Intercept),0.124621844275,0.100674825,0.1529926,random locality
+_,sd(logGc_Intercept),0.27818470325,0.230437175,0.3326504,random locality
+_,sd(logIherb_Intercept),0.60791373175,0.508022025,0.72721375,random locality
+_,sd(logIpisc_Intercept),0.636254864,0.52561305,0.764657475,random locality
+_,"cor(logFn_Intercept,logFp_Intercept)",-0.3102106905085,-0.541353875,-0.047301925,random locality
+_,"cor(logFn_Intercept,logGc_Intercept)",0.67243033625,0.50731305,0.8025517,random locality
+_,"cor(logFp_Intercept,logGc_Intercept)",-0.73671183325,-0.848517825,-0.583019325,random locality
+_,"cor(logFn_Intercept,logIherb_Intercept)",0.4039574546125,0.1657994,0.611089325,random locality
+_,"cor(logFp_Intercept,logIherb_Intercept)",-0.58677161,-0.74165465,-0.387539125,random locality
+_,"cor(logGc_Intercept,logIherb_Intercept)",0.5514342465,0.3560886,0.71099,random locality
+_,"cor(logFn_Intercept,logIpisc_Intercept)",-0.311821951135,-0.54164775,-0.0634883524999999,random locality
+_,"cor(logFp_Intercept,logIpisc_Intercept)",0.23586184610425,-0.02777418,0.4746071,random locality
+_,"cor(logGc_Intercept,logIpisc_Intercept)",-0.3479686373875,-0.55499075,-0.11049705,random locality
+_,"cor(logIherb_Intercept,logIpisc_Intercept)",-0.060840851215705,-0.3165751,0.1964163,random locality
+_,sd(logFn_Intercept),0.063859315425,0.0572208325,0.071120305,random sites
+_,sd(logFp_Intercept),0.0910316094,0.0800989175,0.102706025,random sites
+_,sd(logGc_Intercept),0.16931647475,0.150425525,0.1899962,random sites
+_,sd(logIherb_Intercept),0.37306895375,0.329982,0.41951375,random sites
+_,sd(logIpisc_Intercept),0.298304183,0.231732025,0.36288125,random sites
+_,"cor(logFn_Intercept,logFp_Intercept)",-0.21519530862,-0.373441375,-0.0587162925,random sites
+_,"cor(logFn_Intercept,logGc_Intercept)",0.79596959325,0.717452475,0.858395525,random sites
+_,"cor(logFp_Intercept,logGc_Intercept)",-0.59487049475,-0.695786075,-0.4808054,random sites
+_,"cor(logFn_Intercept,logIherb_Intercept)",0.0420139300534125,-0.115537225,0.1920808,random sites
+_,"cor(logFp_Intercept,logIherb_Intercept)",-0.630624313,-0.731342525,-0.512827225,random sites
+_,"cor(logGc_Intercept,logIherb_Intercept)",0.21594658571625,0.05958296,0.362985625,random sites
+_,"cor(logFn_Intercept,logIpisc_Intercept)",0.0358891101552325,-0.188617875,0.257534325,random sites
+_,"cor(logFp_Intercept,logIpisc_Intercept)",0.0560234165391575,-0.185477075,0.2808818,random sites
+_,"cor(logGc_Intercept,logIpisc_Intercept)",0.121066633326325,-0.10190925,0.345146375,random sites
+_,"cor(logIherb_Intercept,logIpisc_Intercept)",-0.4371869473,-0.627139075,-0.217992425,random sites
