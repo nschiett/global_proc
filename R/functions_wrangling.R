@@ -241,7 +241,6 @@ tfs <- group_by(tfish, studyName, region, locality, sites, area, transect_id, lo
   ) %>% ungroup()
 
 
-hum <- read.csv("data/humanPopulation.csv")
 geo <- read.csv("data/geogrVar.csv")
 
 tfs <- ungroup(tfs) %>% left_join(geo) 
