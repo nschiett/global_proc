@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Global drivers and vulnerability of coral reef fish functions
+# Biological trade-offs underpin coral reef ecosystem functioning
 
 <!-- badges: start -->
 
